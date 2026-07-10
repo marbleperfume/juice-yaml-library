@@ -19,12 +19,14 @@ InnateSummon: Summon.Water.Slime   # carried innately, not cast -- see Summons/W
 LootRegistry:
   - ItemKey: Item.Material.DrakolScale
     BaseDropRate: 40.0
+  - ItemKey: Item.Consumable.Bone.MonsterBone
+    BaseDropRate: 25.0   # closes the Shaman consumable-resource loop -- see Items/Item.Consumable.Bone.MonsterBone.yaml
 
 # --- Rank Profile (see Ranks/Rank_System.yaml for the contract) ---
 # Minimal authoring example: required tiers + one optional Mercenary Rank2.
 # Doctrine has no Level2/3, so all players see the Level1 pattern.
 RankProfile:
-  PartyResolution: Lowest
+  # Doctrine resolution is content/difficulty-scoped now -- see Ranks/Rank_System.yaml DoctrineResolution
   Adventurer:
     LootCurve: Global.LootScaling.CurveA
   Mercenary:

@@ -1,0 +1,28 @@
+Intent:
+  Narrative: >
+    Merryin -- mermaid and merman-based people who can float on land.
+    Excellent at lightning and water magic, and skilled with harpoons,
+    bows, and other ranged tools. Exceptional singers, to the point that
+    their "sirens" can be a public threat by luring people to their
+    deaths. Generally peaceful, but anti-Landwin and currently tense with
+    Landwin sympathizers over water pollution.
+Definition:
+  ParentCategory: Depth Dead
+  Subrace: Merryin
+  AttributeModifiers:   # placeholder values -- awaiting the original lore draft; tune freely
+    STRENGTH: 7
+    STAMINA: 8
+    SPEED: 10
+    CRAFT: 0
+    GATHER: 2
+    MAGICCAPACITY: 16
+    MAG: 14
+    MED: 9
+    DEXTERITY: 11
+    NTU: 9
+  Assets:
+    Mesh: Mesh.Race.Merryin
+    AnimSet: AnimSet.Merryin
+  Restrictions:
+    BannedTags: []
+  BonusSkills: []

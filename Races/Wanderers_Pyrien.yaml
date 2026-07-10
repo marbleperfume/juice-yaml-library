@@ -1,0 +1,35 @@
+Intent:
+  Narrative: >
+    Pyrien -- fire elves born in "Ra," a small, extremely exposed hot
+    section of the magic forests kept rainless by an overarching stone
+    structure held up by plant life; it isn't sun-drenched so much as
+    stripped of any tree cover to hide in. Ra's Pyrien rely on an
+    underground oasis to survive and develop pink or purple skin with age,
+    regardless of being born white- or dark-skinned. Rejected even by the
+    superstitious Soue shamans, they rarely survive long outside Ra and
+    naturally cluster there. Past a certain age, or after enough time
+    living in Ra, a Pyrien must survive the Ring of Fire -- a trial meant
+    to remind them they can die without constant preparation for battle.
+    Survivors enter a military structure and rarely deviate from its
+    chain-of-command; all Pyrien at the military level can conjure fire
+    weapons from thin air and can use almost anything as kindling.
+Definition:
+  ParentCategory: Wanderers
+  Subrace: Pyrien
+  AttributeModifiers:   # placeholder values -- awaiting the original lore draft; tune freely
+    STRENGTH: 10
+    STAMINA: 12
+    SPEED: 10
+    CRAFT: 0
+    GATHER: 0
+    MAGICCAPACITY: 16
+    MAG: 15
+    MED: 4
+    DEXTERITY: 9
+    NTU: 12   # Ring of Fire survivors drilled into a military chain-of-command
+  Assets:
+    Mesh: Mesh.Race.Pyrien
+    AnimSet: AnimSet.Pyrien
+  Restrictions:
+    BannedTags: []
+  BonusSkills: []

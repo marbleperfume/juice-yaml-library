@@ -1,0 +1,36 @@
+Intent:
+  Narrative: >
+    Heavenly Black Drakols -- the closest living relatives of the dragon
+    ancestors, ranked as the highest tier of non-dragon magic race. They
+    can morph into forms more dragonic than a Midnight's, are proficient
+    at nearly anything given enough time to adapt, and reproduce rarely
+    enough that they're treated as national treasures rather than royalty
+    or political figures. When they live within a society like Landwin's,
+    it's typically for personal gain. HBDs settled in enclosed societies
+    typically enslave Lower Drakols, who cannot fight back with a
+    reasonable chance of winning and don't share a spoken tongue with
+    them.
+Definition:
+  ParentCategory: Wanderers
+  Subrace: Heavenly Black Drakols
+  AttributeModifiers:   # placeholder values -- awaiting the original lore draft; tune freely
+    STRENGTH: 15
+    STAMINA: 15
+    SPEED: 13
+    CRAFT: 5
+    GATHER: 0
+    MAGICCAPACITY: 18
+    MAG: 16
+    MED: 12
+    DEXTERITY: 12
+    NTU: 14   # proficient at nearly anything given time to adapt
+  Assets:
+    Mesh: Mesh.Race.HeavenlyBlackDrakols
+    AnimSet: AnimSet.HeavenlyBlackDrakols
+  Restrictions:
+    BannedTags: []
+  BonusSkills: []
+NarrativeIntent: >
+  Sits above Wanderers_Lower_Drakols.yaml in the Wanderers hierarchy -- the
+  master/enslaved dynamic between the two subraces should inform any
+  shared NPC groups or quest content involving both.

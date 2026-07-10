@@ -2,23 +2,156 @@ Key: Combat.AggroSystem
 Description: >
   Canonical Focus/Aggro/Unfocus contract. Aggro determines which target an
   enemy's Doctrine AI casts at; Focus is the primary lever players have over
-  it. Player Strategy rank modifies the formula, tying enemy-targeting
-  behavior into the same rank pipeline as everything else -- see
-  Ranks/Rank_System.yaml.
+  it. Strategy rank and Mercenary rank are DELIBERATELY NOT part of this
+  numerical calculation -- they gate WHICH tools/classes/tests a player has
+  access to (see Ranks/Rank_System.yaml, Classes/Class_Prerequisites.yaml),
+  not the moment-to-moment targeting math. Mixing progression rank into a
+  live combat formula would be a confusing, invisible signal to the player;
+  Proximity and Focus are both things a player can SEE and act on mid-fight.
+Universality: >
+  This contract applies to ANY enemy carrying a RankProfile.Doctrine block
+  -- not only Doctrine-test fixtures like NPC.Boss.Test.MechaGolem.yaml.
+  Any regular enemy with a Doctrine tier resolves targeting the same way.
+CurrentTargetExemption: >
+  FocusRedirectRule only ever evaluates NON-current-target scores -- it
+  answers "should the enemy SWITCH targets," not "should it keep hitting
+  who it already has." A Tank generating huge Proximity+Focus while
+  already being the current target triggers nothing, because there is no
+  redirect to check for someone who's already the target. This is why Tank
+  Focus generation was never the risk in this system -- the risk is
+  specifically a NON-current-target's score crossing the threshold.
 AggroFormula: >
   Aggro(target) = (ProximityScore * ProximityWeight)
                 + (FocusScore * FocusWeight)
-                + (StrategyRankModifier * StrategyWeight)
   Enemy Doctrine AI casts at / redirects toward whichever target currently
-  has the highest Aggro score.
-DefaultWeights: {ProximityWeight: 0.3, FocusWeight: 0.5, StrategyWeight: 0.2}
+  has the highest Aggro score. Proximity ALWAYS participates, at every
+  Doctrine tier, with no mode that drops it -- a consistent, visible rule
+  the player can always reason about, rather than something that silently
+  changes shape at higher tiers.
+DefaultWeights: {ProximityWeight: 0.4, FocusWeight: 0.6}
+FocusNamingNote: >
+  Called "Focus" specifically because building it is what makes the enemy
+  FOCUS on the player. It is a real, separate lever from steady-state
+  positioning -- but it never fully replaces Proximity in the calculation;
+  it just carries more weight (0.6 vs 0.4).
 FocusRedirectRule: >
-  If a non-current-target's Aggro score crosses the enemy's
-  FocusRedirectThreshold (declared per-enemy under
-  RankProfile.Doctrine.<Tier>.FocusRedirectThreshold), the enemy DROPS its
-  current cast and retargets the new highest-Aggro target instead of
-  finishing the cast. This is a genuine self-interrupt, not just a
-  threat-table swap.
+  If a non-current-target's blended Aggro score (Proximity + Focus, same
+  formula at every tier) crosses RankProfile.Doctrine.<Tier>.FocusRedirectThreshold
+  (worked example: NPC.Boss.Test.MechaGolem.yaml), the enemy DROPS its
+  current cast and retargets that player instead of finishing the cast --
+  a genuine self-interrupt, not just a threat-table swap. What changes
+  between Doctrine tiers is ONLY the threshold's forgiveness -- Level1 has
+  no threshold at all (no redirect possible), Level2 uses a generous
+  threshold, Level3 uses a harsher (lower) one. The formula itself never
+  changes shape.
+ChanneledCastPenalty: >
+  A skill tagged Tag.Mechanic.Channeled -- the mechanic exists primarily on
+  unique/stronger Mercenary Rank 2+ skills (worked examples:
+  Skill.Combat.Shaman.SpiritChannel.yaml, and Madolt Warrior's own Rank2/3
+  aggressive GCDs -- see TankRoleExemption below) -- LOCKS the caster's
+  Proximity contribution to its value at cast-start for the skill's full
+  duration. The caster cannot kite away from the Proximity risk they
+  committed to when the channel began, unlike an instant/short hard-cast
+  thrown from range and then immediately retreated from.
+FocusTimingRule: >
+  Every skill declares a FLAT FocusGeneration value (a house-style
+  requirement -- see individual Skill files). For a Channeled skill NOT
+  covered by TankRoleExemption, that full Focus value is applied at CAST
+  START, not on cast completion. This is deliberate: it forces the
+  redirect check to happen as early as possible in the channel, so a
+  player who started channeling too close to the boss finds out
+  immediately (and can be punished for the remainder of the channel while
+  still locked in place) rather than getting to "sneak" a burst in and
+  reposition before any consequence lands. The lesson this teaches is
+  "reposition BEFORE you commit to a Channeled cast," not "during or after."
+TankRoleExemption: >
+  A Channeled skill tagged RoleMechanic: Tank (worked example: Madolt
+  Warrior's Rank2/3 aggressive GCDs -- Skill.Combat.Madolt.OverloadThrust,
+  ArcDetonation, ECWeaponDischargeControl, ArcOverload -- and the
+  Electron Guard / EC Shield Discharge combo more generally) is EXEMPT from
+  FocusTimingRule's cast-start front-loading. There is no failure case to
+  punish sooner: per CurrentTargetExemption, the Tank generating
+  Proximity+Focus on themselves while already the current target changes
+  nothing, so front-loading the Focus application would just be
+  ceremony -- these skills keep normal (cast-completion) Focus timing.
+  This is what "channeling is unfavorable to the focus logic" is NOT
+  describing for a Tank -- for a Tank, the same Proximity+Focus profile is
+  the intended job, not a mistake being made.
+FlatFocusConvention: >
+  Every skill's FocusGeneration is a fixed, declared number (not derived
+  from potency or scaled dynamically) -- keeps the Aggro formula legible
+  and lets Focus be tuned independently of damage balance.
+WeakestLinkPitfall: >
+  The real risk this system creates: an inexperienced or careless player
+  (most often a Healer, the most volatile role -- their burst/emergency
+  tools spike Focus at exactly the moments they're already exposed) can
+  force the boss to target them simply by standing too close while
+  spending Focus, regardless of whether that was their intent. This is a
+  Proximity-plus-Focus mistake a player can genuinely make, not a flaw
+  where Focus alone decides everything -- but it is still real. The
+  primary mitigation is ACCESS GATING, not a math safety net: the classes
+  most able to generate this problem (Shaman, via Spirit Channel) are
+  locked behind Mercenary Rank 2+ and their own tests (see
+  Classes/Class_Prerequisites.yaml), specifically so a player is not
+  handed the tool to hurt the party this way before they've demonstrated
+  they understand positioning.
+BossMechanicBoundary: >
+  Focus/Aggro/Unfocus operate entirely within an enemy's NORMAL AI
+  decision-making. None of this system can override a SCRIPTED boss
+  mechanic (a forced target-swap phase, an unavoidable raid-wide, a
+  "must be tanked by X" scripted moment) -- Unfocus and the Focus
+  redirect are targeting-logic and potency levers, not mechanic-canceling
+  tools.
+NotTrueEnmityGrabbers: >
+  Because a large enough Proximity+Focus combination can always cross the
+  threshold (see FocusRedirectRule), Tanks are NOT true enmity grabbers by
+  default the way a classic MMO taunt guarantees -- aggro is not a
+  lockable, permanent hold. This is a deliberate difficulty choice: it
+  makes the encounter harder to guarantee who gets hit, but the game is
+  built so an off-tank hit does not kill quickly (see
+  Combat/EncounterDamageCurve.yaml's front-loaded, forgiving early-fight
+  damage) -- a player getting "lovetapped" by a stray redirect is a real
+  risk to manage, not an instant death sentence.
+WhyMeleeDPSDoesNotBreakTanking: >
+  CORRECTED -- an earlier draft of this note claimed melee's constant high
+  Proximity "doesn't change anything" because it's already priced in. That
+  was wrong: melee DPS sit CLOSER to the redirect threshold than ranged DPS
+  at all times, before Focus is even added, precisely because Proximity is
+  a real number in the formula, not a flag. A melee DPS using a Rank 2+
+  Channeled skill (FocusTimingRule) is genuinely MORE likely to cross the
+  threshold than a ranged class using an equivalent-Focus skill from
+  range -- this is not an edge case to explain away, it is the actual
+  shape of the system. The correct conclusion: melee DPS depend on the
+  Tank's Unfocus-driven threshold-raising (UnfocusTargetingEffect) MORE
+  than ranged classes do, which is why a dedicated Tank matters MORE in a
+  melee-heavy party, not less. The system does not prevent a melee DPS
+  from "taking a turn" pulling aggro this way -- it just costs them
+  correspondingly more (both in redirect risk and in lacking a Tank's
+  survivability if it lands), so it is a bad trade by the numbers rather
+  than something the game blocks outright.
+DeliberateTauntException: >
+  The passive Proximity+Focus formula is not the only way to force a
+  redirect. Skill.Combat.Madolt.ElectronPivot.yaml (Rank 2 skill-quest
+  reward) is a GUARANTEED, instant, controlled taunt -- when an ally makes
+  a positioning/mechanic mistake and is about to eat a hard-hitting
+  incoming attack, the Tank can pivot the enemy's attention onto themselves
+  on demand, bypassing the formula entirely for that one cast. This is
+  "taunt logic with Focus done properly": the safety comes from real
+  controls (30s cooldown, Rank 2 gate, single-target) rather than from
+  trying to out-design a player who deliberately withholds it to grief a
+  teammate -- that's a trust problem, not a mechanic to solve for.
+StrategyRank3HealerTargeting: >
+  At Strategy Rank 3, certain enemy Doctrine/AI profiles begin actively
+  weighting Healer targeting -- not a special case bolted onto the
+  formula, but an emergent consequence of it: Healer burst tools (Triage
+  Override's hard casts, Emergent Light, Magic Leech) generate real Focus,
+  and Strategy Rank 3 content is exactly the tier where enemies are tuned
+  to notice. This is intended to require BOTH sides of the system at once:
+  the Tank actively containing Focus (Unfocus stacking, and now
+  DeliberateTauntException's ElectronPivot for the moments Unfocus alone
+  isn't enough) and the Healer exercising self-control over when/where
+  they commit to a hard cast, rather than either side solving it alone.
+  See Ranks/Strategy_Unlocks.yaml.
 PlayerAdvantageWindow: >
   Dropping a cast this way opens a brief window where the enemy isn't
   casting at anyone -- a free action window for whoever isn't the new
@@ -29,10 +162,35 @@ PlayerAdvantageWindow: >
 UnfocusStatus: >
   Applied by Tank-flavored skills (see Passives/Unfocus.yaml). Each stack
   reduces the potency of the enemy's HIGHER Doctrine-tier skills
-  specifically -- it does not touch baseline/Level1 skills. This is what
-  lets a Tank use Aggro-holding to blunt an enemy's escalated kit rather
-  than only its target selection.
+  specifically -- it does not touch baseline/Level1 skills.
+UnfocusRealPurpose: >
+  Given NotTrueEnmityGrabbers above, Unfocus's job is NOT "guarantee the
+  Tank keeps aggro forever" -- it's to generate Unfocus onto HARDER foes
+  (higher Doctrine tiers) so the PARTY gets its initial setup or position
+  established: base classes, especially at Mercenary Rank 1, have almost
+  no setup tools of their own yet, so a smoothed opening is what Unfocus
+  actually buys, not a standing guarantee for the whole fight.
+UnfocusTargetingEffect: >
+  Unfocus is not purely a potency debuff -- stacks also raise the
+  effective FocusRedirectThreshold the AI checks against (see
+  Passives/Unfocus.yaml TargetingLogicEffect), making the enemy less
+  likely to redirect onto a squishier role's incidental Proximity+Focus
+  combination while stacks are active. This is the concrete mechanism by
+  which a Tank protects the party from WeakestLinkPitfall, even without
+  being a true enmity grabber -- and it can still be overwhelmed by a
+  large enough combination (e.g. ChanneledCastPenalty stacking with
+  repeated bursts at close range), which is intended, not a bug.
 NoteOnRoleMechanic: >
   For the Tank role, this entire system (Focus generation, Aggro
   management, Unfocus application) IS the Tank RoleMechanic -- see
   Ranks/RoleMechanics.yaml. It is not a separate bolt-on system.
+InstanceAssessment: >
+  How Tank RoleMechanic competency is actually GRADED (used by the
+  RoleMechanicUse check on Quest.Test.Mercenary.Rank2/3.Tank), rather than
+  just inferred from a pass/fail outcome. Two signals: (1) PLAYER PROXIMITY
+  -- is the Tank actually within range to be the live aggro target, not just
+  nominally "tanking" from elsewhere; (2) CROSS-ROLE CAST TELEMETRY -- are
+  other roles' casts landing against the enemy's baseline (Level1) kit as
+  expected, or is its escalated Level2/3 kit still firing at full potency,
+  which would mean Unfocus stacks aren't actually being maintained. Both
+  signals are observable without asking the player to self-report.

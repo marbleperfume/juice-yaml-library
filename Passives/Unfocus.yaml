@@ -13,10 +13,24 @@ AppliesTo: Enemy
 Effect:
   PotencyReductionPerStack: 0.08   # -8% potency per stack
   AffectsTiers: [Level2, Level3]   # baseline/Level1 skills are unaffected
+TargetingLogicEffect:
+  Description: >
+    Each stack also raises the effective FocusRedirectThreshold the enemy
+    checks a non-Tank ally's Proximity+Focus score against (see
+    Combat/AggroSystem.yaml FocusRedirectRule / UnfocusTargetingEffect) --
+    Unfocus doesn't just blunt potency, it makes the AI less reactive to a
+    squishier role's Proximity+Focus combination. This is what gives
+    Unfocus real value even though Tanks are NOT true enmity grabbers by
+    default (Combat/AggroSystem.yaml NotTrueEnmityGrabbers) -- it can't
+    lock aggro, but it can raise the bar. A large enough combination (e.g.
+    two ChanneledCastPenalty-locked bursts at close range) can still
+    exceed even a maxed threshold -- intended, not a bug.
+  RedirectThresholdIncreasePerStack: 0.05   # effective FocusRedirectThreshold felt by the AI rises 5% per stack while Unfocus is active
+  DoesNotOverrideScriptedMechanics: true    # see Combat/AggroSystem.yaml BossMechanicBoundary
 GameplayGoal: >
-  Lets a Tank blunt an enemy's escalated (Level2/Level3) Doctrine kit while
-  holding Aggro, without directly reducing the enemy's base difficulty for
-  everyone else in the encounter.
+  Lets a Tank blunt an enemy's escalated (Level2/Level3) Doctrine kit and
+  raise its redirect threshold while holding Aggro, without directly
+  reducing the enemy's base difficulty for everyone else in the encounter.
 NarrativeIntent: >
   The enemy is being needled/distracted out of its stronger techniques, not
   losing raw power -- represented as stacking Unfocus rather than a flat

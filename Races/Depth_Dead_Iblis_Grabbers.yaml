@@ -1,0 +1,29 @@
+Intent:
+  Narrative: >
+    Iblis Grabbers -- octopus and squid humanoids with variable arm
+    growths; most have developed away from looking like deformed Landwin,
+    though mutated-looking individuals still occur. Highly adaptive and
+    intelligent, but voracious eaters that stick close to the water. In a
+    fight they're stealth melee hunters that blend into any environment,
+    backed by strong paralysis, poison, and restraint abilities tied to
+    their tentacle types.
+Definition:
+  ParentCategory: Depth Dead
+  Subrace: Iblis Grabbers
+  AttributeModifiers:   # placeholder values -- awaiting the original lore draft; tune freely
+    STRENGTH: 10
+    STAMINA: 9
+    SPEED: 9
+    CRAFT: 2
+    GATHER: 4
+    MAGICCAPACITY: 10
+    MAG: 8
+    MED: 5
+    DEXTERITY: 14
+    NTU: 12   # highly adaptive and intelligent stealth hunters
+  Assets:
+    Mesh: Mesh.Race.IblisGrabbers
+    AnimSet: AnimSet.IblisGrabbers
+  Restrictions:
+    BannedTags: []
+  BonusSkills: []

@@ -1,9 +1,14 @@
 Key: Ranks.RoleMechanics
 Description: >
-  RoleMechanic = the skill/resource/stance unique to a Role, tested during
-  Mercenary rank-up (see Ranks/Mercenary_Unlocks.yaml). Distinct from
-  ClassMechanic (Classes/ClassMechanics.yaml), which is per-Class within a
-  Role rather than shared across the whole Role.
+  RoleMechanic = the skill/resource/stance shared across an entire Role,
+  tied directly to ROLE EXECUTION -- what the role's job actually is in an
+  encounter (aggro-holding, healing/support, sustained damage). Tested
+  during Mercenary rank-up (see Ranks/Mercenary_Unlocks.yaml). Distinct from
+  ClassMechanic (Classes/ClassMechanics.yaml), which is gauge-driven and
+  per-Class -- it's the class's own path to its single most important
+  offensive/defensive/utility tool (e.g. Madolt Warrior's Charge Gauge
+  culminating in EC Shield Discharge's block-burst; Elementalist's
+  ElementalConvergence gauge), not something shared across a Role.
 Tank:
   Definition: >
     Focus generation + Aggro management + Unfocus application -- see
@@ -12,21 +17,64 @@ Tank:
     letting the Tank hold an enemy's attention while blunting its escalated
     kit rather than its baseline attacks.
   ExampleSkill: Skill.Combat.Shield.Bash
+  InstanceAssessment: >
+    Competency is graded objectively, not just by outcome: instance
+    assessments track PLAYER PROXIMITY (is the Tank actually in range to be
+    the aggro target, not just nominally "tanking" from a distance) and
+    CROSS-ROLE CAST TELEMETRY (are DPS/Healer casts landing on the enemy's
+    baseline kit as expected, or is the enemy's escalated Level2/3 kit still
+    firing at full potency -- which would mean Unfocus isn't actually being
+    maintained). See Combat/AggroSystem.yaml InstanceAssessment.
 Healer:
   Definition: >
-    Healing output under genuine HP pressure. Unlike Tank/DPS, a Healer's
-    RoleMechanic can't be exercised on demand -- it only manifests once the
-    party (or the Healer) is at critical HP / risk of losing, since a
-    Healer otherwise spends most of an encounter buffing or dealing damage.
-    This is why the Healer Mercenary test
-    (Quest.Test.Mercenary.Rank2.Healer) is structured as a buff/damage
-    phase followed by a forced crisis, rather than a continuous check like
-    the Tank/DPS Golem test.
-  ExampleSkill: null   # TBD -- no healer skills authored yet
+    Healers are DPS/support sub-archetypes (Elementalist, Shaman -- there is
+    no dedicated "Healer class"), which is deliberate: FFXIV's non-White-Mage
+    healers accumulated redundant kit bloat in dungeons/raids, carrying a
+    full healing toolkit in parallel with their damage kit at all times.
+    Here the kit is NOT duplicated -- most buttons are reused, not doubled.
+    Day-to-day, the RoleMechanic is proactive barrier/HoT/buff-debuff play
+    via Combat/DelayedStatus.yaml (armed with a visible pending indicator,
+    auto-resolving on its own trigger condition -- no verbal tank/healer
+    handshake, no back-to-back recast loop), plus weak attack variants (see
+    Skills/Skill.Combat.Elementalist.EmberLance.yaml) and weak HoTs
+    (TidalMending.yaml) that are the efficient choice while the team is
+    stable. This proactive kit is named "GeneralUtility" in
+    Combat/UtilityCostModel.yaml, distinct from the REACTIVE
+    "MercRank2Utility" tier (CC/interrupts answering a specific Doctrine
+    mechanic, worked example: the Rank 2 Tank test's CastBarTiming check)
+    -- one is a routine, budgetable cost, the other is zero unless the
+    encounter actually calls for it. The RoleMechanic's real payoff -- Triage Override
+    (Passives/TriageOverride.yaml) -- can't be exercised on demand: it
+    triggers only at genuine party-crisis HP, and when it does the ENTIRE
+    kit loses its offensive/support qualities and each skill is replaced by
+    a stronger, hard-cast healing-equivalent, crossing element into Water
+    or Light rather than staying in an offense element like Fire
+    (EmberLance -> TidalSurge),
+    while Resurrection (TidalRevival.yaml) becomes castable for the first
+    time. This is why the Healer Mercenary test
+    (Quest.Test.Mercenary.Rank2.Healer) is structured as a support phase
+    followed by a forced crisis, rather than a continuous check like the
+    Tank/DPS Golem test.
+  ExampleSkill: Skill.Combat.Elementalist.EmergentLight
+  SecondSubArchetype: >
+    Shaman (Classes/Shaman.yaml) is ALSO a Healer, via a distinct paradigm:
+    it protects the party through CC/curse-based threat denial (Hex stacks,
+    Bone Spirit's interrupt catch) rather than direct healing -- unusual for
+    what its kit otherwise looks like (a ranged burst-damage silhouette). Its
+    Triage Override integration is designed: Leech Life -> Magic Leech
+    (blood/essence self-heal) and Spirit Cleansing (cleanse, not a revive)
+    are its crisis tools, distinct from Elementalist's direct-heal pair.
 DPS:
   Definition: >
-    Maximum rotation uptime -- sustained optimal skill sequencing rather
-    than a resource/stance. Reuses the same Mecha Golem test shape as Tank
-    (RoleMechanic/ClassMechanic/timing checks against the Golem's cast
-    bar), swapping in rotation-uptime as the RoleMechanic being graded.
-  ExampleSkill: null   # TBD -- no worked example authored yet
+    Sustained rotation uptime plus correctly-timed interrupt/dodge cycles --
+    the most linear RoleMechanic to grade, but with no safety net: DPS has
+    neither Tank's Unfocus (no role tool blunts the enemy's escalated kit)
+    nor preemptive CC (that's a Strategy-rank Tactical item, a different
+    pillar entirely -- see Items/Item.Tactical.*.yaml), so AoE engagement
+    without one is a real risk rather than a routine choice. At Rank 3 the
+    same gap gets worse: the enemy's punish timing is periodic rather than
+    random, actively interrupting rotation-on-cooldown play, and a DPS's
+    thinner effective HP means a missed read is lethal rather than just a
+    damage-taken cost. This forces weaving Rank 2/3 utility skills in at the
+    moments the encounter demands, not on a fixed 2-minute burst cycle.
+  ExampleSkill: null   # TBD -- no dedicated DPS class kit authored yet; see Quests/Test.Mercenary.Rank2/3.DPS for the test design this definition drives

@@ -1,0 +1,31 @@
+Intent:
+  Narrative: >
+    Nyanto -- highly agile feline people capable of covering long
+    distances in a dash and climbing walls. They rely on small hunts and
+    struggle against bigger or armored foes, though relationships with
+    Landwin have accelerated their adaptation to weapon styles that work
+    around that weakness.
+Definition:
+  ParentCategory: Noct Aurorus
+  Subrace: Nyanto
+  AttributeModifiers:   # placeholder values -- awaiting the original lore draft; tune freely
+    STRENGTH: 7
+    STAMINA: 8
+    SPEED: 16
+    CRAFT: 0
+    GATHER: 3
+    MAGICCAPACITY: 8
+    MAG: 6
+    MED: 6
+    DEXTERITY: 14
+    NTU: 13
+  Assets:
+    Mesh: Mesh.Race.Nyanto
+    AnimSet: AnimSet.Nyanto
+  Restrictions:
+    BannedTags: []
+  BonusSkills: []
+NarrativeIntent: >
+  Soft rivalry with Rawrotin (Linfree_Rawrotin.yaml) -- both are fast,
+  Landwin-adjacent races filling similar niches by different means (raw
+  agility vs. marking/sustained pressure).

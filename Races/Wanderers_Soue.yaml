@@ -1,0 +1,43 @@
+Intent:
+  Narrative: >
+    Soue -- isolative elves within the Wanderers parent category, typically
+    light-skinned forest dwellers who deal daily with the dangers of the
+    magic forest. That natural defense against the forest's hazards is the
+    in-world reason the land has never been worth invading. Soue are
+    naturally stealthy, have exceptional hearing, and are masters of magic.
+    Their isolation from other races is the in-world reason the bone/spirit
+    Shaman tradition (Classes/Shaman.yaml) belongs to them specifically: it
+    developed apart from other peoples' martial or arcane traditions, not
+    adapted from one. They rely on trading with other races to sustain the
+    forest after natural disasters, and currently train "Honey Badgers" --
+    Soue who handle those trades and deliberately don't assimilate into the
+    societies they trade with. Dark-skinned Soue are a separate branch:
+    canopy dwellers who don't share a plane with the forest-floor Soue,
+    follow an entirely different religion, and rarely associate with other
+    races except in combat or to address what they see as worldly threats
+    to their canopy -- which they consider more sensitive than the forest
+    below.
+Definition:
+  ParentCategory: Wanderers
+  Subrace: Soue
+  AttributeModifiers:
+    STRENGTH: 8
+    STAMINA: 9
+    SPEED: 12
+    CRAFT: 0
+    GATHER: 0
+    MAGICCAPACITY: 14
+    MAG: 12
+    MED: 8
+    DEXTERITY: 11
+    NTU: 12   # forest-honed hearing and stealth read as sharp reactive awareness
+  Assets:
+    Mesh: Mesh.Race.Soue
+    AnimSet: AnimSet.Soue
+  Restrictions:
+    BannedTags: []
+  BonusSkills: []
+NarrativeIntent: >
+  Race spec backing Classes/Shaman.yaml's Definition.Race restriction --
+  Shaman is the only class gated to this subrace specifically, per the
+  isolative-elves lore above.

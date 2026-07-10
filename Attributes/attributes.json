@@ -21,7 +21,7 @@
     },
     "MAGICCAPACITY": {
         "default": "100",
-        "intent": "Resource pool for casting abilities."
+        "intent": "Resource pool for casting abilities. 1 point = 100 mana (MaxMana = MAGICCAPACITY * 100). See Combat/ManaEconomy.yaml for regen rules and Combat/ManaflowSystem.yaml for the caster mana-recovery skill contract."
     },
     "MAG": {
         "default": "10",
@@ -34,5 +34,9 @@
     "DEXTERITY": {
         "default": "2",
         "intent": "Controls critical damage and is the damage modifier for ranged physical attacks."
+    },
+    "NTU": {
+        "default": "5",
+        "intent": "Intuition. Governs how many scripted 'correct response' prompts get surfaced to the player during Mercenary Rank 2+ encounters -- a deliberate middle ground between a purely manual reaction and auto-battle: the game highlights the right button, the player still has to press it. See Combat/IntuitionPrompts.yaml."
     }
 }

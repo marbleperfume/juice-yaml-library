@@ -29,19 +29,32 @@ Rank2:
   TestQuest:
     Tank: Quest.Test.Mercenary.Rank2.Tank
     Healer: Quest.Test.Mercenary.Rank2.Healer
-    DPS: null   # TBD -- reuses the Tank Golem-test shape, RoleMechanic swapped to Maximum Rotation Uptime
+    DPS: Quest.Test.Mercenary.Rank2.DPS   # linear rotation + interrupt-cycle check, no Unfocus/preemptive-CC safety net -- see Ranks/RoleMechanics.yaml DPS
   SyncRetention: 0.5
   Unlocks: {Skills: [], Classes: []}   # Promoted classes gated via Classes/Class_Prerequisites.yaml instead
 Rank3:
   TestQuest:
     Tank: Quest.Test.Mercenary.Rank3.Tank
     Healer: null   # TBD -- not yet authored
-    DPS: null      # TBD -- not yet authored
+    DPS: Quest.Test.Mercenary.Rank3.DPS   # same gap as Rank2 but worse: periodic (not random) punish timing, thinner effective HP
   SyncRetention: 0.75
   Unlocks: {Skills: [], Classes: []}   # Special classes gated via Classes/Class_Prerequisites.yaml instead
-NoPotencyRule: >
-  Nothing in Unlocks may raise damage/healing numbers directly; unlocked
-  skills must be utility/counterplay (interrupts, mitigations, mobility).
+PotencyRule: >
+  (Formerly "NoPotencyRule" -- the "no potency" wording was a deliberate
+  exaggeration.) Rank and gear MAY add potency; the real constraint is that
+  no MAJOR DPS swing may decide an encounter. Higher ranks earn damage through
+  OPPORTUNITY, not flat power -- longer-cast, risk-gated, conditional skills
+  hit harder but carry no guarantee (variance, not a stat bump). A Rank 1
+  player stays COMPARABLE in raw damage and must never feel underwhelmed;
+  higher ranks win on consistency, control (interrupts/stuns), and capturing
+  openings. Rank unlocks grant CAPABILITY, gear carries the NUMBERS: ranking
+  up with a placeholder weapon adds zero potency; the payoff only exists when
+  a rank capability (e.g. Bonus Strike) meets a stable special weapon.
+  Encounter damage is front-loaded by enemy HP% (see
+  Combat/EncounterDamageCurve.yaml): a target above 50% HP takes +25% (fast,
+  forgiving opening, all ranks alike); at/below 50% HP damage returns to
+  baseline (slower, harder phases where higher-rank control matters but
+  absolute rank gaps stay small).
 RacialSummonException: >
   Summons count as "extra buttons" and are normally gated the same as
   Skills/Classes above -- EXCEPT summons with a RacialAttachment field (see

@@ -1,0 +1,32 @@
+Intent:
+  Narrative: >
+    Harvesters -- insect humanoids descended from a single ancestor
+    species with ant, butterfly, and moth traits at a larger scale, since
+    downsized into three phenotypes. Builders (ant-likes) dig complex
+    underground tunnels and are naturally very strong. Flutters
+    (butterfly-likes) are mistaken for fairies or magical beings, though
+    most of what they do is harvest fruit, honey, and flower nectar.
+    Nightflies (moth-likes, colloquially "pests") do similar work at
+    night and feed off magic-rich insects. The stat block below is a
+    generalist baseline across all three phenotypes -- split it out per
+    phenotype later if one of them needs its own kit.
+Definition:
+  ParentCategory: Linfree
+  Subrace: Harvesters
+  AttributeModifiers:   # placeholder values -- awaiting the original lore draft; tune freely
+    STRENGTH: 9
+    STAMINA: 10
+    SPEED: 10
+    CRAFT: 2
+    GATHER: 10
+    MAGICCAPACITY: 10
+    MAG: 7
+    MED: 6
+    DEXTERITY: 7
+    NTU: 6
+  Assets:
+    Mesh: Mesh.Race.Harvesters
+    AnimSet: AnimSet.Harvesters
+  Restrictions:
+    BannedTags: []
+  BonusSkills: []

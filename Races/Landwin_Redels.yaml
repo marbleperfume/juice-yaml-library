@@ -1,0 +1,26 @@
+Intent:
+  Narrative: >
+    Redels -- the poorest Landwin subrace, pushed into whatever work
+    nobody else wants. Their GATHER attribute should outclass every other
+    Landwin subrace to reflect this, at the cost of lower base stats
+    everywhere else.
+Definition:
+  ParentCategory: Landwin
+  Subrace: Redels
+  AttributeModifiers:   # placeholder values -- awaiting the original lore draft; tune freely
+    STRENGTH: 7
+    STAMINA: 8
+    SPEED: 8
+    CRAFT: 3
+    GATHER: 9
+    MAGICCAPACITY: 6
+    MAG: 5
+    MED: 5
+    DEXTERITY: 5
+    NTU: 9   # street-survival instinct from being handed every job nobody else wants
+  Assets:
+    Mesh: Mesh.Race.Redels
+    AnimSet: AnimSet.Redels
+  Restrictions:
+    BannedTags: []
+  BonusSkills: []

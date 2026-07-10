@@ -28,7 +28,7 @@ MechanicScaling:
 # Ranks/Strategy_Unlocks.yaml TestEncounterConstraints). This file only
 # needs Level1.
 RankProfile:
-  PartyResolution: Lowest
+  # Doctrine resolution is content/difficulty-scoped now -- see Ranks/Rank_System.yaml DoctrineResolution
   Adventurer:
     LootCurve: null
   Mercenary:

@@ -17,7 +17,7 @@ LootRegistry: []
 # --- Rank Profile (see Ranks/Rank_System.yaml) ---
 # Minimal authoring example, same shape as NPC.Enemy.Drakol.Lower.yaml.
 RankProfile:
-  PartyResolution: Lowest
+  # Doctrine resolution is content/difficulty-scoped now -- see Ranks/Rank_System.yaml DoctrineResolution
   Adventurer:
     LootCurve: null
   Mercenary:

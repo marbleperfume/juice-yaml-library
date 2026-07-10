@@ -9,11 +9,16 @@ Action: Custom
 RequiresFlag: Quest.Test.Mercenary.Rank2.Tank.Cleared
 TestConfig:
   ForcedDoctrineLevel: Level3
+  SoloOnly: true            # Rank 3 is solo-only by design
+  ItemsAllowed: true        # the Golem has broad immunities + specific instance weaknesses to exploit with items
+  RequiresFullClear: true
+  FailureMode: FullRetry
   Checks:
     - RoleMechanicUse
     - ClassMechanicUse
     - CastBarTiming
     - StabilityContestAvoidance
+    - GuaranteedLethalInvuln   # survive the mathed-death mechanic with true invulnerability (mitigation fails)
 Reward:
   TitleID: null
   ItemID: null

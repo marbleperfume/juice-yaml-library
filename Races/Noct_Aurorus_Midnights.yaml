@@ -1,0 +1,30 @@
+Intent:
+  Narrative: >
+    Midnights -- dragonic-origin race with a mostly Landwin build. Armored
+    forearms and ankles combine with dragon claws and adapted
+    drago-humanoid feet to make them exceptional unarmed fighters,
+    comparable to jaguars in how they maul targets. Unlike other dragonic
+    races they are wingless, though they keep a tail. They struggle with
+    science and tend to linger in urban areas to take advantage of local
+    conveniences -- arguably the reason they've drifted from their
+    dragonic brethren.
+Definition:
+  ParentCategory: Noct Aurorus
+  Subrace: Midnights
+  AttributeModifiers:   # placeholder values -- awaiting the original lore draft; tune freely
+    STRENGTH: 14
+    STAMINA: 12
+    SPEED: 12
+    CRAFT: 1
+    GATHER: 0
+    MAGICCAPACITY: 8
+    MAG: 7
+    MED: 6
+    DEXTERITY: 13
+    NTU: 13   # jaguar-like predatory instinct
+  Assets:
+    Mesh: Mesh.Race.Midnights
+    AnimSet: AnimSet.Midnights
+  Restrictions:
+    BannedTags: []
+  BonusSkills: []

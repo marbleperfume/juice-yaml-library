@@ -9,9 +9,10 @@ Action: Custom
 RequiresFlag: SkillQuest.Adafold.AllCleared   # aggregate flag: every Adafold skill quest cleared (see Mercenary_Unlocks.yaml SkillQuestGate) -- not set by a single quest step
 TestConfig:
   ForcedDoctrineLevel: Level2
+  FailureMode: FullRetry    # the broad Merc test is a full-clear integration exam; the individual per-skill quests are the forgiving, isolated practice
   Checks:
     - RoleMechanicUse       # must land Shield Bash (or another Tank class's equivalent) successfully
-    - ClassMechanicUse      # must use Adafold's Bulwark Gauge
+    - ClassMechanicUse      # must use the class ClassMechanic (Adafold Bulwark Gauge / Madolt Warrior Charge Gauge)
     - CastBarTiming         # must correctly react to whichever of the 3 random Golem casts occurs
 Reward:
   TitleID: null

@@ -298,6 +298,58 @@ Resolved (see git history / file contents for the actual fix):
   completeness -- these are one-off scripted story fights, not repeatable
   rank trials.
 
+- **Madolt Warrior class design (full worked class, 6-goal build)** — the
+  first end-to-end class kit + progression, designed interactively then
+  written in one pass. **Goal 1, baseline Lv 1-30 kit** (`Skills/Skill.Combat.Madolt.*`,
+  11 skills): FFXIV Warrior's acquisition skeleton reskinned to EC weapon/
+  shield + Charge Gauge + Unfocus + Electron Guard. Combo spine
+  Voltstep Thrust(1)/Arc Rend(4)/Grounding Drive(26), Arc Sweep(10) AoE,
+  gauge loop EC Weapon Discharge(15)/Electron Guard stance(20)/EC Shield
+  Discharge(30), CDs Overcharge(6)/Plating Reinforce(8)/Concussive Bash(12)/
+  Field Dampener(22). Deliberately NO Provoke (innate aggro) and NO baseline
+  interrupt (cast-response is earned at Rank 2). Charge Gauge is the
+  ClassMechanic (`Combat/ChargeGauge.yaml`; entry added to
+  `Classes/ClassMechanics.yaml`). **Goal 2, weapons** (`Items/Item.Equipment.Madolt.EC{Weapon,Shield}.*`,
+  placeholders/scaling/stable): two equips; attack marginal, attributes
+  right-skewed `1+0.2*Lvl^1.5`; scaling special = high attributes/weak flat
+  effect/consistent DPS/Rank-1-best, stable specials (20/25/30) = low
+  attributes/strong rank-gated effect/sawtooth DPS/+6% mastery edge. Rank
+  interaction: scaling wins at Merc R1, stable's bonus strikes come online at
+  R2, 75% charged discharge ceiling at R3; Adventurer-obtain + Mercenary-
+  trigger crafts. **Goal 3, Magnetic Armor** (`Attire/MagneticArmor.System.yaml`):
+  required armor type, left-skew `45+7*sqrt(Lvl)` high-base mirror of the
+  weapon curve; reforged from ANY Normal Heavy Armor (Blacksmith or player
+  market), destructive/permanent, ACID-transactional, cost-gated not drop-
+  gated, with a marginal input top-up. **Goal 4, classes are sideways
+  variety not a power ladder**: `Classes/Class_Library.yaml` +
+  `Class_Prerequisites.yaml` renamed `Base/Promoted/Special` ->
+  `Base Available/Experienced/Special` and reframed as difficulty-of-rank-1
+  access gates (Merc rank as the vertical end-goal, not new classes; a
+  stronger class is narrower/more volatile, paid in Focus). Each class gets a
+  `FocusProfile` + `VolatilityCounter` (added to `Madolt_Warrior.yaml`).
+  **Goal 5, Rank 2 kit** (`Skills/*.Madolt.{CircuitBreak,GroundingCounter,OverloadThrust,ArcDetonation,BonusStrike}`
+  + `Quests/SkillQuest.Madolt.*_Seq0`): earned via offense-favored perform-to-
+  unlock skill quests (forgiving per-skill retries) that gate the full-retry
+  broad Merc test; two archetypes (30-60s reactive oGCDs; no-cooldown gauge-
+  cost long-cast aggressive GCDs that self-limit via shared gauge + Focus
+  risk). **Goal 6, Rank 3 kit** (`Skills/*.Madolt.{ECWeaponDischargeControl,ArcOverload,ElectronBulwark}`
+  + solo skill quests): 75% charged discharges (flashier/harder, needs a Stun
+  setup, generate heavy Focus so power RAISES difficulty) + a true-invuln;
+  `NPC.Boss.Test.MechaGolem` Doctrine Level3 extended with `CastInterruption`
+  (interrupts best casts unless distracted via aggro/Focus -> tanks are the
+  only easy Rank 3) and `GuaranteedLethal` (mathed death that scales hits to
+  defeat mitigation; only invuln survives; `DeathScalingVisibility: Hidden`).
+  **System changes**: `NoPotencyRule` -> `PotencyRule` (potency allowed, no
+  encounter-deciding swings; opportunity over flat power; rank = capability,
+  gear = numbers; Rank 1 stays comparable; new `Combat/EncounterDamageCurve.yaml`
+  = >50% HP takes +25%, front-loading damage). `Rank_System.yaml`'s flat
+  `PartyResolution: Lowest` replaced by a content-and-difficulty-scoped
+  `DoctrineResolution` table (OpenWorld=Lowest, Instanced/Normal group=
+  Highest, Hard=Level2 floor, Extreme/Savage=Fixed Level3) -- and
+  `PartyResolution` dropped from every enemy `RankProfile` (8 files) and from
+  `NPCCreator.pyw`'s output. `Project_Validator.py` keys on none of the
+  renamed/removed fields, so it still passes.
+
 Still open (needs a decision, not a unilateral fix):
 
 - File naming is inconsistent at the tool level: `Item Registry Creator.pyw`,

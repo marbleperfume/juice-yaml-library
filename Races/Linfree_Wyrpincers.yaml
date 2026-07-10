@@ -1,0 +1,27 @@
+Intent:
+  Narrative: >
+    Wyrpincers -- beetle humanoids considered the physically strongest
+    race, who typically do nothing with it. If not for the health of the
+    magic forests they inhabit, they'd likely be extinct, since they lack
+    the drive to travel long distances. Some are kept as pets by Soue or
+    Landwin; most survive by hunting giant creatures or eating plants.
+Definition:
+  ParentCategory: Linfree
+  Subrace: Wyrpincers
+  AttributeModifiers:   # placeholder values -- awaiting the original lore draft; tune freely
+    STRENGTH: 18
+    STAMINA: 16
+    SPEED: 5
+    CRAFT: 0
+    GATHER: 2
+    MAGICCAPACITY: 4
+    MAG: 3
+    MED: 4
+    DEXTERITY: 4
+    NTU: 3   # no natural drive to react to much of anything
+  Assets:
+    Mesh: Mesh.Race.Wyrpincers
+    AnimSet: AnimSet.Wyrpincers
+  Restrictions:
+    BannedTags: []
+  BonusSkills: []

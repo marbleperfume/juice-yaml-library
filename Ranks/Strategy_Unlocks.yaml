@@ -31,6 +31,15 @@ TestEncounterConstraints: >
   Worked example (Rank2): a melee Goblin Vanguard + ranged AoE-casting
   goblins (see NPCs/Bosses/NPC.Boss.Test.GoblinVanguard.yaml,
   NPCGroups/Group.Test.GoblinRangedCasters.yaml).
+Rank3HealerTargeting: >
+  Certain enemy Doctrine/AI profiles at Strategy Rank 3 begin actively
+  weighting Healer targeting through the normal Proximity+Focus formula
+  (see Combat/AggroSystem.yaml StrategyRank3HealerTargeting) -- Healer
+  burst tools (Triage Override hard casts) generate enough Focus that
+  Rank3-tuned enemies notice. Intended to require both the Tank actively
+  containing Focus (Unfocus, Skill.Combat.Madolt.ElectronPivot.yaml for
+  the moments that isn't enough) and the Healer showing self-control over
+  when they commit to a hard cast -- neither role solves it alone.
 RoleToolBudget: >
   Tanks are expected to need FEWER of a Strategy test's provided tactical
   tools (Smokescreen/Bombs/Traps, see Items/Item.Tactical.*.yaml) than other

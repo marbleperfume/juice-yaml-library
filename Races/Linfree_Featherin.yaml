@@ -1,0 +1,28 @@
+Intent:
+  Narrative: >
+    Featherin -- avian people with humanoid features who still carry
+    hollow bones. They rely on magic auras to dodge rather than block, as
+    their frames can't carry enough mana or structural defense to tank
+    hits otherwise. They can be found anywhere, but rarely assimilate
+    fully due to migration habits -- a land race convincing a Featherin
+    to marry them is considered a rare case.
+Definition:
+  ParentCategory: Linfree
+  Subrace: Featherin
+  AttributeModifiers:   # placeholder values -- awaiting the original lore draft; tune freely
+    STRENGTH: 6
+    STAMINA: 6
+    SPEED: 15
+    CRAFT: 0
+    GATHER: 1
+    MAGICCAPACITY: 10
+    MAG: 9
+    MED: 7
+    DEXTERITY: 13
+    NTU: 11   # dodge-by-aura playstyle is inherently reactive
+  Assets:
+    Mesh: Mesh.Race.Featherin
+    AnimSet: AnimSet.Featherin
+  Restrictions:
+    BannedTags: []
+  BonusSkills: []

@@ -1,0 +1,27 @@
+Intent:
+  Narrative: >
+    Grimm -- darker-skinned Landwin concentrated in the hard labor trades.
+    Most work the mines; the ones who make something of themselves tend to
+    end up blacksmiths, the more knowledgeable and successful branch of the
+    subrace. Their CRAFT and GATHER attributes should read high relative to
+    other Landwin subraces to reflect this.
+Definition:
+  ParentCategory: Landwin
+  Subrace: Grimm
+  AttributeModifiers:   # placeholder values -- awaiting the original lore draft; tune freely
+    STRENGTH: 13
+    STAMINA: 13
+    SPEED: 8
+    CRAFT: 6
+    GATHER: 4
+    MAGICCAPACITY: 8
+    MAG: 6
+    MED: 6
+    DEXTERITY: 4
+    NTU: 6
+  Assets:
+    Mesh: Mesh.Race.Grimm
+    AnimSet: AnimSet.Grimm
+  Restrictions:
+    BannedTags: []
+  BonusSkills: []

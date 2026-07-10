@@ -26,7 +26,7 @@ MechanicScaling:
 # check -- he teleports out before a real Mercenary/Doctrine test would
 # matter. Present for contract completeness only.
 RankProfile:
-  PartyResolution: Lowest
+  # Doctrine resolution is content/difficulty-scoped now -- see Ranks/Rank_System.yaml DoctrineResolution
   Adventurer:
     LootCurve: null
   Mercenary:

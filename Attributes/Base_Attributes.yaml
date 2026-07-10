@@ -10,7 +10,12 @@ Base_Character:
     MagicCapacity: 100
     Mag: 10
     Med: 10
-    Intellect: 10
+    Ntu: 5
+    # Intellect: 10   # LEGACY -- not in Attributes/attributes.json's active schema (DEXTERITY/NTU
+    # cover ranged-precision and reactive-intuition respectively). Kept here, commented out, as a
+    # placeholder in case a future INT stat gets added (see Combat/IntuitionPrompts.yaml naming
+    # note: NTU was deliberately abbreviated to leave INT free). Not currently in scope -- do not
+    # wire this into any tool or race/class file until it's actually designed.
   
   # Tags that every entity starts with
   DefaultTags:

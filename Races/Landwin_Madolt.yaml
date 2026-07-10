@@ -1,0 +1,47 @@
+Intent:
+  Narrative: >
+    Madolt -- science-driven Landwin who maintain most of the defense
+    systems of modern cities. Not just scientists: they invent and
+    engineer solutions into everyday living, capable of constructing
+    large machines and equally capable of taking them down. In combat
+    they are unmatched through technology and rarely have their fights
+    defined by raw strength, firepower, or overwhelming magic -- the
+    in-world reasoning behind the phrase "With a Landwin, strength isn't
+    always what matters." Non-integrated races who haven't seen Madolt
+    fight up close tend to doubt this, believing non-Madolts could
+    achieve the same feats; the Madolt themselves know better. Their
+    education is brutal from childhood and drills accuracy and precision
+    above all -- what a real-world observer would just call perfection.
+Definition:
+  ParentCategory: Landwin
+  Subrace: Madolt
+  AttributeModifiers:   # placeholder values -- awaiting the original lore draft; tune freely
+    STRENGTH: 10
+    STAMINA: 11
+    SPEED: 10
+    CRAFT: 12
+    GATHER: 0
+    MAGICCAPACITY: 10
+    MAG: 6
+    MED: 6
+    DEXTERITY: 14
+    NTU: 16   # precision-drilled education is this race's whole thesis -- highest in the game on purpose
+  Assets:
+    Mesh: Mesh.Race.Madolt
+    AnimSet: AnimSet.Madolt
+  Restrictions:
+    BannedTags: []
+  BonusSkills: []
+NarrativeIntent: >
+  Titular race for the Reiden/Galactos storyline (Quests/Reiden.GalactosUprising,
+  NPCs/NPC.Friendly.MalachiteCity.ReidenKurogane.yaml,
+  NPCs/Bosses/NPC.Boss.Galactos.yaml). Reiden's signature line "It's not
+  always about strength when you fight a Landwin" is this race's central
+  thesis stated in-character. Goldwyn Excelsior
+  (NPC.Friendly.MalachiteCity.GoldwynExcelsior.yaml) is the deliberate
+  foil: same race, opposite relationship to that thesis -- Goldwyn
+  compensates for weak fundamentals with gear and his mentor's name,
+  Reiden's precision-drilled competence IS the gear working as intended.
+  Backs Classes/Madolt_Warrior.yaml's Definition.Race restriction; DEXTERITY
+  is weighted above STRENGTH here on purpose so the race stat block doesn't
+  read as a strength-race despite fielding a Tank-role Warrior.

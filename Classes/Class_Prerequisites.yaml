@@ -1,33 +1,42 @@
 Key: Classes.Prerequisites
 Description: >
-  Prerequisites for advancing into a Promoted or Special class (see
-  Classes/Class_Library.yaml for the Base/Promoted/Special lists). Base
-  classes have no prerequisite gate beyond normal character leveling.
-  Special is a SEPARATE track from Promoted -- it does not chain off
-  completing a Promoted class -- and is restricted to a higher minimum
-  Mercenary rank than Promoted. Only one worked example per tier is
-  authored here; add the rest as each class is actually designed.
-Base:
-  Rule: No prerequisite gate beyond character level.
-Promoted:
-  Rule: >
-    Requires (1) a specific Base class at a specific character level,
-    (2) a Role Quest, and (3) a minimum Mercenary rank.
-  WorkedExample:
-    Class: Lancer
-    RequiredBaseClass: Adafold (Shield Knight)
-    RequiredBaseLevel: 30
-    RoleQuest: Quest.Role.Lancer          # not yet authored -- forward reference
-    RequiredMercenaryRank: 2
-Special:
-  Rule: >
-    SEPARATE from Promoted -- does not require completing a Promoted
-    class first. Requires (1) a specific Base class at a specific
-    character level, (2) a dedicated Special Quest (not the Role Quest),
-    and (3) a higher minimum Mercenary rank than Promoted requires.
-  WorkedExample:
-    Class: Dracomancer
-    RequiredBaseClass: Elementalist
-    RequiredBaseLevel: 30
-    SpecialQuest: Quest.Special.Dracomancer   # not yet authored -- forward reference
-    RequiredMercenaryRank: 3
+  Classes are horizontal VARIETY, not upgrades. A new class can be stronger,
+  but only by being narrower and more volatile -- its higher damage / longer
+  casts generate more enemy Focus (see Classes/Madolt_Warrior.yaml
+  FocusProfile / VolatilityCounter and Combat/AggroSystem.yaml), so it hits
+  interrupt/punish difficulties a Base Available class sidesteps. The tier
+  therefore gates ACCESS by rank-1 difficulty, not power. Mercenary rank is
+  the vertical end-goal; you deepen your CURRENT class by ranking up, you
+  don't climb into a "better" one. The gate is also bypassable by a single
+  shop entitlement flag (planned pay-to-skip) -- kept as one boolean so it
+  never entangles the prerequisite logic.
+Tiers:
+  Base Available:
+    Rule: No gate -- easy rank-1 on-ramp (e.g. Madolt Warrior).
+  Experienced:
+    Rule: >
+      Harder rank-1 that assumes fluency. Requires (1) Mercenary Rank 2 (the
+      difficulty proxy -- earned by clearing all of a class's Lv-30 skill
+      quests + the role test, which already implies a Base class taken far
+      enough) and (2) the class's ORIGINATING area cleared (Reaper-needs-
+      Endwalker style; unrelated areas irrelevant).
+    WorkedExample:
+      Class: Lancer
+      RequiredMercenaryRank: 2
+      OriginatingAreaCleared: true   # the area that introduces Lancer, at rank 2
+      Note: >
+        Reframed from the old "promoted from Adafold at Lv 30" upgrade path --
+        Lancer is now a sideways option gated by its own rank-1 difficulty,
+        not an Adafold upgrade. The old base-class-at-Lv-30 requirement folds
+        into "you have Mercenary Rank 2," since earning that rank means you
+        maxed a class's skill quests.
+  Special:
+    Rule: >
+      Hardest rank-1 ("almost a different game"). Same shape as Experienced
+      but gated behind Mercenary Rank 3 + the originating area.
+    WorkedExample:
+      Class: Dracomancer
+      RequiredMercenaryRank: 3
+      OriginatingAreaCleared: true
+Override:
+  ShopEntitlementFlag: "Bypasses the entire access gate (planned microtransaction skip)."

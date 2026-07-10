@@ -1,0 +1,33 @@
+Intent:
+  Narrative: >
+    Rawrotin -- wolf-like people ranging from Nyanto-esque dog-featured
+    looks to outright werewolf forms. Tightly bound to Landwin society as
+    bodyguards, caretakers, and package couriers. Unlike Nyanto they can
+    mark enemies and benefit from repeated strikes to the same mark to
+    eventually break through tougher foes; they're fast, but don't
+    otherwise mimic Nyanto playstyle. There's a soft rivalry between the
+    two subraces.
+Definition:
+  ParentCategory: Linfree
+  Subrace: Rawrotin
+  AttributeModifiers:   # placeholder values -- awaiting the original lore draft; tune freely
+    STRENGTH: 11
+    STAMINA: 12
+    SPEED: 14
+    CRAFT: 0
+    GATHER: 2
+    MAGICCAPACITY: 8
+    MAG: 6
+    MED: 8
+    DEXTERITY: 12
+    NTU: 11   # trained bodyguard/courier reflexes
+  Assets:
+    Mesh: Mesh.Race.Rawrotin
+    AnimSet: AnimSet.Rawrotin
+  Restrictions:
+    BannedTags: []
+  BonusSkills: []
+NarrativeIntent: >
+  Soft rivalry with Nyanto (Noct_Aurorus_Nyanto.yaml) -- both fast,
+  Landwin-adjacent races filling similar niches by different means
+  (marking/sustained pressure vs. raw agility).

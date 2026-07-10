@@ -1,0 +1,27 @@
+Intent:
+  Narrative: >
+    Mantidia -- praying-mantis humanoids with razor-sharp arms hidden
+    beneath a shell casing, letting them eviscerate targets at high speed
+    without scraping themselves on their surroundings. Temperamental and
+    difficult to handle, but they help their environment significantly by
+    hunting down other insects. Capable of limited flight.
+Definition:
+  ParentCategory: Linfree
+  Subrace: Mantidia
+  AttributeModifiers:   # placeholder values -- awaiting the original lore draft; tune freely
+    STRENGTH: 13
+    STAMINA: 10
+    SPEED: 13
+    CRAFT: 0
+    GATHER: 0
+    MAGICCAPACITY: 6
+    MAG: 4
+    MED: 4
+    DEXTERITY: 15
+    NTU: 13   # razor-arm strikes need the reflex to match the speed
+  Assets:
+    Mesh: Mesh.Race.Mantidia
+    AnimSet: AnimSet.Mantidia
+  Restrictions:
+    BannedTags: []
+  BonusSkills: []

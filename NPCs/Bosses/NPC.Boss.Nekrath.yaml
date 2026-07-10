@@ -28,7 +28,7 @@ MechanicScaling:
 # (mirrors NPC.Enemy.Drakol.Lower.yaml's minimal pattern), since the real
 # stakes of this fight are the Seq2/Seq4 script beats, not rank-gated play.
 RankProfile:
-  PartyResolution: Lowest
+  # Doctrine resolution is content/difficulty-scoped now -- see Ranks/Rank_System.yaml DoctrineResolution
   Adventurer:
     LootCurve: null
   Mercenary:

@@ -1,0 +1,29 @@
+Intent:
+  Narrative: >
+    Chunkers -- shark and piranha humanoids that stick to the water.
+    Remarkably tame, but impossible to talk out of a hunt once it starts,
+    which makes them impossible to domesticate. Much of their evolution
+    has revolved around communicating with adjacent aquatic races, making
+    them exceptionally logical despite their appearance. Can fire tooth
+    projectiles that explode, making them dangerous to anyone unfamiliar
+    with their fighting habits.
+Definition:
+  ParentCategory: Depth Dead
+  Subrace: Chunkers
+  AttributeModifiers:   # placeholder values -- awaiting the original lore draft; tune freely
+    STRENGTH: 14
+    STAMINA: 13
+    SPEED: 11
+    CRAFT: 0
+    GATHER: 3
+    MAGICCAPACITY: 8
+    MAG: 7
+    MED: 5
+    DEXTERITY: 10
+    NTU: 9   # exceptionally logical despite appearances
+  Assets:
+    Mesh: Mesh.Race.Chunkers
+    AnimSet: AnimSet.Chunkers
+  Restrictions:
+    BannedTags: []
+  BonusSkills: []

@@ -1,0 +1,31 @@
+Intent:
+  Narrative: >
+    Noms -- goblins who survived through enchanting and tribal offerings
+    to other races. Their genes are highly resilient, consistently
+    producing more Noms even from pairings that should make it
+    impossible, which has led to close ties with Giants and other
+    physically bulkier races that cover for their small stature. Noms are
+    the most advanced race at gem craft, able to refine dug-up gems into
+    highly dangerous "temporary" skills that function like spells in a
+    can -- a craft limited to Noms and sold in limited quantity by Nom
+    NPCs.
+Definition:
+  ParentCategory: Noct Aurorus
+  Subrace: Noms
+  AttributeModifiers:   # placeholder values -- awaiting the original lore draft; tune freely
+    STRENGTH: 5
+    STAMINA: 7
+    SPEED: 11
+    CRAFT: 15
+    GATHER: 6
+    MAGICCAPACITY: 12
+    MAG: 10
+    MED: 6
+    DEXTERITY: 9
+    NTU: 10
+  Assets:
+    Mesh: Mesh.Race.Noms
+    AnimSet: AnimSet.Noms
+  Restrictions:
+    BannedTags: []
+  BonusSkills: []

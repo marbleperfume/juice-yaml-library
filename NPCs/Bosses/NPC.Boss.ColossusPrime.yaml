@@ -24,7 +24,7 @@ MechanicScaling:
 # Scripted Chapter 1 finale boss -- minimal example, same pattern as
 # NPC.Boss.Nekrath.yaml.
 RankProfile:
-  PartyResolution: Lowest
+  # Doctrine resolution is content/difficulty-scoped now -- see Ranks/Rank_System.yaml DoctrineResolution
   Adventurer:
     LootCurve: null
   Mercenary:

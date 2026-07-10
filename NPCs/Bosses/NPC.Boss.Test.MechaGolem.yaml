@@ -27,7 +27,7 @@ MechanicScaling:
 # the player's actual Strategy/Doctrine standing, so the trial is
 # controlled and repeatable rather than varying with normal progression.
 RankProfile:
-  PartyResolution: Lowest
+  # Doctrine resolution is content/difficulty-scoped now -- see Ranks/Rank_System.yaml DoctrineResolution
   Adventurer:
     LootCurve: null
   Mercenary:
@@ -51,12 +51,13 @@ RankProfile:
           - Skill.Combat.Golem.OverloadBeam
           - Skill.Combat.Golem.GroundPound
         SelectionRule: "One randomly selected per attempt; timing window differs per skill"
-      FocusRedirectThreshold: 600
+      FocusRedirectThreshold: 600   # Combat/AggroSystem.yaml FocusRedirectRule -- same Proximity+Focus formula as every tier, just a generous threshold here
       TestGate:
         TestQuest: Quest.Test.Mercenary.Rank2.Tank
         Checks: [RoleMechanicUse, ClassMechanicUse, CastBarTiming]
     Level3:
       Inherit: Level2
+      FocusRedirectThreshold: 480   # overrides Level2's inherited 600 -- same Proximity+Focus formula, just a harsher (lower) threshold at the highest tier
       StabilityContest:
         Description: >
           If the player casts a skill tagged Tag.Skill.Risky while the
@@ -66,6 +67,26 @@ RankProfile:
           adding raw Golem damage.
         RiskySkillTag: Tag.Skill.Risky
         PlayerCastInstantlyDropped: true
+      CastInterruption:
+        Description: >
+          At Level3 the Golem actively interrupts the player's best casts
+          UNLESS it is distracted via aggro/Focus. This is why tanks are the
+          only "easy" Rank 3 Mercenary -- their innate aggro + Unfocus can
+          hold the Golem off their casts, where a DPS/healer cannot. Drives
+          the "needs a Stun/setup" requirement of the Rank 3 charged
+          discharges (Skill.Combat.Madolt.ECWeaponDischargeControl).
+        DistractedBy: [Aggro, Focus]
+      GuaranteedLethal:
+        Description: >
+          A telegraphed mechanic that LOOKS avoidable and invites the player
+          to mitigate/time it -- but it is a mathed-out guaranteed death.
+          Mitigation only adds more hits to the lethal total, so defense/
+          timing never survives it; only true invulnerability
+          (Skill.Combat.Madolt.ElectronBulwark) does. Teaches that losing is
+          not always obvious.
+        MitigationScaling: AddsHitsToLethalTotal
+        SurvivableBy: [Invulnerability]
+        DeathScalingVisibility: Hidden   # no on-screen breakdown; deduced across retries
       TestGate:
         TestQuest: Quest.Test.Mercenary.Rank3.Tank
-        Checks: [RoleMechanicUse, ClassMechanicUse, CastBarTiming, StabilityContestAvoidance]
+        Checks: [RoleMechanicUse, ClassMechanicUse, CastBarTiming, StabilityContestAvoidance, GuaranteedLethalInvuln]

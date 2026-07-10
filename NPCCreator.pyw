@@ -164,7 +164,8 @@ class NPCCreatorApp:
                 'FailureSeverity': self.severity_cb.get()
             },
             'RankProfile': {
-                'PartyResolution': self.party_res_cb.get(),
+                # PartyResolution retired -- Doctrine resolution is now content/difficulty-scoped
+                # (see Ranks/Rank_System.yaml DoctrineResolution), not a per-enemy field.
                 'Adventurer': {
                     'LootCurve': self.loot_entry.get(),
                     'Tier': int(self.tier_spin.get())

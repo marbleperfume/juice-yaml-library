@@ -39,7 +39,7 @@ AssignedSkills:
 # Full authoring example: every optional tier used. Compare with the minimal
 # Drakol file -- both are valid; missing tiers inherit the tier below.
 RankProfile:
-  PartyResolution: Lowest
+  # Doctrine resolution is content/difficulty-scoped now -- see Ranks/Rank_System.yaml DoctrineResolution
   Adventurer:
     LootCurve: Global.LootScaling.CurveA
   Mercenary:

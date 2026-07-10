@@ -1,0 +1,27 @@
+Intent:
+  Narrative: >
+    Hecapqo -- walrus and seal-based humanoids, highly playful when young
+    and fiercely territorial with age. Zoo-friendly, and typically don't
+    return to the wild once domesticated. Their signature trait is their
+    blubber, which lets them resist temperature swings and take damage
+    differently from other creatures.
+Definition:
+  ParentCategory: Depth Dead
+  Subrace: Hecapqo
+  AttributeModifiers:   # placeholder values -- awaiting the original lore draft; tune freely
+    STRENGTH: 12
+    STAMINA: 16
+    SPEED: 6
+    CRAFT: 0
+    GATHER: 3
+    MAGICCAPACITY: 6
+    MAG: 5
+    MED: 6
+    DEXTERITY: 5
+    NTU: 5
+  Assets:
+    Mesh: Mesh.Race.Hecapqo
+    AnimSet: AnimSet.Hecapqo
+  Restrictions:
+    BannedTags: []
+  BonusSkills: []

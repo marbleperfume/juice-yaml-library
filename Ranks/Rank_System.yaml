@@ -18,9 +18,31 @@ DefaultingRule: >
   OPTIONAL; a missing tier inherits the tier below it. Project_Validator
   enforces the required tiers.
 
-PartyResolution:
-  Default: Lowest                # party snapshot collapses to lowest member
-  PerEnemyOverride: RankProfile.PartyResolution
+DoctrineResolution:
+  Description: >
+    How an enemy's Doctrine tier resolves against a party. Content type AND
+    difficulty variant decide the rule -- not a single per-enemy field, since
+    the same enemy can appear in open world and in a dungeon. Replaces the
+    old flat "PartyResolution: Lowest" (which let a Rank 1 suppress Rank 2
+    enemy logic). Governing principle: stepping into a higher content
+    category is opting into being outscaled; the open world is the one
+    protective default.
+  OpenWorld: {Mode: Lowest}                 # protects mixed/learning play
+  InstancedQuest: {Mode: Highest}           # incl. MSQ-equivalents; soloed => your own rank
+  Dungeon:
+    Normal: {Mode: Highest}
+    Hard: {Mode: Highest, MinDoctrine: Level2}     # floored, can exceed
+  Trial:
+    Normal: {Mode: Highest}
+    Hard: {Mode: Highest, MinDoctrine: Level2}
+    Extreme: {Mode: Fixed, FixedDoctrine: Level3}  # party-independent gate
+  Raid:
+    Normal: {Mode: Highest}
+    Savage: {Mode: Fixed, FixedDoctrine: Level3}
+  AreaContentGate: >
+    Access to a rank-gated advancement is additionally tied to its OWN
+    originating area's completion (Reaper-needs-Endwalker style) -- unrelated
+    areas are irrelevant. See Classes/Class_Prerequisites.yaml.
 
 NamingSplit:
   PlayerFacing: Strategy         # item gate + progression indicator

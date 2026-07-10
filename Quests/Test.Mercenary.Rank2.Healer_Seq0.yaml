@@ -10,18 +10,29 @@ RequiresFlag: SkillQuest.CurrentClass.AllCleared   # resolves to whichever Heale
 TestConfig:
   ForcedDoctrineLevel: Level2
   Phase1:
-    Requirement: "Sustain buffs/damage output -- no healing input required or expected"
+    Requirement: >
+      Play DelayedStatus barriers/regen (Skills/Skill.Combat.Elementalist.WaterBarrier.yaml,
+      TidalMending.yaml), buffs/debuffs, and weak attack variants
+      (EmberLance.yaml) -- no direct healing input required or expected.
+      Arming DelayedStatus tools proactively here is what pays off in Phase2.
     Duration: "Until Phase2Trigger fires"
   Phase2Trigger:
     Condition: "PartyHP <= 25% OR SelfHP <= 25%"
     Description: >
-      Scripted or emergent crisis, never a fixed timer -- forces the
-      Healer's RoleMechanic (Healing) to actually manifest, since a Healer
-      otherwise spends the whole test buffing/dealing damage.
+      Scripted or emergent crisis, never a fixed timer -- triggers
+      Passives/TriageOverride.yaml. The Healer's entire kit converts:
+      EmberLance is replaced by the hard-cast, Water-element Tidal Surge, and Tidal Revival
+      becomes castable for the first time. This forces the Healer
+      RoleMechanic to actually manifest, since outside this window the
+      Healer spends the whole test on support tools, not direct healing.
   Phase2:
-    Requirement: "Successfully stabilize the party/self above 25% HP within the crisis window"
+    Requirement: >
+      Successfully stabilize the party/self above 25% HP within the crisis
+      window using the converted kit (Tidal Surge's hard casts, Emergent
+      Light's amplified flash), and revive any downed party member with
+      Tidal Revival if applicable.
     Checks:
-      - RoleMechanicUse   # Healing, under real pressure
+      - RoleMechanicUse   # DelayedStatus play beforehand + correct use of the converted kit under real pressure
       - ClassMechanicUse
 Reward:
   TitleID: null
@@ -30,8 +41,11 @@ Reward:
   Reputation: null
 NarrativeIntent: >
   Deliberately rougher than the Tank/DPS test: Healers spend most of an
-  encounter buffing or dealing damage, since their actual RoleMechanic
-  (Healing) can't be exercised on demand. The test can't grade continuous
-  healing uptime, so instead it grades whether the player CAN heal
-  decisively the moment a genuine crisis (party or self critical HP)
-  occurs.
+  encounter on DelayedStatus support tools (Combat/DelayedStatus.yaml) rather
+  than direct healing, since Triage Override can't be exercised on demand.
+  The test can't grade continuous healing uptime, so instead it grades
+  whether the player armed the right proactive tools in Phase1 AND can pilot
+  the fully converted, hard-cast kit the moment a genuine crisis occurs -- a
+  Healer who spent Phase1 spamming heals gains nothing extra in Phase2; the
+  conversion is the same either way, but arriving at it having already
+  spent cooldowns is strictly worse.

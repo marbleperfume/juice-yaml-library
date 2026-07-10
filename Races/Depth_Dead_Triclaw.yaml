@@ -1,0 +1,28 @@
+Intent:
+  Narrative: >
+    Triclaw -- polar-bear-based people with non-aquatic adjacent
+    brethren, though most survive by dominating glacial ground. Naturally
+    resilient to temperature swings, tanky, and fast, with magical
+    enhancements that let them slash or bite through tough targets like
+    Hecapqo. Generally considered dangerous to be around even when
+    communicative.
+Definition:
+  ParentCategory: Depth Dead
+  Subrace: Triclaw
+  AttributeModifiers:   # placeholder values -- awaiting the original lore draft; tune freely
+    STRENGTH: 16
+    STAMINA: 15
+    SPEED: 12
+    CRAFT: 0
+    GATHER: 1
+    MAGICCAPACITY: 8
+    MAG: 6
+    MED: 5
+    DEXTERITY: 11
+    NTU: 8
+  Assets:
+    Mesh: Mesh.Race.Triclaw
+    AnimSet: AnimSet.Triclaw
+  Restrictions:
+    BannedTags: []
+  BonusSkills: []

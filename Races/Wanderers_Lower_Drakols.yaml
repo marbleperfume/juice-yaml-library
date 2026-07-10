@@ -1,8 +1,15 @@
 Intent:
   Narrative: >
-    Lower Drakol -- semi-aquatic wanderers who carry an innate Water Slime
+    Lower Drakol -- semi-aquatic, lizard-like wanderers with green skin and
+    a big tail usable as a third hand. They carry an innate Water Slime
     companion from birth to offset an inherited vulnerability to dry
-    environments (see Passives/DrySkin.yaml).
+    environments (see Passives/DrySkin.yaml). They have a natural affinity
+    for elemental spirits and communicate with them more successfully than
+    any other race, which keeps them naturally peaceful despite their
+    situation -- enslaved by Heavenly Black Drakols
+    (Wanderers_Heavenly_Black_Drakols.yaml) in enclosed HBD societies,
+    unable to fight back with a reasonable chance of winning and lacking a
+    shared tongue with their captors.
 Definition:
   ParentCategory: Wanderers
   Subrace: Lower Drakols
@@ -16,6 +23,7 @@ Definition:
     MAG: 11
     MED: 10
     DEXTERITY: 10
+    NTU: 10
   Assets:
     Mesh: Mesh.Race.LowerDrakol
     AnimSet: AnimSet.LowerDrakol

@@ -1,0 +1,26 @@
+Intent:
+  Narrative: >
+    Tryll -- the "little twigs" of Landwin society: bookkeepers,
+    politicians, business owners, and farmland owners. Physically frail,
+    with lower STAMINA than other Landwin subraces, and lean on MED rather
+    than MAG where other subraces would go magical.
+Definition:
+  ParentCategory: Landwin
+  Subrace: Tryll
+  AttributeModifiers:   # placeholder values -- awaiting the original lore draft; tune freely
+    STRENGTH: 6
+    STAMINA: 6
+    SPEED: 9
+    CRAFT: 3
+    GATHER: 2
+    MAGICCAPACITY: 12
+    MAG: 6
+    MED: 13
+    DEXTERITY: 8
+    NTU: 5
+  Assets:
+    Mesh: Mesh.Race.Tryll
+    AnimSet: AnimSet.Tryll
+  Restrictions:
+    BannedTags: []
+  BonusSkills: []

@@ -1,0 +1,27 @@
+Intent:
+  Narrative: >
+    Jumpers -- whale and dolphin-based humanoids who use sound to
+    communicate and to attack. Far stronger in water than on land. Their
+    behaviors resemble Hecapqo, but Jumpers are usually far more sadistic
+    in the wild and difficult to avoid confrontation with once in the
+    water.
+Definition:
+  ParentCategory: Depth Dead
+  Subrace: Jumpers
+  AttributeModifiers:   # placeholder values -- awaiting the original lore draft; tune freely
+    STRENGTH: 11
+    STAMINA: 12
+    SPEED: 9
+    CRAFT: 0
+    GATHER: 2
+    MAGICCAPACITY: 12
+    MAG: 10
+    MED: 5
+    DEXTERITY: 9
+    NTU: 10   # sound-based hunting instinct
+  Assets:
+    Mesh: Mesh.Race.Jumpers
+    AnimSet: AnimSet.Jumpers
+  Restrictions:
+    BannedTags: []
+  BonusSkills: []
