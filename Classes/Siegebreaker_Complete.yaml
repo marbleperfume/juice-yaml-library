@@ -1,1017 +1,1559 @@
-# ============================================================================
-# SIEGEBREAKER — Complete Class Specification
-# juice-yaml-library | github.com/marbleperfume/juice-yaml-library
-# ============================================================================
-
-header:
-  class_name: Siegebreaker
-  race_lock: Wyrpincers
-  tier: Base
-  role: Frontline
-  lock_type: Biological
-  last_updated: 2026-07-14
-  design_philosophy: >
-    The laziest class in the game. Rewards decision quality over execution speed.
-    A new player and a veteran perform near-identically — the gap is in WHERE
-    you commit, not HOW FAST you press buttons. The battering ram fantasy.
-
-# ============================================================================
-# SECTION 1: IDENTITY
-# ============================================================================
-
-identity:
-  race: Wyrpincers
-  lock_justification:
-    type: Biological
-    explanation: >
-      The Wyrpincer exoskeleton IS the class. Their chitin is not armor — it's skin.
-      Their mass is not gear — it's body. STR 18 is not trained — it's baseline
-      physiology. The class is literally "be a Wyrpincer and walk forward." No
-      technique to teach, no skill to learn. The body does this when it moves
-      with intent. Remove the body, remove the class entirely.
-
-    physiological_requirements:
-      - Exoskeleton provides passive damage reduction WITHOUT equipment
-      - Body mass creates kinetic momentum that scales with sustained movement
-      - Pincer appendages deliver STR 18 force on arrival
-      - Chitinous structure absorbs impacts without flinching (biological super armor)
-      - Low neural throughput (NTU 3) means the body doesn't PROCESS fast enough to redirect
-
-  stat_profile:
-    STR: 18   # Anything you reach dies. Raw biological force.
-    SPD: 5    # Slowest in the game. Enemies outrun you trivially.
-    NTU: 3    # Neural throughput too low for reactive play or complex decisions mid-action.
-    MAGICCAP: 6  # Banned from ALL casting. No magic, no exceptions.
-    # Implied: High HP pool, high natural defense, low evasion (0 effective)
-
-  stat_narrative:
-    STR_18: >
-      The kill guarantee. If the Siegebreaker arrives, the target dies. This is
-      not an exaggeration — STR 18 with exoskeleton-amplified impact means the
-      ARRIVAL is the damage event. The class doesn't need a complex damage
-      rotation because one commitment that lands IS the rotation.
-    SPD_5: >
-      The core vulnerability AND the core tension generator. Everything in the
-      game is faster. Enemies kite. Allies reposition. The Siegebreaker plods.
-      The entire skill expression of the class emerges from this single stat:
-      "How do I make SPD 5 reach the thing I need to kill?"
-    NTU_3: >
-      Mechanically enforces simplicity. The Wyrpincer brain doesn't process
-      fast enough for mid-action adjustments. Once committed, neural signals
-      are already sent — changing direction requires a full new decision cycle.
-      This is WHY commitment is locked: biology, not game design artifice.
-    MAGICCAP_6: >
-      No buffs, no elemental coatings, no self-heals, no utility casting.
-      The Siegebreaker cannot access ANY magical solution. It has its body and
-      nothing else. This forces complete reliance on physical presence and
-      removes the temptation to add "just one utility spell" during design.
-
-  fantasy_statement: >
-    You are the battering ram. You are pointed at a wall and you go through.
-    You don't think about HOW to get through — your body handles that. You
-    think about WHICH wall matters most right now. One perfect decision per
-    engagement. The beetle that chose correctly wins. The beetle that chose
-    wrong... is somewhere else, being useless, while the fight happened
-    without them.
-
-# ============================================================================
-# SECTION 2: CORE MECHANIC
-# ============================================================================
-
-core_mechanic:
-  name: Commitment
-  principle: >
-    Once direction is chosen, the Siegebreaker is unstoppable but cannot redirect.
-    Super armor is permanent during forward movement. The class has exactly ONE
-    decision point per engagement: where do I go? After that decision, execution
-    is automatic. High floor (anyone can press forward), low ceiling (no mechanical
-    optimization improves the forward press).
-
-  commitment_model:
-    description: >
-      The Siegebreaker selects a direction/target and begins advancing. During
-      advancement: super armor active, damage reduction scaling with distance
-      traveled, cannot be CC'd below Stage 3, cannot voluntarily change direction.
-      Turning requires a full stop — momentum zeroes, must recommit.
-    
-    lock_behavior:
-      initiation: "Player designates direction or target. Movement begins."
-      during_advance: >
-        - Cannot turn more than ~15° from committed heading
-        - Cannot use abilities that require facing a non-forward direction
-        - Cannot voluntarily stop (must reach destination OR hit impassable terrain OR be Stage 3 CC'd)
-        - CAN be pushed laterally (displacement still works, just doesn't stop forward intent)
-      termination_conditions:
-        - Arrival at committed target/position
-        - Impassable terrain (wall, cliff, sealed door)
-        - Stage 3 CC application (stun/paralysis/sleep breaks commitment)
-        - Manual full-stop (costs ALL accumulated momentum, 3s recovery before new commit)
-      post_arrival: >
-        After reaching destination, the Siegebreaker enters Impact State (2-3 GCDs
-        of devastating melee output) before needing to commit again or hold position.
-
-  super_armor:
-    description: >
-      The Siegebreaker does not flinch. Does not stagger. Does not get knocked
-      back (unless Stage 3 CC). Attacks that hit during advance are absorbed by
-      the exoskeleton — damage is taken (reduced by momentum-scaling DR) but NO
-      hitstun, NO interruption, NO animation cancellation. The beetle keeps walking.
-    
-    interaction_with_cc_stages:
-      stage_1: "Slows, roots — IGNORED during commitment. Exoskeleton mass breaks roots. Speed reduction doesn't matter when committed."
-      stage_2: "Silences, interrupts — IRRELEVANT. No casting to silence. No abilities to interrupt mid-advance (advance IS the ability)."
-      stage_3: "Stuns, paralysis, sleep — THESE WORK. The only thing that stops a Siegebreaker mid-commitment. This is the counterplay."
-
-  skill_expression:
-    what_separates_players: >
-      Decision quality. Not reaction time, not APM, not combo knowledge. The
-      veteran Siegebreaker reads the fight 10 seconds ahead and commits to where
-      the VALUE will be when they arrive (accounting for SPD 5 travel time). The
-      new player commits to where the value IS right now — and arrives after it
-      moved. The gap is predictive positioning, not mechanical execution.
-    
-    decision_factors:
-      - "Which target is the highest priority AND won't move before I arrive?"
-      - "Is committing here worth abandoning my current position for 8+ seconds?"
-      - "Can my party survive without frontline presence during my transit time?"
-      - "Will enemies scatter when they see me coming, wasting my commitment?"
-      - "Is this a corridor (they CAN'T dodge) or open field (they WILL dodge)?"
-
-  high_floor_low_ceiling:
-    high_floor: >
-      A brand new Siegebreaker player picks a direction and walks. They absorb
-      damage. They arrive and kill things. The kit WORKS without optimization
-      because the base behavior (move forward, hit what's there) is the entire
-      gameplay loop. No rotation to learn. No combos to memorize. No proc windows
-      to track. Walk. Arrive. Kill.
-    low_ceiling: >
-      A mastery-level Siegebreaker player... also walks forward and kills things.
-      They do it to better targets at better times. Maybe 15-20% more effective
-      than a new player through superior commitment timing. Compare to Elementalist
-      or Strix where mastery is 200-300% more effective. The ceiling is deliberately
-      compressed. This class is NOT the "skill expression" class.
-
-# ============================================================================
-# SECTION 3: TRIGGER SYSTEM
-# ============================================================================
-
-trigger_system:
-  design_note: >
-    Minimal triggers. The Siegebreaker's simplicity means it responds to FEWER
-    encounter conditions than other classes. Most classes ask "what do I do NOW?"
-    every GCD. The Siegebreaker asks "should I commit?" once per 10-15 seconds.
-    Between commits, the class is either advancing (automated) or holding position
-    (passive). Triggers exist primarily to validate or invalidate commitment timing.
-
-  triggers:
-    - trigger_name: Commit Window
-      condition: >
-        High-value target is stationary OR in a corridor (cannot dodge laterally)
-        AND party can survive without Siegebreaker presence during transit.
-      response: Initiate commitment toward target.
-      frequency: "Once per 10-20 seconds (transit time between positions)"
-      decision_created: "Is this the RIGHT commit? Or am I wasting 15 seconds walking to nothing?"
-
-    - trigger_name: Arrival
-      condition: "Siegebreaker reaches committed destination/target."
-      response: "Enter Impact State. Execute melee abilities on anything in reach."
-      frequency: "Once per commitment (end of each advance)"
-      decision_created: "None — arrival is automatic execution. Abilities fire on whatever is there."
-
-    - trigger_name: Holding Ground
-      condition: "No valid commit target. Enemies approaching Siegebreaker's position."
-      response: "Stand and fight. Use positional abilities (sweep, brace) to punish enemies who approach."
-      frequency: "Filler between commitments. The 'lazy' gameplay state."
-      decision_created: "Should I hold here as a deterrent, or commit somewhere else?"
-
-    - trigger_name: Threatened Ally
-      condition: "Allied backline is being flanked/pressured AND Siegebreaker is nearby (within ~8m)."
-      response: "Short-range commit to intercept. Faster than long-range commit due to proximity."
-      frequency: "Reactive — depends on enemy behavior."
-      decision_created: "Protect ally (short commit, low value) OR continue toward high-value target (long commit, high value)?"
-
-    - trigger_name: Momentum Break
-      condition: "Stage 3 CC applied during commitment OR impassable terrain reached before target."
-      response: "Forced stop. Momentum lost. Must reassess and recommit."
-      frequency: "Rare — represents class being countered."
-      decision_created: "Same target (retry) or new target (adapt)? Sunk cost vs. new information."
-
-  what_is_NOT_a_trigger:
-    - "Cooldown coming off (there are almost no cooldowns to track)"
-    - "Resource reaching threshold (resource system is passive/automatic)"
-    - "Combo window opening (no combos exist)"
-    - "Proc activating (no procs exist)"
-    - "Party member using a specific ability (no synergy combos to coordinate)"
-
-# ============================================================================
-# SECTION 4: ABILITIES
-# ============================================================================
-
-abilities:
-  design_note: >
-    8 abilities total. This is a simple class. No rotations — abilities are
-    contextual (some only usable during advance, some only on arrival, some
-    only while holding). The player never has more than 2-3 valid choices at
-    any moment. Most abilities are semi-automatic or passive.
-
-  ability_list:
-
-    - name: Commit
-      type: Active (Primary action)
-      trigger_condition: "Not currently in commitment. Valid direction/target designated."
-      effect: >
-        Begin advancing toward designated target/direction at SPD 5. Super armor
-        activates. Momentum gauge begins filling. Cannot voluntarily stop or turn.
-        Movement continues until arrival, impassable terrain, or Stage 3 CC.
-      what_item_it_replaces: >
-        Ramcharge Capsule (single-use directional charge, interruptible, no ongoing
-        momentum). Commit is the PERMANENT, UNINTERRUPTIBLE, SCALING version.
-      decision_created: >
-        THE decision. Where do I go? This single choice defines the next 10-20
-        seconds of gameplay. Bad commits waste the class entirely. Good commits
-        win encounters. There is no recovery from a bad commit except time.
-      cooldown: "None. Can recommit immediately after arrival/stop. But momentum resets."
-      notes: "This is not an 'ability' in the traditional sense — it IS the class."
-
-    - name: Inexorable Advance
-      type: Passive (always active during Commit)
-      trigger_condition: "Currently committed and moving forward."
-      effect: >
-        Damage reduction increases by +5% per second of sustained forward movement
-        (caps at +40% after 8 seconds). Enemies in the direct path take minor
-        collision damage (not the main damage source — arrival is). Contact with
-        enemies does NOT stop movement — they are pushed aside (Stage 1 displacement).
-      what_item_it_replaces: >
-        Ironhide Tincture (+50% DR for 8s with -40% speed). Inexorable Advance
-        provides SCALING DR that improves over time AND doesn't impose additional
-        speed penalties on an already-slow class. Also provides the displacement
-        component that Concussion Charge provides as single-use.
-      decision_created: >
-        None directly. But informs the meta-decision: longer commits are SAFER
-        (more DR built up) but riskier (more time invested in potentially wrong
-        direction). Short commits are less protected but more adaptable.
-      cooldown: "N/A — passive during all committed movement."
-
-    - name: Chitin Brace
-      type: Active (usable ONLY while holding position, not during Commit)
-      trigger_condition: "Stationary. Enemies within melee range attacking the Siegebreaker."
-      effect: >
-        Plant legs and harden exoskeleton. +25% damage reduction from all directions.
-        Attacks against the Siegebreaker while braced have a 30% chance to damage
-        the attacker's weapon/limb (chitin is HARD — hitting it hurts). Lasts until
-        the Siegebreaker moves or commits. Cannot attack while braced.
-      what_item_it_replaces: >
-        Hardshell Powder (party-wide defense boost, fixed duration). Chitin Brace
-        is self-only but permanent-while-active and has a retaliatory component.
-        Also replaces Stoneskin Scroll (resistance to physical, no offensive presence).
-      decision_created: >
-        Brace (become unkillable wall but deal no damage) OR stand-fight (take
-        more damage but kill what's in front)? Brace is for when the Siegebreaker
-        SHOULDN'T commit but enemies are on top of them.
-      cooldown: "None. Toggle on/off. Cannot be active during Commit."
-
-    - name: Pincer Crush
-      type: Active (primary melee attack)
-      trigger_condition: "Enemy within melee range. Usable during Hold or during Impact State after arrival."
-      effect: >
-        Close pincers on target. STR 18 base damage. If target is smaller than
-        Siegebreaker, target is briefly held (0.5s — just long enough to guarantee
-        ONE follow-up hit from an ally). If target is same-size or larger, applies
-        Fractured (armor reduced 20% for 6s) instead of hold.
-      what_item_it_replaces: >
-        Rupture Oil (weapon coating, 3-stack armor shred, 8s window). Pincer Crush
-        applies armor reduction in a SINGLE hit with no stacking requirement.
-        Also partially replaces Brittlemark Chalk (vulnerability mark for allies).
-      decision_created: >
-        Minimal. This is the "you arrived, now hit things" button. The decision
-        was GETTING here. Now you execute. Decision only matters vs. multiple
-        targets in reach: which one gets Crushed first?
-      cooldown: "GCD-locked (2.0s base). Standard melee cadence."
-
-    - name: Impact Arrival
-      type: Passive (triggers automatically on Commit completion)
-      trigger_condition: "Siegebreaker reaches committed destination after traveling at least 4m."
-      effect: >
-        Kinetic mass resolves on arrival. AoE damage in 3m radius around landing
-        point. Damage scales with distance traveled during Commit (minimum 4m for
-        activation, scales up to 15m max travel for full damage). All enemies in
-        radius suffer Stage 1 knockback (pushed 2-4m away from impact point).
-        Siegebreaker enters Impact State for 3 GCDs (enhanced melee damage).
-      what_item_it_replaces: >
-        Ramcharge Capsule (directional impact damage, single-use, interruptible).
-        Impact Arrival is the premium version: uninterruptible approach + AoE on
-        landing + knockback + follow-up enhanced state. Also replaces Upheaval Flask
-        (AoE displacement, thrown from ground level) by being delivered FROM the
-        Siegebreaker's mass.
-      decision_created: >
-        None on activation (automatic). But INFORMS the Commit decision: "If I
-        commit from 15m away, Impact Arrival will hit maximum damage. If I commit
-        from 5m away, the arrival is weaker but I get there sooner."
-      cooldown: "N/A — triggers once per Commit completion. Limited by Commit frequency."
-      scaling: "Damage = base + (distance_traveled × momentum_multiplier). Min 4m, max scaling at 15m."
-
-    - name: Exoskeletal Shed
-      type: Active (emergency)
-      trigger_condition: "Siegebreaker HP below 30%. Usable once per encounter."
-      effect: >
-        Shed damaged outer chitin layer. Immediate: remove all Stage 1-2 debuffs
-        currently applied. For 6 seconds: SPD increases to 8 (still slow, but
-        faster than base 5). After 6s: new chitin hardens, DR returns to normal,
-        SPD returns to 5. During shed window: DR is REDUCED by 30% (soft interior
-        exposed until new chitin sets).
-      what_item_it_replaces: >
-        No direct item analog. Closest is a combination of debuff cleanse + brief
-        mobility boost. The "oh shit" button for a class that otherwise has no
-        escape. Thematic: insects molt. This is a biological emergency response.
-      decision_created: >
-        When to shed? Immediately at 30% (maximize survival time with faster speed)
-        or hold it for a worse situation (risk dying before using it)? The reduced
-        DR during shed means you're VULNERABLE — using it at the wrong time kills
-        you faster.
-      cooldown: "Once per encounter. High commitment, high stakes."
-
-    - name: Tremor Stomp
-      type: Active (area control while holding position)
-      trigger_condition: "Stationary or during Impact State. Enemies within 5m."
-      effect: >
-        Slam mass into ground. 5m radius shockwave. All enemies in radius suffer
-        Stage 1 slow (-30% movement speed for 4s) and are briefly staggered (0.3s
-        hitstun — NOT enough to qualify as Stage 2, but enough to interrupt channels).
-        Enemies directly adjacent (within 2m) take moderate damage.
-      what_item_it_replaces: >
-        Concussion Charge (directional push, 2s delay, doesn't move with you).
-        Tremor Stomp is radial (all directions), instant, and applies slow rather
-        than displacement. Also partially replaces Thickglass Flask (speed reduction
-        puddle, stationary) by being centered on the Siegebreaker.
-      decision_created: >
-        Use Tremor Stomp to keep enemies IN melee range (slow prevents escape) or
-        save it for when enemies try to disengage? The slow is the Siegebreaker's
-        only tool to prevent kiting — timing it wrong means enemies escape freely.
-      cooldown: "12 seconds. The Siegebreaker's only real cooldown to manage."
-
-    - name: Fortress Body
-      type: Passive (always active)
-      trigger_condition: "Permanent. No activation required."
-      effect: >
-        Base damage reduction from exoskeleton: 20% physical, 10% magical (chitin
-        is less effective vs. energy). Immunity to Stage 1 CC during any movement
-        (committed or not). Immunity to knockback from sources with STR < 14.
-        Attacks from behind deal 10% LESS damage (curved shell deflection) rather
-        than the normal bonus damage for rear attacks that other classes suffer.
-      what_item_it_replaces: >
-        Stoneskin Scroll (resistance to physical, duration-limited). Fortress Body
-        is PERMANENT and built-in. Also replaces Hardshell Powder (party-wide defense
-        boost) — but self-only and always-on rather than brief and team-wide.
-      decision_created: >
-        None. This is the "tax" the class pays for existing: it's always tanky,
-        which means encounters are designed assuming it can absorb X damage. The
-        player doesn't decide anything — they just ARE durable.
-      cooldown: "N/A — always active."
-
-    - name: Inevitable Presence
-      type: Passive (threat generation)
-      trigger_condition: "Siegebreaker is visible to enemies AND currently committed (advancing toward them)."
-      effect: >
-        Enemies with SR2+ AI that can SEE the Siegebreaker advancing toward them
-        must make a decision: stand and fight (knowing STR 18 arrives in X seconds)
-        or reposition (giving up their current position/target). This is not a
-        mechanical "taunt" — it's an AI behavior that recognizes the approaching
-        threat. SR1 enemies ignore it (too dumb). SR3+ enemies may attempt to
-        bait the commitment then dodge at the last moment.
-      what_item_it_replaces: >
-        Pheromone Tag (forces aggro for 8s), Taunt Cracker (forces pathing for 3s),
-        Hollowform Decoy (draws aggro to deployable). Inevitable Presence doesn't
-        FORCE attention — it DEMANDS a response. Smarter enemies respond smarter.
-        The item versions force behavior; this passive creates a strategic dilemma
-        for the AI.
-      decision_created: >
-        For the ENEMY: fight or flight. For the PLAYER: indirect. By committing
-        toward enemies, you force them to make suboptimal choices (abandon position
-        OR eat STR 18). The player's decision was the Commit — this passive is the
-        payoff of that decision applied to enemy AI.
-      cooldown: "N/A — always active during Commit. Range: line-of-sight based."
-
-# ============================================================================
-# SECTION 5: RESOURCE SYSTEM
-# ============================================================================
-
-resource_system:
-  design_note: >
-    Simple. No complex gauges. No mana. No bone economy. The Siegebreaker's
-    "resource" is momentum — built automatically during Commit, spent automatically
-    on arrival. The player never manually manages it. They see a number going up
-    while walking and a satisfying IMPACT when they arrive. That's it.
-
-  primary_resource:
-    name: Momentum
-    description: >
-      Fills passively during Commit movement. Represents accumulated kinetic
-      energy from sustained directional travel. Cannot be spent manually —
-      resolves automatically on Impact Arrival. Resets to zero on any stop.
-    
-    generation: "Passive. +1 per meter traveled during Commit. Starts at 0 on each new Commit."
-    maximum: "15 (representing 15m of travel distance — the max scaling distance)"
-    spending: "Automatic on Impact Arrival. All accumulated Momentum converts to bonus damage."
-    decay: "Instant to zero on ANY stop (voluntary, terrain collision, Stage 3 CC)."
-    
-    player_interaction: >
-      The player does NOT manage Momentum. They do not press a button to spend it.
-      They do not choose WHEN it resolves. The ONLY choice that affects Momentum is
-      the Commit distance — longer commits = more Momentum = bigger arrival. This
-      is the "low ceiling" design: there is no optimization. Walk further = hit harder.
-      That's the entire system.
-
-  secondary_resource:
-    name: Endurance
-    description: >
-      Health-adjacent stamina pool. Represents the exoskeleton's structural
-      integrity. Depletes when taking damage during Commit (separate from HP).
-      If Endurance reaches 0, super armor degrades (can be staggered by heavy
-      hits). Regenerates slowly when stationary (holding position).
-    
-    generation: "Passive regeneration while stationary. +5% per second when not taking damage."
-    maximum: "100 (abstract units)"
-    depletion: "Each hit during Commit costs Endurance based on hit damage (after DR). Heavy hits cost more."
-    threshold_effect: >
-      At 0 Endurance: super armor partially fails. Hits above a damage threshold
-      CAN stagger the Siegebreaker (heavy attacks, boss slams). This creates the
-      scenario where sustained focus fire from many enemies CAN eventually stop
-      the beetle — but requires coordinated, sustained punishment.
-    
-    player_interaction: >
-      Slightly more interactive than Momentum. The player can SEE Endurance
-      depleting and factor it into Commit decisions: "Am I healthy enough to
-      walk through THAT crossfire?" But they cannot directly restore it except
-      by stopping and waiting. The decision is: "commit now at partial Endurance
-      (risky, might get staggered) or wait until full (safe but wastes time)."
-
-  what_this_system_is_NOT:
-    - "Not mana — nothing costs mana, there IS no mana"
-    - "Not a combo meter — no combo exists"
-    - "Not a gauge that unlocks abilities — all abilities are always available"
-    - "Not a buff timer to manage — no temporary buffs to maintain"
-    - "Not an energy system with spending choices — Momentum spends itself"
-
-# ============================================================================
-# SECTION 6: CC STAGE BUDGET
-# ============================================================================
-
-cc_stage_budget:
-  design_note: >
-    The Siegebreaker is primarily a Stage 1 CC class: displacement and knockback
-    through sheer physical force. It does NOT stun, does NOT silence, does NOT
-    paralyze. It PUSHES things. The CC it provides is a byproduct of its mass
-    and momentum — not a deliberate control ability. Things get out of the way
-    or they get bowled over.
-
-  stage_1_effects:
-    - source: Inexorable Advance (path collision)
-      effect: "Enemies in direct path pushed aside (lateral displacement 2m)"
-      mechanism: "Physical mass. Not an ability — just what happens when a beetle walks through you."
-      reliability: "Automatic during any Commit. No resource cost. Enemies must be in the path."
-      counterplay: "Don't stand in front of the beetle. Simple."
-
-    - source: Impact Arrival (landing shockwave)
-      effect: "3m radius knockback on arrival. Enemies pushed 2-4m from impact point."
-      mechanism: "Kinetic energy discharge on sudden stop. Like a truck hitting a wall — everything nearby bounces."
-      reliability: "Guaranteed on any Commit of 4m+ distance. Scales with Momentum."
-      counterplay: "Don't be near the Siegebreaker's destination. Predict where it's going."
-
-    - source: Tremor Stomp (area slow)
-      effect: "-30% movement speed in 5m radius for 4s. Brief stagger (0.3s hitstun)."
-      mechanism: "Ground impact. Mass hitting the floor creates shockwaves."
-      reliability: "Cooldown-gated (12s). Only active ability that provides CC on demand."
-      counterplay: "Range. Stay beyond 5m. The Siegebreaker can't CHASE you to Stomp (SPD 5)."
-
-  stage_2_effects:
-    - source: None
-      note: >
-        The Siegebreaker has NO Stage 2 CC (silence, interrupt, confusion).
-        This is deliberate. The class does not disable enemies — it displaces
-        them or kills them. There is no "prevent them from acting" tool because
-        the class's answer to dangerous enemies is "be there and kill them"
-        not "prevent them from doing the thing."
-
-  stage_3_effects:
-    - source: None
-      note: >
-        The Siegebreaker has NO Stage 3 CC. It cannot stun, paralyze, or sleep
-        enemies. This is the tradeoff for BEING IMMUNE to Stage 1-2 CC itself.
-        The beetle doesn't disable — it destroys. Hard CC is for other classes
-        (Grappler, Shaman) to provide.
-
-  cc_budget_summary: >
-    Total budget: Stage 1 ONLY. Three sources of displacement/slow, all physical,
-    all byproducts of the class's primary activity (moving and arriving). No dedicated
-    CC abilities exist. The Siegebreaker's "crowd control" is that things die or get
-    shoved when it arrives. Parties wanting actual disables need a Shaman or Grappler.
-    The Siegebreaker controls space through THREAT, not through lockdown.
-
-  interaction_with_party_cc:
-    synergy: >
-      Siegebreaker benefits enormously from ALLIED CC. A Shaman slowing enemies means
-      they CAN'T kite the beetle. A Grappler pinning a target means the Siegebreaker's
-      Commit is GUARANTEED to land. Stage 1 displacement from the beetle sets up
-      enemy positions for allied abilities (pushed into Shaman totems, into Elementalist
-      terrain, off edges).
-    anti_synergy: >
-      Siegebreaker does NOT need CC applied TO enemies it's already reaching. Slowing
-      an enemy the Siegebreaker already committed toward is wasted — the beetle will
-      arrive regardless. Allied CC is best applied to enemies the Siegebreaker ISN'T
-      targeting (controlling the rest of the fight while the beetle handles its lane).
-
-# ============================================================================
-# SECTION 7: VULNERABILITY
-# ============================================================================
-
-vulnerability:
-  design_note: >
-    The Siegebreaker's vulnerabilities are STRUCTURAL — they emerge from the same
-    stats that make it powerful. STR 18 + SPD 5 + NTU 3 + MAGICCAP 6 means the
-    class is devastatingly effective in its lane and utterly useless outside it.
-    Enemies don't beat the Siegebreaker by overpowering it — they beat it by
-    being somewhere else.
-
-  primary_vulnerabilities:
-
-    - name: Kiting (SPD 5 = everything outruns you)
-      description: >
-        Any enemy with SPD 6+ can simply... walk away. The Siegebreaker cannot
-        chase. It can Commit, but if the enemy sees it coming and moves laterally,
-        the Commit resolves into empty space. The beetle arrives at a position the
-        enemy already left. SPD 5 means zero ability to pursue anything that
-        doesn't WANT to be caught.
-      exploited_by: "Ranged enemies, mobile melee enemies, SR3+ AI that recognizes and sidesteps Commits."
-      mitigation: "Tremor Stomp slow (if in range), allied CC, corridor geography (can't dodge laterally in a hallway)."
-
-    - name: Predictability (commitment = telegraphed)
-      description: >
-        Once committed, the Siegebreaker's destination is OBVIOUS. Every enemy
-        can see where it's going. SR3+ enemies will simply vacate that position.
-        The beetle announces its intent with every Commit — there's no surprise,
-        no feint, no misdirection. It walks forward. Everyone knows where "forward" is.
-      exploited_by: "SR3+ enemy AI, any enemy with repositioning abilities, coordinated enemy groups."
-      mitigation: "Committing to positions rather than specific enemies (area denial), committing down corridors (no lateral escape possible)."
-
-    - name: Ranged Attackers (can't reach them, can't dodge their attacks)
-      description: >
-        The Siegebreaker cannot close distance to ranged enemies quickly. SPD 5
-        means archers/casters get 15+ seconds of free fire before the beetle
-        arrives. The exoskeleton absorbs this damage (DR + Endurance) but sustained
-        ranged focus fire WILL deplete Endurance before arrival, potentially
-        breaking super armor. Also: MAGICCAP 6 means no gap-closing spells exist.
-      exploited_by: "Archer enemies, caster enemies, enemies on elevated positions, enemies across gaps."
-      mitigation: "Endurance pool (absorbs the fire), allied support (Shaman debuffs ranged accuracy, Elementalist shields), terrain LoS breaks during approach."
-
-    - name: Multi-front Engagements (committed = absent from other fronts)
-      description: >
-        While committed toward Target A, the Siegebreaker is not protecting
-        Position B. The 10-20 seconds of transit time means the party must
-        survive WITHOUT their frontline during every Commit. A bad Commit
-        (wrong target, wrong direction) leaves the party exposed for the
-        entire transit duration with no way to recall the beetle.
-      exploited_by: "Coordinated enemy spawns from multiple directions, SR3 pincer movements, boss adds appearing behind the party."
-      mitigation: "Good Commit decisions (pre-reading enemy patterns), short-range Commits (less absence time), holding position in central locations."
-
-    - name: Magic Damage (exoskeleton is physical armor)
-      description: >
-        Fortress Body provides 20% physical DR but only 10% magical DR. The
-        exoskeleton is chitin — it deflects blades and absorbs impacts but
-        doesn't resist energy, fire, ice, or lightning well. Magic-heavy
-        encounters pressure the Siegebreaker's HP directly through the
-        reduced magical resistance.
-      exploited_by: "Caster enemies, elemental AoE, magical DoT effects, enchanted attacks."
-      mitigation: "None innate (MAGICCAP 6 means no magical self-buff possible). Requires party support (Elementalist shields, Shaman damage reduction curses on enemies)."
-
-    - name: Commitment Inertia (wrong choice = 15 seconds wasted)
-      description: >
-        The single biggest punish for the Siegebreaker is a WRONG COMMIT. If
-        the player reads incorrectly — commits toward a target that moves,
-        toward a position that becomes irrelevant, or away from where the
-        real threat emerges — there is NO recovery. The beetle walks for 15
-        seconds toward nothing while the actual fight happens elsewhere. This
-        is the "low ceiling" expressed as downside: good and bad play look
-        similar EXCEPT for which direction the beetle walks.
-      exploited_by: "Any situation that changes after Commit is made. Boss phase transitions, enemy reinforcement spawns, ally repositioning that changes the protection need."
-      mitigation: "Manual full-stop (costs all Momentum + 3s recovery — painful but available). Better pre-reading. Shorter Commits (less time invested, less risk, but less Impact Arrival damage)."
-
-  vulnerability_summary: >
-    The Siegebreaker is beaten by AVOIDANCE, not by FORCE. You don't overpower
-    the beetle — you go around it. You don't burst it down — you kite it until
-    its allies die. You don't CC-lock it — you lure it into a bad Commit and
-    kill its party while it's walking toward an empty corner. The class is
-    "unbeatable if it reaches you" balanced by "entirely beatable if it doesn't."
-
-# ============================================================================
-# SECTION 8: ITEM COMPLEMENTARITY
-# ============================================================================
-
-item_complementarity:
-  design_note: >
-    The Siegebreaker replaces specific defensive/displacement items as a premium
-    alternative. But it also BENEFITS from items that address its vulnerabilities.
-    The class doesn't need damage items (STR 18 handles damage). It doesn't need
-    defense items (exoskeleton handles defense). It NEEDS mobility and CC items
-    to compensate for SPD 5.
-
-  items_the_class_replaces:
-    - item: Ironhide Tincture
-      replaced_because: "Fortress Body + Inexorable Advance provide permanent, scaling DR without the speed penalty."
-    - item: Ramcharge Capsule
-      replaced_because: "Commit + Impact Arrival is the permanent, uninterruptible, scaling version."
-    - item: Hardshell Powder
-      replaced_because: "Fortress Body is always-on physical DR. No activation needed, no duration."
-    - item: Quartzwall Capsule
-      replaced_because: "The Siegebreaker IS the moving wall. Better than static crystal because it also kills."
-    - item: Barricade Foam
-      replaced_because: "The Siegebreaker blocks corridors by standing in them. No construction time needed."
-    - item: Stoneskin Scroll
-      replaced_because: "Physical resistance is built into the exoskeleton permanently."
-    - item: Concussion Charge
-      replaced_because: "Impact Arrival and path displacement provide superior, on-demand knockback."
-
-  items_the_class_wants:
-    - item: Thickglass Flask
-      why: "Slows enemies in an area, preventing them from kiting. Addresses primary vulnerability."
-    - item: Frostweave Net
-      why: "Roots a single target in place, guaranteeing the Siegebreaker's Commit lands."
-    - item: Gravwell Orb
-      why: "Clusters enemies together at a point — Commit toward the cluster for maximum Impact Arrival value."
-    - item: Flashstep Cartridge
-      why: "Theoretically addresses SPD 5... but 8m teleport on a class that can't cast might not be usable. Open question."
-    - item: Siphonwax Pellet
-      why: "Reduces enemy damage output during the Siegebreaker's approach, preserving Endurance."
-
-  items_the_class_does_NOT_need:
-    - item: Might Potion / Demon Powder
-      why: "STR 18 already provides overwhelming damage. More ATK on a class that already one-shots is wasted."
-    - item: Green Blossom
-      why: "Stamina regen for dodging is useless — the Siegebreaker doesn't dodge. Ever."
-    - item: Smokebreak Ampule
-      why: "Escape tool for a class that never retreats. Philosophically incompatible."
-    - item: Springboard Disc
-      why: "Vertical mobility for a class that weighs as much as a small vehicle. Structurally impossible."
-
-  party_item_economy_impact: >
-    A party WITH a Siegebreaker can drop all defensive corridor-control items
-    from their loadout (Quartzwall, Barricade Foam, Ironhide Tincture) because
-    the class provides that function permanently. This frees 2-3 consumable slots
-    per party member for offensive or utility items. The Siegebreaker's item
-    contribution to the party is NEGATIVE (it replaces items others would carry)
-    rather than ADDITIVE (it doesn't need items itself).
-
-# ============================================================================
-# SECTION 9: HIT/MISS ANALYSIS VS ITEM BASELINES
-# ============================================================================
-
-hit_miss_analysis:
-  design_note: >
-    Comparing the Siegebreaker's kit against the item baseline from class_item_baselines.md.
-    Does the class clearly outperform items in its lane? Are there gaps where items
-    remain superior?
-
-  hits:
-    - comparison: "Siegebreaker vs. Ironhide Tincture (+50% DR, 8s, -40% speed)"
-      verdict: HIT
-      reasoning: >
-        Fortress Body (permanent 20% physical DR) + Inexorable Advance (scaling
-        +5%/sec up to +40%) provides comparable or superior DR with NO duration
-        limit and NO additional speed penalty. The tincture is 8 seconds of
-        mediocre tankiness. The Siegebreaker is permanently tanky and gets
-        TANKIER the longer it advances. Clear premium.
-
-    - comparison: "Siegebreaker vs. Ramcharge Capsule (single directional charge, interruptible)"
-      verdict: HIT
-      reasoning: >
-        Commit is uninterruptible (super armor), scales with distance (more damage
-        from longer charges), repeatable (no consumable cost), and chains into
-        Impact State for follow-up damage. Ramcharge is one-shot, can be stopped
-        mid-charge, and deals fixed damage with no follow-up state. Clear premium.
-
-    - comparison: "Siegebreaker vs. Quartzwall Capsule (crystal wall, blocks both teams, destroyable)"
-      verdict: HIT
-      reasoning: >
-        The Siegebreaker IS the wall but only blocks enemies (allies can move through
-        it freely by going around). It also destroys what it blocks (not just
-        stopping movement but killing). It's not destroyable by enemy attacks
-        (HP pool, not barrier HP). And it MOVES. A moving, killing, unkillable
-        wall vs. a static, fragile, team-blocking crystal. Clear premium.
-
-    - comparison: "Siegebreaker vs. Concussion Charge (directional blast, pushes 4m, 2s delay)"
-      verdict: HIT
-      reasoning: >
-        Impact Arrival knockback is guaranteed (no delay), AoE (360° not 90° cone),
-        scales with Momentum, and is delivered from WITHIN the enemy group (not
-        from a placed explosive you have to reach first). The Siegebreaker brings
-        the displacement TO the enemies rather than placing it and hoping they
-        walk over it.
-
-    - comparison: "Siegebreaker vs. Hardshell Powder (party-wide defense boost)"
-      verdict: PARTIAL HIT
-      reasoning: >
-        Fortress Body exceeds Hardshell for SELF defense, but Hardshell buffs the
-        ENTIRE PARTY. The Siegebreaker only protects itself and whatever it stands
-        in front of. If the party is spread out, the beetle can't provide the same
-        team-wide coverage that one Hardshell Powder does. The item retains value
-        for team defense; the class excels at personal durability.
-
-  misses:
-    - comparison: "Siegebreaker vs. Stoneskin Scroll (resistance to ALL nonmagical physical)"
-      verdict: NEAR-MISS
-      reasoning: >
-        Stoneskin provides resistance (50% reduction) to ALL nonmagical physical
-        damage for its duration. Fortress Body provides 20% base — lower magnitude.
-        HOWEVER: Fortress Body is permanent, and Stoneskin is duration-limited.
-        Over a full encounter, Fortress Body provides more TOTAL mitigation. But
-        in a 10-second spike damage window, Stoneskin is mathematically superior
-        to Fortress Body alone (without Inexorable Advance stacks). Verdict:
-        Stoneskin still has value in burst-damage situations even WITH a Siegebreaker.
-
-    - comparison: "Siegebreaker as gap-closer vs. Flashstep Cartridge (8m teleport)"
-      verdict: MISS — Items win here
-      reasoning: >
-        The Siegebreaker has NO instant gap-close. SPD 5 means reaching anything
-        takes 10-20 seconds. Flashstep Cartridge provides INSTANT 8m repositioning.
-        A non-Siegebreaker player with Flashstep can reach a target faster than a
-        Siegebreaker can by walking. The class premium is NOT speed of arrival —
-        it's inevitability and impact ON arrival. But for time-critical situations
-        (enemy about to finish a cast in 3 seconds), the item is simply better
-        than "start walking and arrive in 12 seconds."
-
-    - comparison: "Siegebreaker zone control vs. Barricade Foam (custom-shaped barrier)"
-      verdict: PARTIAL MISS
-      reasoning: >
-        Barricade Foam creates barriers in CUSTOM SHAPES at CHOSEN POSITIONS.
-        The Siegebreaker can only block where it IS standing. It cannot be in two
-        corridors simultaneously. Foam can seal both exits of a room with two uses.
-        The beetle can only stand in one. For multi-path zone denial, items
-        remain superior to a single Siegebreaker body.
-
-  overall_assessment: >
-    The Siegebreaker clearly outperforms items in sustained frontline presence,
-    directional threat pressure, and personal durability. Items remain superior
-    in: instant gap-closing, multi-position zone denial, and team-wide defensive
-    buffs. This is correct for a Base tier class — it should not obsolete ALL
-    defensive items, only the personal-tankiness and directional-charge categories.
-
-# ============================================================================
-# SECTION 10: ANTI-PATTERNS
-# ============================================================================
-
-anti_patterns:
-  design_note: >
-    Things the Siegebreaker must NEVER become. These are design traps that would
-    destroy the class identity if implemented. Reference these during any future
-    iteration to ensure the lazy beetle stays lazy.
-
-  forbidden_patterns:
-
-    - pattern: Rotation
-      description: "Any sequence of abilities that must be performed in order for optimal output."
-      why_forbidden: >
-        The Siegebreaker has no rotation. It walks and hits things. If a sequence
-        emerges (Commit → Arrive → Stomp → Crush → Crush → Recommit = "rotation"),
-        the damage must NOT be noticeably worse when performed out of order. Every
-        action should be independently valuable regardless of what came before.
-      violation_test: "If players discuss 'opener' or 'optimal sequence,' the design has failed."
-
-    - pattern: Burst Windows
-      description: "Periodic high-damage windows separated by low-damage valleys."
-      why_forbidden: >
-        Impact State (post-arrival enhanced damage) is a burst window but it's
-        not PERIODIC. It triggers on ARRIVAL, which is player-determined timing.
-        If Impact State gets a cooldown that creates a "commit every 30s for burst,
-        downtime between" cadence, the design has failed. The beetle hits hard
-        when it arrives, whenever that is. No clock dictates when to arrive.
-      violation_test: "If there's a 'best time' to commit based on internal cooldowns rather than enemy positioning, the design has failed."
-
-    - pattern: Resource Optimization
-      description: "Gameplay where managing resource efficiency provides significant power gains."
-      why_forbidden: >
-        Momentum is automatic. Endurance is passive. There is nothing to "optimize."
-        A player who perfectly manages Endurance should not be more than 5% more
-        effective than one who ignores it entirely. If Endurance management becomes
-        a skill differentiator, it's too complex for this class.
-      violation_test: "If guides say 'optimal Endurance management' or 'Momentum breakpoints,' the design has failed."
-
-    - pattern: Reactive Gameplay
-      description: "Responding to enemy actions with timed counterplay (parries, dodges, interrupts)."
-      why_forbidden: >
-        NTU 3 means the beetle doesn't REACT. It doesn't parry. It doesn't dodge.
-        It doesn't interrupt on reaction. If any ability rewards "press this when
-        the enemy does X" with timing precision, it violates NTU 3 and the simple
-        design intent. The beetle's answer to enemy attacks is: absorb them.
-      violation_test: "If a Siegebreaker ability has a 'perfect timing' window that rewards frame-precise input, the design has failed."
-
-    - pattern: APM Sensitivity
-      description: "Performance scaling with actions-per-minute (pressing buttons faster = more damage)."
-      why_forbidden: >
-        The Siegebreaker should perform identically at 10 APM and 60 APM. GCD-locked
-        melee during Impact State means more button presses don't help (GCD gates
-        everything). During Commit, there are NO buttons to press (walking is
-        automatic). High APM players gain zero advantage.
-      violation_test: "If a Siegebreaker player ever feels 'I should be pressing more buttons,' the design has failed."
-
-    - pattern: Complex Positioning
-      description: "Requiring precise spatial awareness or specific angles for ability optimization."
-      why_forbidden: >
-        "Go forward" is the only positional instruction. The beetle doesn't need
-        to flank, doesn't need specific angles, doesn't need to be behind the boss.
-        All damage is front-facing because the beetle only MOVES forward. If any
-        ability rewards "attack from behind" or "position at 45° angle," it
-        contradicts the commitment-forward identity.
-      violation_test: "If positional guides exist for Siegebreaker beyond 'commit toward the right thing,' the design has failed."
-
-    - pattern: Buff Management
-      description: "Maintaining temporary buffs through specific action sequences or timing."
-      why_forbidden: >
-        No temporary buffs exist on the Siegebreaker. Inexorable Advance scales
-        during Commit but resets on stop — that's not a "buff to maintain," it's
-        a state that exists while doing the one thing the class does. If any
-        future addition creates a buff that must be "refreshed" or "maintained,"
-        it adds complexity inappropriate for this class.
-      violation_test: "If the Siegebreaker has a buff bar with timers to track, the design has failed."
-
-    - pattern: Execution Ceiling Creep
-      description: "Adding 'skill expression' through mechanical difficulty over time."
-      why_forbidden: >
-        It will be TEMPTING to add complexity because the class "feels too simple."
-        DO NOT. The simplicity IS the identity. The low ceiling IS the design. If
-        players want high-ceiling gameplay, they play Strix, Elementalist, or Grappler.
-        The Siegebreaker exists FOR players who want "I make one good decision and
-        then my character handles the rest." Respect that player.
-      violation_test: "If patch notes add 'new skill expression tools for Siegebreaker,' the design philosophy has been abandoned."
-
-# ============================================================================
-# SECTION 11: OPEN QUESTIONS
-# ============================================================================
-
-open_questions:
-
-  mechanical:
-    - question: "How does commitment-lock work in engine terms?"
-      context: >
-        Does the player's movement input get OVERRIDDEN during Commit (character
-        moves automatically toward target)? Or does the player still hold forward
-        but the turning speed is severely limited? The former is simpler but removes
-        player agency. The latter is more "felt" but might allow slight optimization
-        through path micro-adjustments.
-      design_preference: >
-        Automatic movement toward committed target/position. Player input IGNORED
-        during Commit. This is the simplest implementation and prevents any
-        "micro-optimization" from emerging. The beetle drives itself.
-
-    - question: "What happens when the committed target DIES before arrival?"
-      context: >
-        An ally kills the Siegebreaker's target while the beetle is still walking
-        toward it. Does the Commit continue to the position? Transfer to the
-        nearest enemy at that position? End early (wasting the Commit)?
-      design_preference: >
-        Continue to the POSITION (not the target). Impact Arrival still resolves
-        on anything at that location. The Commit was a spatial decision — the
-        target dying doesn't change the position being valuable.
-
-    - question: "How does corridor width interact with Siegebreaker body width?"
-      context: >
-        If the beetle is physically large enough to BLOCK a corridor, that's a
-        major strategic tool (allies behind are protected). Level design must
-        accommodate this. What's the beetle's hitbox relative to standard corridor
-        width? Can enemies get past it?
-      design_preference: >
-        Siegebreaker hitbox should be ~2/3 corridor width in standard corridors.
-        Small enemies can squeeze past (creating flanking risk). Same-size or
-        larger enemies cannot pass (beetle IS the wall). This creates the corridor
-        value proposition without making the beetle an absolute wall in all cases.
-
-    - question: "How does SPD 5 interact with GCD/turn order?"
-      context: >
-        If initiative is SPD-based, the Siegebreaker always goes LAST. Does this
-        mean enemies always get to reposition before the beetle Commits? Or does
-        Commit persist BETWEEN turns (the beetle is always walking)?
-      design_preference: >
-        Commit persists between turns. The beetle initiated its walk on its turn
-        and CONTINUES walking during enemy turns. It doesn't stop and restart
-        each turn cycle. Real-time movement at SPD 5 means constant forward
-        motion — not "take turn, move 5 units, wait for next turn."
-
-    - question: "Does Exoskeletal Shed create a 'second life' that's too strong?"
-      context: >
-        Once per encounter emergency at 30% HP with SPD boost and debuff cleanse
-        is strong. Combined with the already high base DR, does this make the
-        Siegebreaker effectively unkillable in content where enemies can't burst
-        from 30% to 0% in 6 seconds?
-      design_preference: >
-        The 30% DR REDUCTION during shed is the balancing factor. Enemies do 30%
-        MORE damage to the beetle during shed. If the shed is triggered in a bad
-        position (still surrounded, still taking fire), the reduced DR means the
-        beetle might die FASTER than if it hadn't shed. Shed is only good when
-        paired with spatial opportunity to escape pressure — which at SPD 8
-        (temporarily) might still not be fast enough.
-
-  strategic:
-    - question: "What keeps Siegebreaker relevant when enemies just... dodge?"
-      context: >
-        SR3+ enemies should recognize and avoid the Commit. If they all sidestep,
-        the Siegebreaker walks into empty space repeatedly. What prevents this from
-        making the class useless at high SR?
-      proposed_answers:
-        - "Corridor-heavy map design forces fights in spaces where lateral dodge is impossible."
-        - "Inevitable Presence forces enemies into a DECISION (dodge = abandon position = allies capitalize)."
-        - "Party-applied CC (Shaman slow, Grappler root) prevents evasion of Commits."
-        - "Some Commits target POSITIONS (area denial) not enemies — you commit to BLOCK a path, not HIT a target."
-        - "SR3+ encounters should pair mobile dodgers with immobile objectives the Siegebreaker CAN always reach (fortifications, pylons, spawners)."
-
-    - question: "Is the Siegebreaker a viable solo class or purely party-dependent?"
-      context: >
-        SPD 5 + no ranged attacks + no CC above Stage 1 + no self-healing means
-        solo Siegebreaker gameplay is walking toward one thing, killing it, then
-        walking toward the next. Ranged enemies kite forever. Is this acceptable
-        for a Base tier class that new players might pick first?
-      proposed_answers:
-        - "Consumable items compensate (Thickglass Flask for slows, potions for healing)."
-        - "Solo content for Siegebreaker should have narrow geometry (corridors, rooms with limited exits)."
-        - "The Siegebreaker is designed party-first but functions solo against melee-heavy content."
-        - "Base tier means accessible, not necessarily optimal for all content solo."
-
-    - question: "How does the Siegebreaker feel during 'dead time' between Commits?"
-      context: >
-        After Impact State resolves and before the next Commit begins, the beetle
-        is... standing. Chitin Brace or Pincer Crush on nearby enemies. Is this
-        boring? Is 'boring between the exciting parts' acceptable for this design?
-      proposed_answers:
-        - "Yes. The class is deliberately low-intensity. 'Relaxing between big moments' is the design intent."
-        - "Hold-state gameplay (Brace + Crush) should feel 'sturdy and reliable' not 'waiting for the fun part.'"
-        - "If dead time exceeds 5s in well-designed content, the encounter needs more commit targets."
-        - "The 'lazy beetle' identity means dead time IS the identity — you're the chill class."
-
-    - question: "At Base tier, how does the Siegebreaker scale with progression?"
-      context: >
-        If it's low ceiling, how does gear/progression make it FEEL better without
-        raising the ceiling? More HP = more approach attempts before death? More
-        DR = longer sustained pushes? More STR = overkill (already kills on arrival)?
-      proposed_answers:
-        - "Scale Endurance pool (more sustained pressure before super armor degrades)."
-        - "Scale Impact Arrival AoE radius (bigger explosions on arrival = more satisfying)."
-        - "Reduce recovery time between Commits (less dead time, not higher ceiling)."
-        - "DO NOT scale movement speed. SPD 5 IS the class. Progression shouldn't remove the core tension."
-
-    - question: "How does the Siegebreaker interact with boss encounters?"
-      context: >
-        Bosses don't die to one Impact Arrival. They have phases, mechanics, and
-        can't be displacement-CC'd. What does the Siegebreaker DO against a boss
-        that's immune to Stage 1 knockback and doesn't run away?
-      proposed_answers:
-        - "Sustained melee DPS during hold-state (Pincer Crush at GCD). Not exciting, but effective."
-        - "Commit toward boss adds/summoned threats. The beetle handles everything EXCEPT the boss while allies focus boss."
-        - "Boss encounter design should include things that MOVE and must be CHASED — the beetle's Commit still has value for intercepting mobile boss mechanics."
-        - "Phase transitions that reposition the boss create new Commit opportunities (boss teleports across arena — beetle Commits toward new position)."
-
-  balance:
-    - question: "Is 20% base physical DR + scaling up to 40% additional during Commit too high?"
-      context: >
-        At maximum stacks during Commit: 60% total physical DR. Most enemies deal
-        physical damage. Is the beetle effectively invincible during long Commits?
-        What damages it enough to matter?
-      proposed_answers:
-        - "Magical damage bypasses most of it (only 10% magical DR). Magic-heavy encounters threaten."
-        - "Endurance depletion means sustained fire EVENTUALLY breaks super armor even at 60% DR."
-        - "60% DR with SPD 5 means you still take a LOT of total damage over the 15-second approach — DR per second ≠ DR per damage instance × many instances."
-        - "If testing shows it's too high, reduce Inexorable Advance cap from +40% to +30%."
-
-    - question: "Does Tremor Stomp's 12s cooldown feel wrong on a 'no cooldown management' class?"
-      context: >
-        The design intent is 'no cooldowns to track.' But Tremor Stomp has a 12s CD.
-        Does this create a micro-optimization pressure ("save Stomp for the right
-        moment") that contradicts the simple design?
-      proposed_answers:
-        - "12s is long enough that it's 'use it whenever it's up' rather than strategic timing."
-        - "One cooldown is acceptable. It's the ONLY one. If a second cooldown is ever added, re-evaluate."
-        - "Alternative: make Tremor Stomp cost Endurance instead of having a cooldown (resource-gated, not time-gated). This removes the timer but adds a cost/benefit decision."
-
-    - question: "Is once-per-encounter Exoskeletal Shed too infrequent or too frequent?"
-      context: >
-        Once per encounter means one use per fight. In short fights, might never
-        trigger (HP never drops to 30%). In long fights, only one emergency button
-        for the entire duration. Is this the right frequency?
-      proposed_answers:
-        - "Once per encounter is correct for Base tier. The beetle is simple — one emergency is enough cognitive load."
-        - "If encounters are very long (5+ minutes), consider 'once per 2 minutes' instead of 'once per encounter.'"
-        - "The HP threshold (30%) is the real gate — in well-played content, the Siegebreaker might NEVER drop that low, making Shed irrelevant. That's fine — the good player doesn't NEED the emergency."
-
-# ============================================================================
-# END OF SPECIFICATION
-# ============================================================================
-
-meta:
-  word_count_note: "Deliberately verbose. This is a design document, not an implementation spec."
-  next_steps:
-    - "Quantitative pass: assign specific damage numbers, DR values, speed values in game units."
-    - "Playtest scenarios: simulate Siegebreaker in corridor vs. open room vs. multi-enemy."
-    - "Party composition testing: Siegebreaker + Shaman (slowed enemies can't kite), Siegebreaker + Grappler (pinned targets guaranteed arrival)."
-    - "SR3+ encounter design: ensure at least 30% of fight geometry rewards Commit (corridors, chokepoints, fixed objectives)."
-    - "Solo viability pass: can Siegebreaker complete early game content without a party?"
-  dependencies:
-    - "Level design primitives (corridor width, room dimensions) — determines Commit value"
-    - "Base movement speed standard — determines how much faster everything else is vs. SPD 5"
-    - "SR3+ enemy dodge behavior — determines how often Commits whiff"
-    - "Boss encounter templates — determines Siegebreaker's role in non-trash content"
+# Classes/Frontliner/Siegebreaker_Complete.yaml
+# ═══════════════════════════════════════════════════════════════════════════════
+# SIEGEBREAKER (Wyrpincers) — Momentum Frontliner
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Design lineage:
+#   Mythology: Rhinoceros beetles (unstoppable charge, armored carapace),
+#              Siege rams (committed direction, breaks walls),
+#              Juggernauts (once moving, cannot be stopped)
+#   MH Uragaan: massive hitbox, rolls in committed direction, armor plating
+#   Dark Souls Havel: poise-tanking through hits, no dodging, heavy swings
+#   WoW Protection Warrior: Charge + Intercept (directional commitment)
+#   Overwatch Reinhardt: shield-walk, commit to direction, Charge pin
+#   LoL Sion: unstoppable ult, builds momentum, CC immune while charging
+#
+# Core identity: "The simplest class in the game."
+#   Low ceiling, high floor. A veteran Siegebreaker and a newbie Siegebreaker
+#   perform SIMILARLY. Skill expression is decision QUALITY — where and when
+#   to commit — not execution speed, reaction time, or rotation complexity.
+#   8-10 abilities. Simple decisions. Devastating commitment.
+#
+# Fantasy: "I walk at normal speed. I can't dodge, can't react, can't be
+#   stopped. Once I pick a direction and start building momentum, I get
+#   FASTER. Anything in my path dies or moves."
+#
+# Size Model: LARGE character = LARGE hitbox
+#   Gets hit by everything → BUT hits everything in front of them.
+#   The body IS the weapon AND the wall. Exoskeleton isn't just armor,
+#   it's the offensive surface. You don't SWING at things — you walk
+#   THROUGH them. Size IS the kit.
+#
+# Critical distinction from other frontliners:
+#   Adafold: "I physically block the path. Nothing gets past." (corridor king)
+#   Madolt:  "I keep enemies stupid so they don't TRY to get past." (arena king)
+#   Siegebreaker: "I walk THROUGH enemies. Things in my path break." (siege king)
+#
+# These serve DIFFERENT scenarios:
+#   Adafold = defense (hold position, deny passage)
+#   Madolt = suppression (debilitate AI, prevent smart play)
+#   Siegebreaker = OFFENSE (advance, break formations, create openings)
+#
+# References:
+#   - Combat/BalanceTargets.yaml (all numeric targets)
+#   - Combat/AggroSystem.yaml (Strategy Rank interaction)
+#   - Roles/Frontliner_RoleMechanic.yaml (shared frontliner systems)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+Key: Classes.Frontliner.Siegebreaker
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 1: CLASS IDENTITY
+# ═══════════════════════════════════════════════════════════════════════════════
+
+Identity:
+  Name: Siegebreaker
+  Role: Frontliner
+  SubRole: Offensive Frontliner (Momentum / Breach)
+  DamageType: physical
+  ExecutionArchetype: Commitment
+  ExecutionTier: Base
+  # Base tier justified by:
+  # - 8-10 abilities total (smallest kit in the game)
+  # - NO execution speed requirements (SPD 5 = no dodge, no parry, no twitch)
+  # - NO complex rotation (simple decision tree, not sequence memorization)
+  # - NO reaction-based gameplay (NTU 3 = non-reactive class)
+  # - Skill expression = decision QUALITY, not decision SPEED
+  # - Veteran vs newbie gap is the SMALLEST of all classes
+  # - High floor: doing the "obvious" thing is nearly optimal
+  # - Low ceiling: doing the "perfect" thing is barely better than obvious
+
+  Description: >
+    A massive exoskeletal frontliner who advances through enemy formations
+    by building momentum in a committed direction. The Siegebreaker's body
+    IS the weapon — large hitbox means everything in front of them gets hit,
+    and everything the enemy throws hits them back. The trade: absolute CC
+    immunity (nothing stops the advance) in exchange for zero reactive tools
+    (no dodging, no parrying, no quick repositioning).
+
+    Siegebreaker does not "tank" in the traditional sense. They don't hold a
+    position — they ADVANCE through one. Enemies don't attack Siegebreaker
+    because of threat or AI manipulation. Enemies attack Siegebreaker because
+    Siegebreaker is walking directly into them and they physically cannot
+    ignore a beetle the size of a doorframe grinding through their formation.
+
+  CoreFantasy: >
+    You are a living siege engine. You pick a direction. You start walking.
+    You get faster. Nothing stops you — not stuns, not knockbacks, not roots,
+    not walls of enemies. Your exoskeleton shrugs off everything that would
+    interrupt lesser fighters. You don't dodge attacks because you don't
+    NEED to dodge attacks. You walk through them. Enemies in your path
+    break against your carapace or get shoved aside. You are not fast.
+    You are not clever. You are INEVITABLE.
+
+    The skill is knowing WHERE to walk. Once you choose, the outcome is
+    binary: you chose right (everything in your path dies) or you chose
+    wrong (you marched past the real threat). That's the entire game.
+
+  InputModality:
+    PrimaryFocus: directional_commitment_assessment
+    SecondaryFocus: momentum_gauge_management
+    TertiaryFocus: target_priority_evaluation
+    DecisionType: commitment_based
+    # Unlike Madolt (stance-juggling, guard-point timing) or Adafold (reactive
+    # interception, sentinel warnings), Siegebreaker watches the FIELD and
+    # decides WHERE to commit. Once committed, execution is nearly automatic.
+    # The cognitive load is PRE-COMMITMENT, not during execution.
+
+  StatPriority:
+    Primary: STR   # STR 18 — maximum physical force. Every hit is a truck.
+    Secondary: VIT  # Survivability through raw HP pool (takes every hit, needs the HP)
+    Tertiary: END  # Endurance sustain — longer fights, more staying power
+    DumpStat: SPD  # SPD 5 — cannot dodge, cannot parry, slow animation recovery
+    DumpStat2: NTU # NTU 3 — non-reactive class, no intuition-based mechanics
+
+  DesignStatement: >
+    Siegebreaker is the ENTRY POINT frontliner. If a player has never tanked
+    before, Siegebreaker teaches them the CORE SKILL of frontlining: reading
+    the battlefield and choosing where to be. It strips away execution
+    complexity (Madolt's stance juggling, Adafold's reactive intercepts) and
+    asks one question: "Where should I go?" If you answer correctly, you
+    win. If you answer incorrectly, you wasted your commitment and must
+    rebuild momentum. That's the entire skill expression. A newbie who reads
+    the field well performs at 90% of a veteran. A veteran who misreads the
+    field performs at 50%. Decision quality IS the class.
+
+  SkillExpressionAxis: >
+    Other classes reward EXECUTION (hitting buttons fast, reacting to procs,
+    weaving oGCDs perfectly). Siegebreaker rewards JUDGMENT:
+    - Which direction do I commit?
+    - When do I start building momentum?
+    - Do I commit NOW or wait for the fight to develop?
+    - Is this a fight where I advance or where I hold?
+    All of these are answered BEFORE pressing buttons. Once you press the
+    button, the outcome is determined by the quality of that pre-decision.
+    The "rotation" after commitment is trivially simple by design.
+
+  FailureStates:
+    WrongCommitment:
+      Cause: "Picked the wrong direction to advance. Target moved or wasn't priority."
+      Cost: "Momentum wasted. Must stop, rebuild, recommit. 6-8s of reduced effectiveness."
+      Recovery: "Stop advancing. Let momentum drain. Reassess field. Recommit."
+      Severity: "MODERATE — the bread-and-butter mistake. Frequent, recoverable, teaches."
+    OvercommitIntoNothing:
+      Cause: "Built full momentum toward a target that died or relocated before arrival."
+      Cost: "Full momentum resource wasted. Standing in wrong position with nothing to hit."
+      Recovery: "8-10s to rebuild momentum from zero in new direction."
+      Severity: "HIGH — but telegraphed. Good players see this coming and brake earlier."
+    FlankIgnored:
+      Cause: "Committed forward while enemies circled behind to hit backline."
+      Cost: "Party takes unmitigated damage. Siegebreaker too committed to turn quickly."
+      Recovery: "Abort momentum (costly), turn, recommit toward flank threat."
+      Severity: "HIGH — this is the ONE clear limitation. Commitment means direction-lock."
+    EnduranceExhaustion:
+      Cause: "Sustained too many hits without managing Endurance recovery."
+      Cost: "Cannot maintain Super Armor. CC immunity lapses. Potentially stunned mid-advance."
+      Recovery: "Disengage momentarily. Let Endurance tick up. Re-engage."
+      Severity: "MODERATE — happens in very long encounters. Pacing issue, not execution."
+
+  SingleLimitation: >
+    THE limitation of Siegebreaker is COMMITMENT DIRECTION. Not "kited AND
+    flanked AND ranged-countered AND circled." ONE limitation: once you pick
+    a direction, you're going THAT way. Enemies that aren't in that line
+    are not your problem until you finish or abort.
+
+    This is the ONLY trade. CC immunity, massive hitbox damage, unstoppable
+    advance — all in exchange for being directionally committed. You can't
+    be everywhere. You can't change your mind mid-charge. You pick a lane.
+    That's the entire counterplay: don't be in the lane.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 1B: RACIAL LOCK — WYRPINCERS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+RacialLock:
+  Race: Wyrpincers
+  ParentCategory: null  # Wyrpincers category TBD by worldbuilding
+  Enforcement: hard_lock  # Players MUST be Wyrpincers to play Siegebreaker. No exceptions.
+  BiologicalLock: exoskeleton
+  LockJustification: >
+    The Siegebreaker class requires the Wyrpincers exoskeleton — a biological
+    structure unique to the Wyrpincers race that provides natural full-body
+    armor plating AND serves as the offensive weapon surface. Siegebreaker
+    does not CARRY a weapon — the body IS the weapon. The exoskeleton's
+    density, surface hardness, and segmented articulation allow the
+    Siegebreaker to use their own mass and plating as both shield and blade.
+    Other races lack the skeletal density to survive the momentum forces
+    generated during a full charge, and lack the natural armor to absorb
+    sustained frontal damage without dodge/parry mechanics.
+
+    This is NOT "wearing armor." This is BEING armor. The exoskeleton grows,
+    thickens, and hardens through use. Siegebreaker abilities are expressions
+    of biological capability, not learned techniques. You cannot teach a
+    human to be a beetle.
+
+  NPCException: >
+    Non-Wyrpincers "heavy charger" NPCs exist as armored cavalry, mechanical
+    siege units, or magically enhanced brutes. These are narratively distinct
+    from Siegebreaker biology and NEVER available to players. A human in
+    plate armor charging is a different mechanic entirely — they can still
+    be stunned, still knocked back, still interrupted. The CC immunity IS
+    the exoskeleton, not a learned skill.
+
+  RacialSynergy:
+    - "Wyrpincers exoskeleton provides natural Super Armor — CC immunity is BIOLOGY, not a buff"
+    - "Large body model = large hitbox = hits everything in front, gets hit by everything (size IS the kit)"
+    - "Segmented carapace allows momentum storage — biological springs in joint segments"
+    - "Exoskeleton density absorbs kinetic energy without pain response (no flinch, no stagger)"
+    - "Natural weight distribution allows sustained advance under load (enemies pushing back don't slow)"
+    - "Biological lock means CC immunity can NEVER be stripped by dispel — it's anatomy, not a buff"
+
+  SizeModel:
+    CharacterSize: Large
+    HitboxImplications: >
+      Wyrpincers are LARGE. This is not cosmetic — it's mechanical:
+      - Large hitbox = gets hit by EVERY attack aimed vaguely at them
+      - Large hitbox = EVERY enemy in front of them is within melee range
+      - Cannot fit through small gaps (corridor disadvantage vs Adafold)
+      - Cannot hide behind cover (always targetable, always visible)
+      - Body blocks paths by sheer MASS (not a shield — just being big)
+      - AoE attacks ALWAYS hit Siegebreaker (no dodging out of telegraphs)
+
+      The trade is SYMMETRIC: you get hit by everything, you HIT everything.
+      In a game where other classes position to avoid damage, Siegebreaker
+      positions to MAXIMIZE what they contact. More enemies in front = more
+      things getting hit by the advance = more things dying.
+
+    BodyAsWeapon: >
+      The exoskeleton IS the weapon. Siegebreaker does not swing a sword AT
+      enemies — they advance INTO enemies. The carapace surface grinds,
+      crushes, and shoves. Limb strikes are body-checks, not martial arts.
+      The "weapon damage" stat for Siegebreaker IS their exoskeleton hardness.
+      Gear for Siegebreaker = biological augments that enhance the carapace,
+      not external weapons.
+
+    BodyAsWall: >
+      The exoskeleton IS the wall. Unlike Adafold (who holds a shield),
+      Siegebreaker's body physically occupies space. Enemies cannot path
+      through a Large hitbox. This provides PASSIVE frontline presence
+      without any ability activation. The mere existence of Siegebreaker
+      in a space denies that space to enemies. Combined with collision,
+      advancing INTO a group physically displaces them.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 2: SPD STAT CLARIFICATION (CRITICAL SYSTEM RULE)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+SPDClarification:
+  CriticalRule: >
+    SPD does NOT affect movement speed. SPD does NOT affect movement speed.
+    SPD does NOT affect movement speed. This cannot be overstated.
+
+    Siegebreaker moves at NORMAL walking and running speed — identical to
+    every other class in the game. A SPD 5 Siegebreaker and a SPD 18 Siren
+    walk at the SAME pace, run at the SAME pace, traverse the map at the
+    SAME speed.
+
+  WhatSPDDoes:
+    ReactionTime: >
+      SPD determines how quickly a character can REACT to stimuli — dodge
+      windows, parry frames, interrupt timing. SPD 5 means Siegebreaker
+      has effectively ZERO reactive capability. Cannot dodge. Cannot parry.
+      Cannot interrupt on reaction. This is fine because the exoskeleton
+      means they don't NEED to react to incoming threats.
+    DodgeFrames: >
+      SPD determines invulnerability frames during dodge animations. SPD 5
+      means Siegebreaker has NO dodge ability whatsoever. No i-frames.
+      No evasion. This is irrelevant because CC immunity + exoskeleton
+      means taking hits is the intended design, not avoiding them.
+    AnimationSpeed: >
+      SPD affects how quickly attack animations RECOVER. SPD 5 means
+      Siegebreaker has slow animation recovery — long commitment windows
+      on each swing. This reinforces the commitment theme: each action
+      locks you into the animation longer, making each button press a
+      more significant decision.
+    GCDModification: >
+      SPD can reduce GCD for other classes. For Siegebreaker, the base
+      2.0s GCD is effectively FIXED — SPD 5 provides no meaningful haste.
+      This is intentional. Siegebreaker's GCD is slow, deliberate, and
+      weighty. Each press matters more because you get fewer of them.
+
+  WhatSPDDoesNOT:
+    MovementSpeed: >
+      SPD has ZERO effect on walking speed, running speed, or base
+      traversal rate. Siegebreaker covers ground at the same rate as
+      any other class while not using abilities.
+    MomentumSpeed: >
+      MOMENTUM (the class mechanic) affects movement speed during
+      committed advance. This is a CLASS RESOURCE, not a stat. Momentum
+      acceleration is independent of SPD — it's biological (exoskeleton
+      spring joints storing kinetic energy during the advance).
+    MapTraversal: >
+      Siegebreaker gets from point A to point B at normal speed. They
+      are not "slow" in the overworld. They are not outpaced by party
+      members walking between encounters. SPD 5 does NOT mean they
+      lumber around like a movie monster.
+
+  NTUImplication:
+    NTU: 3
+    Meaning: >
+      NTU 3 means Siegebreaker has no intuition-based mechanics. No
+      "sense enemy behind you" proc. No "instinctive dodge" passive.
+      No "gut feeling" about incoming danger. The class is explicitly
+      NON-REACTIVE. You read the field BEFORE committing, not during.
+      Once moving, you don't get warnings or sixth-sense indicators.
+      This is the second axis of simplicity: not only do you lack the
+      SPEED to react, you lack the INTUITION to know you should.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 3: ROLE OBJECTIVE FUNCTION
+# ═══════════════════════════════════════════════════════════════════════════════
+
+RoleObjective:
+  Type: maximize_dps_through_correct_commitment
+  PrimaryMetric: potency_per_second_during_advance
+  SecondaryMetric: momentum_efficiency (% of momentum spent on correct targets)
+  TertiaryMetric: frontline_uptime (% of fight spent advancing into enemies)
+  Constraints:
+    - "hp > 0 AT all times (no invulns — raw HP + exoskeleton DR is the answer)"
+    - "momentum_not_wasted (building toward targets that will still be there)"
+    - "endurance_never_zero (CC immunity requires endurance > 0)"
+    - "correct_direction (advancing toward highest-priority threat)"
+  SurvivalModel:
+    Philosophy: >
+      Siegebreaker does not "mitigate" in the traditional sense. There are
+      no cooldown-mapped mitigation buttons. Survival = exoskeleton passive
+      DR + massive HP pool + CC immunity (can't be burst-comboed). You
+      survive by being too thick to kill quickly, and by killing threats
+      before accumulated damage matters.
+    TankbusterResponse: "Take it. Exoskeleton DR + HP pool. No special action required."
+    InvulnBudget: "0. Siegebreaker has no invulnerability. Ever. Take every hit."
+    CooldownStacking: "N/A. No mitigation cooldowns to stack."
+    UniqueAdvantage: >
+      CC IMMUNITY means Siegebreaker cannot be burst-comboed. In this game's
+      combat, the most dangerous sequences are: Stun → Burst → Kill. Enemies
+      that stun-lock into damage combos are the primary threat model. Siege-
+      breaker's answer: "You can't stun me. Do your damage. I'll take it.
+      My HP pool and exoskeleton say I survive." This makes Siegebreaker
+      uniquely resilient against HIGH-DANGER enemies that rely on CC chains
+      to kill, while being MORE vulnerable to sustained chip damage over time
+      (they take everything, heal nothing, mitigate only passively).
+
+  DPSTarget:
+    RoleBaseline: 85%  # of DPS reference (from BalanceTargets)
+    SiegebreakerSpecific: 83-87%
+    # Range reflects momentum state:
+    # - At 0 momentum (just started): ~78% (slow, uncommitted, building)
+    # - At full momentum: ~87% (accelerated, every hit enhanced)
+    # - Average across a fight: ~83-85%
+    # Higher ceiling than Adafold (85%), lower than Madolt peak (87%)
+    # BUT more CONSISTENT than both because simpler execution = fewer errors
+    VarianceNote: >
+      Siegebreaker's DPS variance between players is the LOWEST of all
+      frontliners. A bad Madolt does 75% (missed guard-points, wrong stance).
+      A bad Adafold does 78% (poor gauge management). A bad Siegebreaker
+      does 80% (wrong direction — still hitting SOMETHING). The floor is
+      built into the kit. Simple kit = fewer ways to fail.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 4: CLASS MECHANIC — SUPER ARMOR (CC IMMUNITY)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+ClassMechanic:
+  Name: "Super Armor"
+  Type: passive_state_with_resource_gate
+  CorePrinciple: >
+    You cannot stun a beetle. You cannot knock it back. You cannot root it
+    meaningfully. You cannot fear it. You cannot sleep it. You cannot pull
+    it. You cannot displace it against its will. The exoskeleton IS CC
+    immunity — not a buff that can be dispelled, not a window that expires,
+    not a proc that might not trigger. It is ALWAYS ON as long as Endurance
+    remains above zero.
+
+    This is THE trade for SPD 5 and NTU 3. Other classes react to CC with
+    dodges, parries, interrupts, or cleanses. Siegebreaker's answer is
+    simpler: CC does not apply. Period. Walk through the stun. Walk through
+    the root. Walk through the fear. The march continues.
+
+  MechanicalDefinition:
+    State: "Permanently active while Endurance > 0"
+    CCImmunities:
+      - "Stun: IMMUNE (exoskeleton prevents neural disruption)"
+      - "Knockback: IMMUNE (mass + exoskeleton anchoring)"
+      - "Root: IMMUNE (legs break through binding materials)"
+      - "Fear: IMMUNE (NTU 3 = no emotional combat response)"
+      - "Sleep: IMMUNE (exoskeleton segments maintain locomotion autonomously)"
+      - "Pull/Grip: IMMUNE (mass exceeds pull force threshold)"
+      - "Silence: IMMUNE (no vocal abilities to silence)"
+      - "Slow: IMMUNE to ability-based slows (momentum cannot be externally reduced)"
+    WhatStillWorks:
+      - "Damage: ALL damage applies normally (exoskeleton provides DR, not immunity)"
+      - "Debuffs: Non-CC debuffs apply (damage amp, defense down, etc.)"
+      - "Terrain: Environmental hazards still affect (lava, pits, walls)"
+      - "Death: HP reaches 0, Siegebreaker dies like anyone else"
+    DesignReasoning: >
+      CC immunity is the PRIMARY fantasy fulfillment of Siegebreaker. The
+      feeling of "nothing stops me" IS the class. Without CC immunity,
+      Siegebreaker is just a slow character with no reactive tools — which
+      is a death sentence in CC-heavy encounters. WITH CC immunity, the
+      slowness and lack of reaction becomes a TRADE rather than a liability.
+      You can't react, but you don't NEED to react. You can't dodge, but
+      you don't need to dodge. Nothing interrupts the march.
+
+  EnduranceGate:
+    Description: >
+      Super Armor requires Endurance > 0 to function. Endurance is the
+      COST of being CC immune — the exoskeleton absorbs CC energy into
+      the Endurance pool, slowly draining it. In practice, Endurance
+      drains VERY slowly from CC absorption (enemies hitting you with
+      CC that gets ignored still costs a small amount of Endurance).
+      Endurance primarily drains from USING abilities (the exoskeleton's
+      energy to swing, advance, crush).
+    FailureCase: >
+      If Endurance reaches 0: Super Armor drops for 3-4s while it recovers.
+      During this window, Siegebreaker IS CC-vulnerable. This should be
+      RARE (only in extremely sustained fights where the player doesn't
+      manage pacing). It's the "you overextended" punishment — not a
+      common occurrence, but a real threat in the hardest content.
+    RecoveryRate: "Endurance recovers at 5/s passively, 10/s while not attacking"
+    DesignNote: >
+      The Endurance gate exists to prevent Siegebreaker from being literally
+      invincible in CC-heavy content. It's a SOFT gate — in normal play,
+      you'll never hit 0. In extreme content with sustained CC pressure,
+      pacing matters. Don't spam abilities non-stop; let Endurance breathe.
+
+  SuperArmorVsOtherDefenses:
+    VsAdafold: >
+      Adafold has SHIELD (physical barrier, blocks damage directionally).
+      Siegebreaker has SUPER ARMOR (CC immunity, takes all damage but can't
+      be stopped). Adafold blocks hits. Siegebreaker absorbs hits. Different.
+    VsMadolt: >
+      Madolt has ELECTRON GUARD (guard-points, timed blocks for counter-attacks).
+      Siegebreaker has no guard, no counter, no timing-based defense. Just
+      walks forward and takes everything. Madolt is rewarded for TIMING.
+      Siegebreaker is rewarded for COMMITMENT.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 5: RESOURCE SYSTEM — MOMENTUM + ENDURANCE
+# ═══════════════════════════════════════════════════════════════════════════════
+
+ResourceSystem:
+  DualResource: true
+  PrimaryResource:
+    Name: Momentum
+    Type: gauge (0-100)
+    Description: >
+      Momentum represents kinetic energy stored in the exoskeleton's
+      segmented joint springs. As Siegebreaker advances in a committed
+      direction and hits targets, momentum builds. Higher momentum =
+      faster movement toward committed target + stronger hits + wider
+      impact area. Momentum is the REWARD for correct commitment.
+    Generation:
+      - "Each GCD ability used while advancing: +10-15 Momentum"
+      - "Each enemy hit during advance: +5 Momentum per target"
+      - "Sustained advance without stopping: +3 Momentum per second"
+      - "Passive (not advancing): +0 (momentum only builds while moving forward)"
+    Decay:
+      - "Stopping movement: -10 Momentum per second"
+      - "Changing direction: INSTANT reset to 0 (commitment broken)"
+      - "Being CC'd (if Endurance = 0): INSTANT reset to 0"
+      - "Out of combat for 5s: reset to 0"
+    MomentumThresholds:
+      Tier0_Stationary: {range: "0", effect: "Base damage, normal movement speed, no acceleration"}
+      Tier1_Moving: {range: "1-30", effect: "+10% movement speed toward committed direction, +5% damage"}
+      Tier2_Rolling: {range: "31-60", effect: "+20% movement speed, +10% damage, cleave width increased"}
+      Tier3_Charging: {range: "61-90", effect: "+30% movement speed, +15% damage, enemies shoved aside on contact"}
+      Tier4_Unstoppable: {range: "91-100", effect: "+40% movement speed, +20% damage, physical displacement on all contact"}
+    DesignNote: >
+      Momentum speed bonuses affect movement TOWARD THE COMMITTED DIRECTION
+      ONLY. Not lateral movement. Not retreat. Not strafe. You accelerate
+      FORWARD along your chosen line. This is the class mechanic's core
+      expression: commit to a direction → get rewarded with speed + damage.
+      Abandon direction → lose everything.
+
+    MomentumAndMovementSpeed: >
+      CRITICAL: Base movement speed (walking, running, no abilities active)
+      is NORMAL for Siegebreaker — same as all classes. Momentum bonuses
+      are ACCELERATION during committed advance (an active state, requiring
+      ability use and directional lock). A Siegebreaker walking between
+      pulls moves at the same speed as a Siren walking between pulls. The
+      speed fantasy only manifests DURING COMBAT COMMITMENT.
+
+  SecondaryResource:
+    Name: Endurance
+    Type: gauge (0-100)
+    Description: >
+      Endurance represents the exoskeleton's structural integrity and
+      stored energy. It gates Super Armor (CC immunity), funds ability
+      usage, and determines how long Siegebreaker can sustain an advance
+      before needing to pause. It is NOT mana — it's physical stamina
+      of the carapace system.
+    Generation:
+      - "Passive recovery: +5 per second (always)"
+      - "Recovery while not attacking: +10 per second (resting the carapace)"
+      - "Kill an enemy: +15 instant (exoskeleton feeds on broken material)"
+    Costs:
+      - "GCD abilities: 8-15 Endurance each"
+      - "Absorbing CC (Super Armor proc): 3-5 Endurance per CC instance"
+      - "Maintaining advance at Tier 3-4 Momentum: +2 drain per second"
+    DepletionConsequence: >
+      Endurance = 0 means:
+      1. Super Armor drops (CC vulnerable for 3-4s)
+      2. Cannot use abilities (must wait for recovery)
+      3. Momentum rapidly decays (cannot sustain advance)
+      This is the PACING tool. Siegebreaker cannot go forever. There are
+      natural "breathe" moments between advances. Smart play = advance,
+      commit, kill, pause, recover, reassess, commit again. Dumb play =
+      hold forward until Endurance hits 0 and you're stuck CC'd.
+    DesignNote: >
+      Endurance is the SIMPLEST resource in the game. It goes down when
+      you do things, up when you don't. No procs. No conditional generation.
+      No "if X then Y" triggers. It's a stamina bar. The only decision is
+      "can I afford to keep going or should I pause?" Simple. Readable.
+      Newbie-friendly.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 6: ABILITY ROSTER (8 ABILITIES — SIMPLE KIT)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+Skills:
+  DesignPhilosophy: >
+    8 abilities. That's it. The simplest kit in the game. No branching combos.
+    No stance switches. No resource converters. Each ability does ONE thing
+    clearly. The decision is "which one, right now?" not "how do I sequence
+    these 20 things optimally?" A new player reads these 8 tooltips and
+    understands the entire class in 5 minutes.
+
+  AbilityCount: 8
+  GCDAbilities: 5
+  oGCDAbilities: 3
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # GCD ABILITIES (5 total)
+  # ─────────────────────────────────────────────────────────────────────────
+
+  GCD_1:
+    Name: "Carapace Slam"
+    Type: GCD
+    Category: "Single-target strike"
+    Potency: 120
+    EnduranceCost: 8
+    MomentumGenerated: 10
+    Range: "Melee (large hitbox — effectively 3y in front)"
+    Description: >
+      Basic strike. Bring the exoskeleton plate down on whatever's in front.
+      Simple. Reliable. Builds momentum. Used when advancing toward a single
+      priority target or when conserving Endurance.
+    CritCondition: "Positional — rear hits from Siegebreaker crit (enemy facing away from you)"
+    DesignNote: >
+      This is the BREAD AND BUTTER. No frills. Hit thing in front of you.
+      Build momentum. The crit condition rewards correct POSITIONING (advancing
+      into enemies from a direction they aren't facing) without requiring
+      any execution complexity.
+    RankRequired: 1
+
+  GCD_2:
+    Name: "Grinding Advance"
+    Type: GCD
+    Category: "Advance + damage"
+    Potency: 100
+    EnduranceCost: 12
+    MomentumGenerated: 15
+    Range: "Self (damages all enemies in contact during 2s advance)"
+    Description: >
+      Siegebreaker lurches forward 3y, damaging everything in contact with
+      the exoskeleton during the advance. Primary momentum builder. Used to
+      close distance while dealing damage. At Tier 3+ Momentum, also shoves
+      enemies aside (Stage 1 CC — physical displacement).
+    CCComponent:
+      Type: "Physical displacement (shove)"
+      Stage: 1
+      Condition: "Only at Momentum Tier 3+ (61+ Momentum)"
+      Duration: "Instant displacement, no follow-up CC"
+      Description: "Enemies pushed 2y to the sides of advance line. Not a stun — just moved."
+    DesignNote: >
+      The primary advance tool. You press this when you want to MOVE and
+      DAMAGE simultaneously. The displacement at high momentum is the Stage 1
+      CC budget — purely physical, purely positional. You're shoving things
+      out of your path, not stunning them.
+    RankRequired: 1
+
+  GCD_3:
+    Name: "Thorax Crush"
+    Type: GCD
+    Category: "High-damage commit"
+    Potency: 200
+    BonusPotency: "+50 at Momentum Tier 3+ (total 250)"
+    EnduranceCost: 15
+    MomentumGenerated: 5
+    Range: "Melee (frontal 120° arc, large hitbox)"
+    Description: >
+      Full-body slam. All weight, all momentum, all carapace. Highest single-
+      hit damage in the kit. The Momentum bonus rewards committing fully before
+      using this — build momentum THEN unleash the big hit. Not the other way.
+    CritCondition: "Conditional — crits against enemies above 50% HP (>50% HP rule: front-loaded damage)"
+    DesignNote: >
+      The PAYOFF button. You built momentum, you advanced correctly, now
+      cash it in with the big hit. The >50% HP crit condition means this
+      is strongest at the START of engaging a new target — which is exactly
+      when Siegebreaker arrives at full momentum. Walk up. Crush. Simple.
+    RankRequired: 1
+
+  GCD_4:
+    Name: "Steamroll"
+    Type: GCD
+    Category: "AoE advance (multi-target)"
+    Potency: 80 per target
+    MaxTargets: "All enemies in 4y × 3y rectangle (advance path)"
+    EnduranceCost: 14
+    MomentumGenerated: "+5 per target hit (up to +25)"
+    Range: "Self (4y advance, hits everything in path)"
+    Description: >
+      Wide-body advance. Siegebreaker spreads their carapace plates and
+      rolls through a pack, hitting everything in the advance path. Lower
+      per-target damage than Carapace Slam but hits EVERYTHING. The
+      momentum generation per-target means packs FEED your momentum faster.
+      This is why Siegebreaker loves advancing INTO groups, not picking
+      off stragglers.
+    CCComponent:
+      Type: "Physical displacement (scatter)"
+      Stage: 1
+      Condition: "Always (lighter enemies only — enemies with Mass > Siegebreaker's push are unmoved)"
+      Duration: "Instant scatter, 1-2y random displacement per target"
+      Description: "Light enemies scattered outward from advance path. Heavy enemies unmoved."
+    DesignNote: >
+      AoE option. Used when facing packs instead of single targets. The
+      per-target momentum gain creates a positive feedback: more targets =
+      more momentum = faster next advance = more damage. Siegebreaker WANTS
+      to be in the thick of groups. Size IS the kit — large hitbox hitting
+      everything in the advance path.
+    RankRequired: 1
+
+  GCD_5:
+    Name: "Entrench"
+    Type: GCD
+    Category: "Hold position (defensive)"
+    Potency: 0 (no damage)
+    EnduranceCost: 0 (RECOVERS 20 Endurance)
+    MomentumEffect: "Pauses decay for 4s (momentum held, not lost)"
+    Range: "Self"
+    Duration: "One GCD (2.0s animation, 4s buff)"
+    Description: >
+      Dig in. Siegebreaker anchors all limbs and channels Endurance recovery.
+      No damage dealt, but Endurance recovers significantly and Momentum
+      is frozen (doesn't decay) for 4s. This is the PACING tool — the
+      "catch your breath" button that lets you pause mid-advance without
+      losing everything.
+    DefensiveBonus: "+10% DR for 4s (carapace locked into defensive configuration)"
+    DesignNote: >
+      The ONE defensive button. Press it when you need to breathe. Recovers
+      Endurance, holds Momentum, provides brief DR. The decision is WHEN to
+      use it — using it means one GCD of no damage, but it prevents the
+      catastrophic Endurance-0 state. Good players Entrench proactively.
+      Bad players never Entrench and hit 0 Endurance. This is the floor/
+      ceiling difference — and even "never Entrench" only costs ~10% DPS.
+    RankRequired: 1
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # oGCD ABILITIES (3 total)
+  # ─────────────────────────────────────────────────────────────────────────
+
+  oGCD_1:
+    Name: "Commit"
+    Type: oGCD
+    Category: "Directional lock (initiate advance)"
+    Potency: 0 (no damage)
+    EnduranceCost: 5
+    Cooldown: "3s (can redirect every 3s — but resets Momentum)"
+    Range: "Self"
+    Description: >
+      Declare commitment direction. Siegebreaker locks facing toward a
+      target or direction. All subsequent GCD abilities advance in this
+      direction. Momentum builds while committed. Using Commit again
+      RESETS momentum to 0 (changing direction = starting over).
+
+      This is the SINGLE MOST IMPORTANT BUTTON. It's the decision point.
+      Everything else flows from this choice.
+    MomentumInteraction: >
+      First Commit: starts Momentum building from 0.
+      Re-Commit (new direction): RESETS Momentum to 0. Full penalty.
+      Re-Commit (same direction/target): No penalty. Refreshes lock.
+    DesignNote: >
+      Commit is the skill expression button. It's free (nearly). It's
+      instant. The COST is that changing your mind (new Commit in different
+      direction) erases all Momentum. So the skill is: commit CORRECTLY
+      the first time. Read the field. Pick the right target. Press Commit.
+      Then press your 5 GCDs and watch things die. If you committed wrong,
+      you lose 6-8s of Momentum building. That's the punishment.
+    RankRequired: 1
+
+  oGCD_2:
+    Name: "Exoskeletal Flare"
+    Type: oGCD
+    Category: "Momentum spender (burst)"
+    Potency: "50 + (3 × current Momentum) — max 350 at 100 Momentum"
+    EnduranceCost: 10
+    Cooldown: "20s"
+    MomentumCost: "Consumes ALL current Momentum"
+    Range: "8y radius AoE centered on self"
+    Description: >
+      Discharge all stored kinetic energy in the exoskeleton outward.
+      Potency scales directly with Momentum consumed — using at low
+      Momentum wastes the cooldown, using at high Momentum is devastating.
+      The ONLY burst tool in the kit. 20s CD means you get one big hit
+      per advance cycle.
+    CCComponent:
+      Type: "Physical displacement (knockback)"
+      Stage: 1
+      Condition: "Only at 60+ Momentum consumed"
+      Effect: "All targets knocked back 3y from Siegebreaker"
+      Duration: "Instant displacement"
+    DesignNote: >
+      The "cash out" button. You built Momentum over 10-15s of advancing,
+      now you can either KEEP the Momentum (continue advancing faster) or
+      SPEND it on Exoskeletal Flare for burst AoE damage. This is the
+      primary decision point DURING an advance: "Am I done advancing?
+      Time to Flare. Do I need to keep going? Hold Momentum."
+    RankRequired: 1
+
+  oGCD_3:
+    Name: "Brace"
+    Type: oGCD
+    Category: "Damage reduction (reactive)"
+    Potency: 0 (no damage)
+    EnduranceCost: 5
+    Cooldown: "30s"
+    Range: "Self"
+    Duration: "6s"
+    Effect: "+20% DR for 6s. Exoskeleton plates lock into reinforced configuration."
+    Description: >
+      The emergency button. When you KNOW a big hit is coming (boss
+      telegraph, visible windup), press Brace. 20% DR for 6s. No other
+      effect. No counter. No proc. Just "take less damage for a moment."
+    DesignNote: >
+      Siegebreaker's only active mitigation. 30s CD, 6s duration. Simple.
+      Readable. The decision is: "is the next 6s going to be dangerous?"
+      If yes, press. If no, hold. That's it. Even if you NEVER press this,
+      you survive (exoskeleton passive DR + HP pool). It's optimization,
+      not survival-mandatory.
+    RankRequired: 1
+
+  AbilityDesignSummary:
+    TotalAbilities: 8
+    GCDs: ["Carapace Slam", "Grinding Advance", "Thorax Crush", "Steamroll", "Entrench"]
+    oGCDs: ["Commit", "Exoskeletal Flare", "Brace"]
+    Complexity: >
+      A new player needs to understand:
+      1. Commit (pick direction)
+      2. Carapace Slam or Steamroll (hit things — single vs AoE)
+      3. Grinding Advance (move and hit simultaneously)
+      4. Thorax Crush (big hit when ready)
+      5. Entrench (catch breath)
+      6. Exoskeletal Flare (cash out momentum when done advancing)
+      7. Brace (big hit incoming, press button)
+      That's seven meaningful decisions. The eighth (Commit re-use) is
+      "did I pick wrong? Start over." Total cognitive load: minimal.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 7: ROTATION DESIGN (DECISION-DRIVEN, NOT SEQUENCE-DRIVEN)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+RotationDesign:
+  Philosophy: >
+    Siegebreaker does NOT have a rotation. There is no fixed sequence of
+    buttons that constitutes "optimal play." There is a DECISION TREE:
+
+    1. Am I committed? → If no, use Commit toward priority target.
+    2. Am I near the target? → If no, use Grinding Advance to close.
+    3. Is this a pack or single target? → Pack: Steamroll. Single: Carapace Slam.
+    4. Is my Momentum high and target damaged? → Thorax Crush (big hit).
+    5. Is my Endurance low? → Entrench (recover).
+    6. Am I done with this cluster? → Exoskeletal Flare (cash out).
+    7. Is a big hit coming? → Brace.
+
+    That's it. No memorized sequence. No "1-2-3 combo" that must be followed.
+    Each GCD is an independent decision based on current state. This is WHY
+    the veteran/newbie gap is small — the "optimal" choice at each moment
+    is usually OBVIOUS if you look at the field.
+
+  SingleTargetLoop:
+    Name: "Boss / Elite engagement"
+    Sequence: "Commit → Grinding Advance → Carapace Slam → Carapace Slam → Thorax Crush → (repeat Slam/Crush) → Flare when repositioning needed"
+    Notes: >
+      Against a single boss, Momentum builds steadily from Slams. Thorax Crush
+      every 3rd-4th GCD for the big hit. Entrench when Endurance dips below 30.
+      Flare only when the boss is about to move (phase transition) — cashing
+      out Momentum before it would decay anyway.
+    PPS_Estimate: "~95 PPS (Slam×2 + Crush + oGCDs: 120+120+200+120_Flare_avg / 8s = ~70 GCD + 15 oGCD = ~92-95)"
+
+  AoELoop:
+    Name: "Pack engagement"
+    Sequence: "Commit → Steamroll → Steamroll → Grinding Advance (reposition) → Steamroll → Flare (cash out stacked Momentum)"
+    Notes: >
+      Steamroll is king in AoE. Per-target Momentum generation means packs
+      feed you to Tier 4 in 2-3 GCDs. Flare at peak Momentum for massive
+      AoE burst. Entrench after Flare to recover Endurance for next cycle.
+    PPS_Estimate: "5 targets: 80×5×3 GCDs + 350 Flare / 8s = ~300 PPS total (~60 per target)"
+
+  DecisionTree:
+    Commit:
+      Question: "Is there a target I should be advancing toward?"
+      IfYes: "Use Commit toward that target."
+      IfNo: "Hold position. Don't waste Commitment on nothing."
+    Advance:
+      Question: "Am I close enough to hit with Slam/Crush?"
+      IfYes: "Use Slam (ST) or Steamroll (AoE) — skip Grinding Advance."
+      IfNo: "Use Grinding Advance to close while dealing contact damage."
+    BigHit:
+      Question: "Is my Momentum at Tier 2+ AND is the target above 50% HP?"
+      IfYes: "Thorax Crush (bonus potency + crit from >50% HP rule)."
+      IfNo: "Keep building with Slam/Steamroll."
+    Breathe:
+      Question: "Is my Endurance below 30?"
+      IfYes: "Entrench this GCD. Recover. Don't risk hitting 0."
+      IfNo: "Keep pressing damage buttons."
+    CashOut:
+      Question: "Am I at Tier 3+ Momentum AND need to reposition soon?"
+      IfYes: "Exoskeletal Flare to cash out before Momentum decays to waste."
+      IfNo: "Hold Momentum. Keep the acceleration. Flare later."
+    Emergency:
+      Question: "Is a major hit telegraphed in the next 3-4s?"
+      IfYes: "Brace."
+      IfNo: "Hold Brace for when you need it."
+
+  NoRotationStatement: >
+    There is no "opener." There is no "burst phase." There is no "align
+    with raid buffs." Siegebreaker presses the contextually correct button
+    each GCD based on a trivially simple decision tree. The class has NO
+    fixed cadence, NO burst cycle, and NO sequence that must be memorized.
+    What separates good from bad is WHICH target they Commit toward and
+    WHEN they decide to Entrench vs press damage — not HOW they sequence
+    their buttons.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 8: RANK PROGRESSION
+# ═══════════════════════════════════════════════════════════════════════════════
+
+RankProgression:
+  Philosophy: >
+    Rank progression for Siegebreaker enhances the QUALITY of the kit, not
+    the COMPLEXITY. No new abilities are added at Rank 2 or Rank 3. Instead,
+    existing abilities gain passive upgrades that reward better play without
+    requiring new inputs. A Rank 1 Siegebreaker and Rank 3 Siegebreaker
+    press the SAME buttons — the Rank 3 player's buttons just DO more
+    because they've mastered the fundamentals.
+
+  Rank1:
+    Unlocks: "All 8 abilities (full kit from moment one)"
+    Description: >
+      Rank 1 Siegebreaker has the complete toolkit. No abilities gated behind
+      progression. You commit, advance, slam, crush, steamroll, entrench,
+      flare, and brace from the start. The class is COMPLETE at Rank 1.
+    ContentViability: "Normal dungeons, open world, story content"
+    MomentumCap: 70  # Cannot reach Tier 4 at Rank 1
+    DesignNote: >
+      Rank 1 cap at 70 Momentum means Rank 1 players experience Tier 1-3
+      acceleration but never reach Tier 4 "Unstoppable." This keeps Rank 1
+      powerful but gives Rank 2-3 players a visible upgrade to aspire to.
+
+  Rank2:
+    Unlocks: "Passive upgrades to existing abilities + Momentum cap raised to 100"
+    MomentumCap: 100  # Tier 4 now accessible
+    PassiveUpgrades:
+      - Ability: "Grinding Advance"
+        Upgrade: "Now generates +20 Momentum (up from 15). Advance distance +1y (4y total)."
+        Impact: "Faster Momentum building. Closes distance better. Reaches Tier 4 sooner."
+      - Ability: "Thorax Crush"
+        Upgrade: "Bonus potency threshold lowered to Tier 2+ (31+ Momentum, up from Tier 3+)."
+        Impact: "Big hit available earlier in advance cycle. Higher average DPS."
+      - Ability: "Entrench"
+        Upgrade: "Now recovers 30 Endurance (up from 20). DR increased to 15%."
+        Impact: "Better sustain. Longer advances between Entrench uses."
+      - Ability: "Exoskeletal Flare"
+        Upgrade: "Cooldown reduced to 15s (from 20s). Scaling: 4× Momentum (up from 3×)."
+        Impact: "More frequent cash-outs. Higher burst potential when used."
+    ContentViability: "Hard dungeons, trials, group content"
+    DesignNote: >
+      Rank 2 makes everything Siegebreaker already does BETTER. No new
+      buttons. No new decisions. Just more reward for the same correct play.
+      A Rank 2 Siegebreaker looks identical to Rank 1 in their inputs —
+      the OUTPUTS are just bigger.
+
+  Rank3:
+    Unlocks: "Trait upgrades + Unstoppable Advance (passive enhancement, not new ability)"
+    Traits:
+      UnstoppableAdvance:
+        Description: >
+          At Tier 4 Momentum (91-100), Siegebreaker's advance cannot be
+          impeded by ANYTHING — including terrain obstacles, destructible
+          walls, and enemy formations. The advance DESTROYS destructible
+          objects in the path and DISPLACES all enemies regardless of mass.
+        MechanicalEffect: "Tier 4 advance breaks destructible terrain. All enemies displaced regardless of Mass stat."
+        DesignNote: "The ultimate expression of 'nothing stops the march.' Environmental destruction."
+      CarapaceResonance:
+        Description: >
+          Exoskeleton vibrates at peak Momentum, dealing 30p per second to
+          all enemies within 2y radius passively. No button press. Just
+          existing near things at high Momentum hurts them.
+        MechanicalEffect: "30 PPS passive AoE at Momentum 60+ (Tier 3-4)"
+        DesignNote: "Reward for sustained high Momentum. Body IS the weapon — even proximity damages."
+      RendingPlates:
+        Description: >
+          Carapace Slam and Thorax Crush apply a 6s physical debuff: target
+          takes +10% physical damage from all sources. Siegebreaker's party
+          contribution beyond personal DPS.
+        MechanicalEffect: "+10% physical vulnerability, 6s, refreshed on each hit"
+        DesignNote: "Raid utility without adding button complexity. Passive. Just keep hitting."
+    ContentViability: "Savage content, raid progression"
+    DesignNote: >
+      Rank 3 adds PASSIVE power — no new buttons. The inputs remain identical
+      to Rank 1. Outputs are dramatically higher because sustained high
+      Momentum now passively damages nearby enemies, breaks terrain, and
+      debuffs targets. The class SCALES with commitment quality — better
+      pathing decisions at Rank 3 mean more sustained Tier 4 uptime, which
+      means massively more passive value.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 9: DPS VALIDATION
+# ═══════════════════════════════════════════════════════════════════════════════
+
+DPSValidation:
+  Methodology: >
+    All DPS validation is against a SINGLE TARGET, FULL UPTIME scenario
+    (standing training dummy equivalent). Real gameplay has slightly lower
+    numbers due to direction changes. But because Siegebreaker's kit is
+    so simple, the "real" vs "dummy" gap is the SMALLEST of all classes.
+
+  STScenario_Rank1:
+    Assumptions: "Committed to target. Never need to redirect. Entrench once per 20s."
+    GCDPattern: "Slam → Slam → Advance → Slam → Crush → Slam → Slam → Entrench → (repeat)"
+    MomentumBuild: "10 + 10 + 15 + 10 + 5 + 10 + 10 + 0 = 70 over 16s (8 GCDs × 2.0s)"
+    GCDPotency: "120 + 120 + 100 + 120 + 200 + 120 + 120 + 0 = 900p / 16s = 56.3 GCD PPS"
+    oGCDContribution:
+      Flare: "50 + (3 × 70 avg Momentum) = 260p / 20s CD = 13 PPS"
+      Brace: "0p (utility only)"
+    MomentumDamageBonus: "+10% average across cycle (varies Tier 1-2)"
+    TotalST_PPS_Rank1: "56.3 × 1.10 + 13 = 74.9 PPS"
+    DPSReference: "110 PPS"
+    Percentage: "68% — BELOW 85% target. See Rank 2."
+    DesignNote: >
+      Rank 1 Siegebreaker is intentionally below the 85% frontliner target
+      because Momentum cap is 70 (no Tier 4). This is acceptable — Rank 1
+      is the learning rank. Content at Rank 1 is Normal difficulty.
+
+  STScenario_Rank2:
+    Assumptions: "Full Momentum access. Entrench every 25s (better recovery). Flare on 15s CD."
+    GCDPattern: "Slam → Advance → Slam → Crush → Slam → Slam → Advance → Crush → Slam → Entrench → (repeat)"
+    MomentumBuild: "Reaches Tier 3-4 by GCD 4-5. Sustained at 70-90."
+    GCDPotency: "120+100+120+250+120+120+100+250+120+0 = 1300p / 20s = 65 GCD PPS"
+    oGCDContribution:
+      Flare: "50 + (4 × 85 avg Momentum) = 390p / 15s = 26 PPS"
+    MomentumDamageBonus: "+15% average (sustained Tier 3)"
+    TotalST_PPS_Rank2: "65 × 1.15 + 26 = 100.8 PPS"
+    Percentage: "91.6% — ABOVE 85% target."
+    DesignNote: >
+      At Rank 2 Siegebreaker exceeds the 85% frontliner target. This is
+      correct — Rank 2 is the intended "standard" progression point. The
+      simplicity of execution means MOST Siegebreaker players at Rank 2
+      achieve 88-92% of reference consistently, with minimal variance.
+
+  STScenario_Rank3:
+    Assumptions: "Rank 2 base + Carapace Resonance (30 PPS passive at Tier 3+) + Rending Plates (+10% vuln)"
+    AdditionalPPS:
+      CarapaceResonance: "+30 PPS (passive, Tier 3+ uptime ~60% = 18 effective PPS)"
+      RendingPlates: "+10% on own damage = +10.1 PPS (100.8 × 0.10)"
+    TotalST_PPS_Rank3: "100.8 + 18 + 10.1 = 128.9 PPS"
+    Percentage: "117% — ABOVE reference."
+    AdjustmentNote: >
+      Rank 3 numbers are INTENTIONALLY high because Rank 3 Savage content
+      has mechanics that force direction changes (resetting Momentum), add
+      downtime phases, and include unavoidable damage that pressures HP.
+      Effective sustained DPS in Savage: ~95-100 PPS (85-91% of reference)
+      after accounting for forced resets and Entrench pressure. This matches
+      target.
+
+  AoEScenario_5Targets:
+    GCDPattern: "Steamroll → Steamroll → Advance → Steamroll → Entrench → Flare"
+    SteamrollPerCycle: "80p × 5 targets × 3 uses = 1200p"
+    AdvancePerCycle: "100p × 3 targets (contact path) = 300p"
+    FlarePerCycle: "350p (5 targets, max Momentum from 5×5×3 = 75 Momentum from targets alone)"
+    CycleTime: "12s (6 GCDs × 2.0s)"
+    TotalAoE_PPS: "(1200 + 300 + 350) / 12s = 154 PPS total"
+    PerTargetPPS: "30.8 PPS per target (correct — lower than ST per-target)"
+
+  ValidationChecklist:
+    - "ST DPS Rank 2: 91% of reference ✓ (target 83-87%, high due to simple execution)"
+    - "ST DPS Rank 3 Savage effective: 85-91% ✓ (after forced resets)"
+    - "AoE DPS (per target): Lower than ST ✓ (31 vs 101 PPS)"
+    - "AoE total DPS: Higher than ST ✓ (154 vs 101 PPS)"
+    - "Veteran vs newbie gap: <12% ✓ (simple kit, obvious decisions)"
+    - "Time to meaningful damage: 2s (first Slam immediately after Commit)"
+    - "Time to peak Momentum: 12-16s (intentionally long — reward for sustained commitment)"
+    - "Endurance sustain: indefinite with 1 Entrench per 20-25s ✓"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 10: SURVIVAL VALIDATION
+# ═══════════════════════════════════════════════════════════════════════════════
+
+SurvivalValidation:
+  DefensiveProfile:
+    ExoskeletonPassiveDR: "15% (always on, cannot be stripped, biological)"
+    BraceActiveDR: "+20% for 6s, 30s CD (12-20% uptime depending on usage)"
+    EntrenchDR: "+10% for 4s (per Entrench use)"
+    AverageEffectiveDR: "~18-22% sustained (passive 15% + intermittent Brace/Entrench)"
+    HPPool: "Highest base HP in the game (VIT secondary stat + Large frame)"
+    EffectiveHP: "Base HP × 1.18 average = ~118% effective HP at all times"
+
+  CCImmunityValue:
+    Description: >
+      The defensive value of CC immunity cannot be overstated. In most
+      encounters, the kill sequence for frontliners is:
+      CC (stun/root) → Burst damage → Death.
+      Siegebreaker removes the FIRST step entirely. You cannot be CC'd
+      into burst damage. Every incoming hit is just... a hit. No combo
+      setup. No vulnerability windows from stun-lock. This makes Siege-
+      breaker's EFFECTIVE survivability much higher than raw numbers suggest.
+    CalculatedValue: >
+      Against CC-heavy enemies (Strategy Rank 3+): CC immunity is worth
+      approximately 30-40% additional effective HP (avoiding burst windows
+      that would land if stunned). Against CC-light enemies (Rank 1-2):
+      CC immunity has minimal value (they don't CC anyway). This creates
+      a scaling curve: Siegebreaker gets RELATIVELY better as content
+      difficulty increases (more CC = more immunity value).
+
+  SoloSurvivalLoop:
+    IncomingDamage: "Takes EVERY hit (large hitbox, no dodge, no parry)"
+    Mitigation: "15% passive + Brace (20% × 20% uptime) = ~19% average DR"
+    SelfHealing: "None. Siegebreaker has ZERO self-healing."
+    SurvivalDuration:
+      Against2_3Enemies: "45-60s without external healing (high HP pool, passive DR)"
+      Against5Plus: "20-30s without external healing (takes everything, heals nothing)"
+      AgainstBoss: "Depends entirely on healer support. No solo sustain against heavy damage."
+    ComparedToAdafold: >
+      Adafold survives LONGER solo (self-healing + shields). Siegebreaker
+      has a LARGER initial HP buffer but no recovery. Adafold is the marathon
+      survivor. Siegebreaker is the sprint survivor — massive initial HP lets
+      you RUSH through a threat before it kills you, but extended fights
+      without healing support are dangerous.
+    ComparedToMadolt: >
+      Madolt survives through KILLING FAST (offensive sustain). Siegebreaker
+      survives through RAW HP + CC IMMUNITY (tanking hits). Both are offensive
+      frontliners but with different survival curves. Madolt dies faster if
+      they stop dealing damage. Siegebreaker dies at a fixed rate regardless
+      of output — just has more HP to burn through.
+
+  NoSelfHealingStatement: >
+    Siegebreaker has ZERO self-healing. This is intentional. The class trades
+    sustain for CC immunity + raw HP. You're the "I take every hit and
+    depend on the healer to keep me alive" frontliner. In exchange, you are
+    the ONLY frontliner that can guarantee reaching the target — nothing
+    stops you. Adafold can be burst-damaged through their shield. Madolt
+    can be overwhelmed if guard-points are mistimed. Siegebreaker just...
+    arrives. Always. The healer's job is to keep the beetle alive while
+    it does its job.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 11: PROCGEN MAP INTERACTION
+# ═══════════════════════════════════════════════════════════════════════════════
+
+ProcgenInteraction:
+  Description: >
+    How does Siegebreaker interact with procedurally generated map layouts?
+    Unlike Adafold (corridor king) and Madolt (arena king), Siegebreaker
+    is the SIEGE king — excels when there are things to BREAK THROUGH.
+
+  CorridorBehavior:
+    Description: >
+      In corridors, Siegebreaker's large hitbox fills the space. Advancing
+      down a corridor hits EVERYTHING in it. However, Siegebreaker cannot
+      HOLD a corridor the way Adafold can — Siegebreaker advances THROUGH,
+      not HOLDS. If the goal is "nothing passes this point," pick Adafold.
+      If the goal is "kill everything in this corridor NOW," pick Siegebreaker.
+    Effectiveness: "HIGH for clearing. LOW for holding."
+    HitboxInteraction: >
+      Large hitbox in narrow corridors means Steamroll hits the WALLS as well
+      as enemies — at Rank 3, this destroys destructible corridor sections,
+      creating new paths. Siegebreaker can RESHAPE the map by breaking walls.
+
+  OpenArenaBehavior:
+    Description: >
+      Open arenas present the commitment challenge. Enemies can circle,
+      approach from multiple angles, and avoid the advance line. Siegebreaker
+      must choose WHICH threat lane to commit toward and accept that enemies
+      in other lanes are temporarily ignored.
+    Effectiveness: "MODERATE. Depends on correct Commit choice."
+    Strategy: >
+      Commit toward the HIGHEST PRIORITY threat. Let the party handle
+      distributed enemies. Siegebreaker is a SCALPEL in open arenas, not
+      a net. Pick the biggest target, advance to it, kill it. Then pick
+      the next. Sequential priority elimination, not simultaneous control.
+
+  SiegeScenarios:
+    Description: >
+      Siegebreaker's UNIQUE niche: fortified positions, barricades, enemy
+      formations that other classes must fight around. Siegebreaker goes
+      THROUGH them. Destructible barriers, enemy shield walls, defensive
+      formations — all broken by sustained advance at high Momentum.
+    Effectiveness: "HIGHEST of all classes for breaking fortifications."
+    UniqueContribution: >
+      In dungeons with barricaded rooms, fortified boss arenas, or enemy
+      shield formations: Siegebreaker is the OPENER. They break the barrier,
+      create the breach, and the party pours through. This is the "siege"
+      in Siegebreaker — breaking walls that other classes must work around.
+
+  FrontlinerNiche:
+    Adafold: "HOLD corridors. Deny passage. Outlast."
+    Madolt: "CONTROL arenas. Suppress AI. Out-damage."
+    Siegebreaker: "BREAK fortifications. Advance through. Create openings."
+    Overlap: >
+      All three are viable in all scenarios. The differences are OPTIMAL
+      contexts, not hard requirements. A Siegebreaker CAN hold a corridor
+      (large hitbox blocks it passively). A Madolt CAN break a barricade
+      (just slower). The niches describe WHERE each frontliner EXCELS.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 12: ITEM BASELINE COMPARISON
+# ═══════════════════════════════════════════════════════════════════════════════
+
+ItemBaselineComparison:
+  Philosophy: >
+    "Items define baseline, class REPLACES permanently." Siegebreaker's class
+    abilities REPLACE item-equivalent effects. You don't get exoskeleton DR
+    AND an item-based DR effect — the class IS your armor. Items provide stats
+    (STR, VIT, END) that amplify class abilities. Here's how Siegebreaker's
+    abilities compare to what item-slot equivalents would provide:
+
+  DamageOutput:
+    ItemBaseline_DPS: "A 'Heavy Weapon' provides ~80 PPS equivalent through stats"
+    Siegebreaker_Committed: "95-101 PPS at Rank 2 (sustained Momentum) = 119-126% of item"
+    Siegebreaker_Uncommitted: "56 PPS (no Momentum, just Slamming in place) = 70% of item"
+    Verdict_Hit: >
+      HIT when committed. Siegebreaker committed to a correct direction
+      EXCEEDS item DPS baseline by 19-26%. The Momentum system is strictly
+      better than "just having a big weapon" — IF you commit correctly.
+    Verdict_Miss: >
+      MISS when uncommitted. Standing in place pressing Slam without
+      Momentum is WORSE than item baseline. This is intentional — the
+      class power is concentrated in the COMMITMENT MECHANIC. Without
+      Momentum, you're a stat-stick wielder with no weapon.
+    DesignNote: >
+      This creates the skill expression in itemization terms: a Siegebreaker
+      who never commits properly is functionally worse than just equipping a
+      good weapon and auto-attacking. The class demands its one mechanic be
+      engaged. But engaging it is TRIVIALLY EASY — press Commit, walk forward.
+
+  Survivability:
+    ItemBaseline_DR: "A 'Heavy Armor Set' provides ~10% passive DR"
+    Exoskeleton_Passive: "15% passive DR (always on) = 150% of item"
+    Exoskeleton_WithBrace: "20% active + 15% passive = 35% DR for 6s = 350% of item (burst)"
+    Verdict_Hit: >
+      HIT always. Exoskeleton passive DR EXCEEDS item baseline permanently.
+      Siegebreaker's defensive floor is higher than what items alone provide.
+    CCImmunityBonus: >
+      Items cannot provide CC immunity. No "Unstoppable Amulet" exists.
+      Siegebreaker's CC immunity is a class-exclusive effect with NO item
+      equivalent. In encounters where CC is the primary danger, Siege-
+      breaker's defensive value is INFINITE compared to item baseline.
+
+  CCCapability:
+    ItemBaseline_CC: "A 'Stunning Mace' provides 2s stun on proc (10% chance per hit)"
+    Siegebreaker_Displacement: "Physical displacement on every Steamroll + high-Momentum Advance"
+    Verdict_Hit: >
+      DIFFERENT CATEGORY. Siegebreaker's CC (Stage 1 physical displacement)
+      is not comparable to item stuns. Items provide random chance hard CC.
+      Siegebreaker provides CONSISTENT positional displacement through mass.
+      In practice, Siegebreaker's displacement is MORE RELIABLE (guaranteed)
+      but LESS POWERFUL (no stun, just shove) than item CC procs.
+
+  MomentumVsItemSpeed:
+    ItemBaseline_Haste: "A 'Swift Gauntlet' provides 5-8% haste (GCD reduction)"
+    Momentum_SpeedBonus: "+10-40% DIRECTIONAL movement speed (not GCD reduction)"
+    Verdict_Different: >
+      Momentum speed is NOT haste. It doesn't reduce GCD. It accelerates
+      physical movement in the committed direction. There is no item equivalent
+      for "move faster while advancing toward a locked target." This is purely
+      class-exclusive functionality with no item parallel.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 13: FRONTLINER CONTRAST TABLE
+# ═══════════════════════════════════════════════════════════════════════════════
+
+FrontlinerContrast:
+  ComparisonTable:
+    Adafold:
+      TankVerb: "HOLD"
+      Mechanic: "Force Targeting (physical compulsion)"
+      BestIn: "Corridors, chokepoints, escort"
+      WeakIn: "Open arenas, multi-angle threats"
+      Execution: "Reactive (watch enemy pathing, intercept)"
+      Survival: "Outlast (self-heal, shields, invuln)"
+      DPSProfile: "Consistent 82-85%, lowest variance"
+      SkillCeiling: "Medium (timing intercepts, gauge management)"
+    Madolt:
+      TankVerb: "SUPPRESS"
+      Mechanic: "Unfocus (AI suppression)"
+      BestIn: "Open arenas, multi-enemy fights"
+      WeakIn: "Rank 4 enemies (resistance), solo without targets"
+      Execution: "Timed (guard-points, stance juggling)"
+      Survival: "Kill fast (offensive sustain)"
+      DPSProfile: "Variable 80-87%, highest ceiling"
+      SkillCeiling: "High (guard-point timing, stance management, discharge ladders)"
+    Siegebreaker:
+      TankVerb: "BREACH"
+      Mechanic: "Momentum (directional commitment)"
+      BestIn: "Fortifications, breaching, straight-line advances"
+      WeakIn: "Multi-angle threats when alone, sustained fights without healer"
+      Execution: "Commitment (read field, decide, commit)"
+      Survival: "Raw HP + CC immunity (take everything, heal nothing)"
+      DPSProfile: "Consistent 83-87%, lowest player variance"
+      SkillCeiling: "Low (correct commitment is obvious most of the time)"
+
+  WhyThreeIsEnough: >
+    Three frontliners cover the full tactical space:
+    - Static defense (hold point) → Adafold
+    - Area denial (suppress zone) → Madolt
+    - Offensive advance (break line) → Siegebreaker
+    Any encounter can be solved by at least one. Many encounters benefit
+    from two (Adafold holds rear while Siegebreaker advances front). The
+    contrast is TACTICAL (when to pick which), not POWER (which is better).
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 14: STRATEGY RANK INTERACTION
+# ═══════════════════════════════════════════════════════════════════════════════
+
+StrategyRankInteraction:
+  Rank1_Mindless:
+    EnemyBehavior: "Attack whoever's closest."
+    SiegebreakerInteraction: >
+      Trivial. Siegebreaker's large hitbox + advance means they're ALWAYS
+      the closest target. Rank 1 enemies attack Siegebreaker by default
+      just because Siegebreaker is walking INTO them. No tools needed.
+    Difficulty: "Trivial. Just walk forward."
+
+  Rank2_Aware:
+    EnemyBehavior: "Seek open path to casters/healers."
+    SiegebreakerInteraction: >
+      Moderate. Rank 2 enemies try to path around. Siegebreaker's answer:
+      advance INTO their path. Large hitbox blocks passage while advancing.
+      Enemies can't easily path around something that's actively moving
+      toward them — they're forced to either fight or flee backward.
+    Difficulty: "Easy. Commit toward the ones trying to flank."
+
+  Rank3_Tactical:
+    EnemyBehavior: "Coordinate flanks, retreat when low, target squishies."
+    SiegebreakerInteraction: >
+      Challenging. Multiple flanking angles mean Siegebreaker must CHOOSE
+      which angle to commit toward. Can't be everywhere. The party must
+      handle the angles Siegebreaker isn't advancing toward. This is where
+      Siegebreaker's limitation (directional commitment) becomes visible.
+      Solution: commit toward the MOST DANGEROUS angle. Party manages rest.
+    Difficulty: "Moderate. Requires correct priority assessment."
+
+  Rank4_Strategic:
+    EnemyBehavior: "Ambush, exploit vulnerabilities, call reinforcements."
+    SiegebreakerInteraction: >
+      Rank 4 enemies will attempt to BAIT commitment in the wrong direction.
+      False retreats to draw Siegebreaker forward, then strike from behind
+      where the advance isn't pointing. This is the ultimate test of
+      decision quality: don't take the bait. Commit only to CONFIRMED
+      threats. Siegebreaker can't react once committed (SPD 5, NTU 3) so
+      the initial read MUST be correct.
+    Difficulty: "High. Requires excellent field reading before commitment."
+
+  CCImmunityVsRank:
+    Description: >
+      Siegebreaker's CC immunity is MOST valuable against Rank 3-4 enemies
+      who use CC as a tactical tool (stun-and-flank, root-and-surround,
+      fear-and-reset). Against these enemies, other frontliners can be
+      CC'd out of position or CC'd and burst-killed. Siegebreaker CANNOT
+      be displaced from their committed advance. The march continues.
+      This is the unique value proposition: against smart enemies,
+      Siegebreaker is the only frontliner guaranteed to REACH the target.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 15: DESIGN NOTES & ANTI-PATTERNS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+DesignNotes:
+  WhatSiegebreakerIsNOT:
+    - "NOT a tank that holds position (Siegebreaker ADVANCES, not HOLDS)"
+    - "NOT a complex execution challenge (simplest kit in the game, 8 abilities)"
+    - "NOT a reaction-based class (SPD 5, NTU 3 — no reactive mechanics exist)"
+    - "NOT slow at walking (SPD ≠ movement speed — normal walk/run like everyone)"
+    - "NOT a burst-cadence class (no 2-minute cycle, no alignment windows)"
+    - "NOT kitable as a primary counter (CC immunity means you GET there)"
+    - "NOT a solo sustain class (zero self-healing — needs a healer for long fights)"
+    - "NOT a multi-angle controller (ONE direction at a time — singular commitment)"
+
+  WhatSiegebreakerIS:
+    - "A directional commitment class that rewards reading the field"
+    - "The lowest floor/ceiling gap in the game (newbie ≈ veteran)"
+    - "A living battering ram that breaks through anything in its chosen path"
+    - "CC immune at all times (the trade for zero reactive tools)"
+    - "The entry-point frontliner for players new to the role"
+    - "A healer's best friend (predictable damage intake, no spikes from CC chains)"
+    - "A siege engine that creates openings for the party to exploit"
+
+  AntiPatterns:
+    - Pattern: "SPD affecting movement speed"
+      Problem: "SPD 5 does NOT mean slow walking. It means no dodging/parrying/reacting."
+      Fix: "Siegebreaker walks/runs at NORMAL speed. Momentum adds speed DURING ADVANCE ONLY."
+      Severity: "CRITICAL — this misunderstanding ruins the entire class feel."
+
+    - Pattern: "Stacking multiple weaknesses"
+      Problem: "Siegebreaker is NOT kited + flanked + ranged-countered + circled simultaneously."
+      Fix: "ONE limitation: directional commitment. That's the ONLY weakness. Everything else has an answer."
+      Severity: "CRITICAL — multiple weaknesses make the class feel awful to play."
+
+    - Pattern: "'Beaten by ranged' as primary counter"
+      Problem: "CC immunity + Momentum speed means Siegebreaker REACHES ranged targets."
+      Fix: "Ranged enemies can't kite forever. Momentum acceleration catches them. They shoot the entire time? Fine. Exoskeleton eats it."
+      Severity: "HIGH — making ranged a hard counter negates CC immunity entirely."
+
+    - Pattern: "Complex rotation or burst cadence"
+      Problem: "Siegebreaker has 8 abilities and a decision tree, NOT a rotation."
+      Fix: "No fixed sequence. No burst window. No alignment. Each GCD = contextual choice."
+      Severity: "HIGH — complexity contradicts the 'simplest class' identity."
+
+    - Pattern: "CC immunity as a buff window"
+      Problem: "Super Armor is NOT a 10s buff you activate. It's ALWAYS ON."
+      Fix: "CC immunity is permanent while Endurance > 0. The gate is soft (rare to deplete). Biology, not buff."
+      Severity: "HIGH — window-based CC immunity feels completely different than permanent immunity."
+
+    - Pattern: "Giving Siegebreaker a dodge or parry"
+      Problem: "SPD 5 and the entire class identity demand ZERO reactive defense."
+      Fix: "Take every hit. DR + HP. That's the survival model. Dodge/parry contradicts the beetle fantasy."
+      Severity: "CRITICAL — even one dodge ability ruins the 'unstoppable march' feel."
+
+    - Pattern: "Making commitment unbreakable"
+      Problem: "If players can NEVER change direction, the class feels like a scripted event, not gameplay."
+      Fix: "Commitment CAN be broken (press Commit again). The COST is Momentum reset. Choice, not lock."
+      Severity: "MEDIUM — the punishment for re-committing IS the gameplay. Not softened, not hardened."
+
+    - Pattern: "Frontliner without party value"
+      Problem: "If Siegebreaker only does personal DPS, why bring them over a DPS class?"
+      Fix: "Large hitbox passive body-blocking + Rending Plates debuff + breach creation. Party enables."
+      Severity: "MEDIUM — Siegebreaker's party value is DIFFERENT from other frontliners, but must exist."
+
+    - Pattern: "2-minute burst cycle alignment"
+      Problem: "No fixed cadence. No alignment with party buffs."
+      Fix: "Exoskeletal Flare on 15-20s CD is the only 'burst' and it's Momentum-gated, not time-gated."
+      Severity: "HIGH — contradicts 'no burst cadence' system rule."
+
+  ZeroFreecure: >
+    There are ZERO random proc mechanics in Siegebreaker's kit. Nothing
+    lights up randomly. Nothing "might happen." Every outcome is deterministic
+    based on Momentum level and button pressed. Zero RNG. Zero Freecure.
+    Zero "lucky crit" procs. Crit is positional (rear hit) or conditional
+    (>50% HP). Never random.
+
+  CritSystemReminder:
+    Description: >
+      Crit in this game is NOT random. For Siegebreaker:
+      - Carapace Slam: crits on REAR positional (enemy facing away)
+      - Thorax Crush: crits against enemies ABOVE 50% HP
+      - All other abilities: do not crit (fixed potency)
+      These conditions reward CORRECT PLAY (approaching from good angles,
+      front-loading damage on fresh targets) without any randomness.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 16: VISUALIZATION HOOKS (for DPS Modeler / Rotation Grapher)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+VisualizationHooks:
+  MomentumTimeline:
+    Description: "Line graph showing Momentum over time during an encounter"
+    XAxis: "Time (seconds)"
+    YAxis: "Momentum (0-100)"
+    Annotations: ["Commit events", "Flare spends", "Direction changes (resets)", "Entrench pauses"]
+    DesignValue: "Shows commitment quality — steady climbs = good play. Frequent resets = bad reads."
+
+  DPSByMomentumTier:
+    Description: "Bar chart showing PPS at each Momentum tier"
+    Categories: ["Tier 0 (stationary)", "Tier 1 (moving)", "Tier 2 (rolling)", "Tier 3 (charging)", "Tier 4 (unstoppable)"]
+    DesignValue: "Shows the payoff curve for sustained commitment vs. frequent direction changes."
+
+  EnduranceTimeline:
+    Description: "Line graph showing Endurance over time"
+    XAxis: "Time (seconds)"
+    YAxis: "Endurance (0-100)"
+    Annotations: ["Entrench recovery spikes", "Ability costs", "CC absorption ticks", "Zero-line danger"]
+    DesignValue: "Shows pacing quality — smooth curve = good pacing. Dipping near 0 = overextension."
+
+  CommitmentMap:
+    Description: "Top-down positional trace showing advance paths during encounter"
+    Visualization: "Arrow paths with color-coding by Momentum tier"
+    DesignValue: "Shows decision quality spatially — direct paths to priority targets = good. Winding/resetting = bad."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 17: CC STAGE BUDGET
+# ═══════════════════════════════════════════════════════════════════════════════
+
+CCBudget:
+  StageAllocation: "Stage 1 ONLY"
+  CCType: "Physical displacement through sheer mass and momentum"
+  Description: >
+    Siegebreaker's CC is purely PHYSICAL and purely STAGE 1. No stuns. No
+    roots. No disables. Just mass displacing other mass. When a beetle the
+    size of a doorframe rolls through a group, bodies get shoved. That's
+    the CC. It's a side effect of existing and moving, not an intentional
+    control ability.
+
+  Stage1Sources:
+    - Source: "Grinding Advance (Tier 3+ Momentum)"
+      Effect: "2y displacement sideways (shoved out of path)"
+      Type: "Positional displacement"
+      Reliability: "Conditional (requires high Momentum)"
+    - Source: "Steamroll (always)"
+      Effect: "1-2y random scatter (lighter enemies only)"
+      Type: "Positional scatter"
+      Reliability: "Always (but Mass-gated — heavy enemies immune)"
+    - Source: "Exoskeletal Flare (60+ Momentum consumed)"
+      Effect: "3y knockback from center"
+      Type: "Radial knockback"
+      Reliability: "Conditional (Momentum threshold + 15-20s CD)"
+    - Source: "Rank 3 Tier 4 advance"
+      Effect: "All enemies displaced regardless of Mass"
+      Type: "Unstoppable displacement"
+      Reliability: "Conditional (Rank 3, Tier 4 Momentum = endgame only)"
+
+  Stage1Limits:
+    - "No stun component. Displaced enemies immediately act after displacement."
+    - "No follow-up CC chain. Displacement is the entire effect."
+    - "Mass-gated (except Rank 3 Tier 4). Heavy enemies resist unless Unstoppable."
+    - "No duration CC. Instantaneous positional change only."
+    - "Cannot be used to interrupt enemy actions (displacement happens, cast continues)."
+
+  DesignReasoning: >
+    Stage 1 only because Siegebreaker's CC is incidental. The class isn't
+    TRYING to control enemies — it's trying to advance through them. The
+    displacement is a SIDE EFFECT of mass in motion. Higher CC stages
+    (stuns, roots, behavioral modification) would require INTENTION and
+    EXECUTION that contradict the simple-class identity. You don't stun
+    things on purpose. You walk through them and they go flying.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 18: BALANCE TARGETS CROSS-REFERENCE
+# ═══════════════════════════════════════════════════════════════════════════════
+
+BalanceTargetsCrossRef:
+  GCD: "2.0s base. NO haste from SPD 5. Effectively fixed at 2.0s."
+  PotencyBands:
+    BasicHit: "Carapace Slam 120p ✓ (band: 80-120, slightly high due to no combo system)"
+    ComboFinisher: "N/A (no combo system — each hit is independent)"
+    GaugeSpender: "Exoskeletal Flare 50-350p ✓ (band: 200-500 for large, variable by Momentum)"
+    oGCD_Damage: "N/A (Flare is oGCD but gauge-gated, classified as spender)"
+    oGCD_Utility: "Commit 0p, Brace 0p ✓ (band: 0-50)"
+  DPSTarget: "85% of reference for frontliner role. Siegebreaker: 83-87% effective ✓"
+  TTKContribution: >
+    Solo Siegebreaker at Rank 2 vs OpenWorld Elite:
+    101 PPS × 0.85 (content difficulty adjustment) = ~86 effective PPS.
+    Elite HP pool: ~2000p equivalent. TTK: ~23s. ✓ (target: 20-30s)
+  CritModel: "Positional + Conditional. ZERO random chance. ✓"
+  HPAbove50Rule: "Thorax Crush crit against enemies >50% HP. Front-loaded damage. ✓"
+  BurstCadence: "NONE. No fixed cycle. Flare every 15-20s is Momentum-gated, not time-gated. ✓"
+  FreecureProcs: "ZERO. No random procs in the entire kit. ✓"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 19: OPEN QUESTIONS & FUTURE WORK
+# ═══════════════════════════════════════════════════════════════════════════════
+
+OpenQuestions:
+  Wyrpincers_Worldbuilding:
+    Question: "What are Wyrpincers like as a race beyond their exoskeleton?"
+    Status: "TBD — worldbuilding team to define culture, society, lore"
+    Recommendation: >
+      Wyrpincers should be coded as "deliberate, patient, committed" —
+      matching the Siegebreaker playstyle. A culture that values decisive
+      action over deliberation, commitment over flexibility, presence over
+      subtlety. They choose and they do. They don't second-guess.
+
+  PvPBalance:
+    Question: "How does CC immunity work in PvP?"
+    Status: "TBD — needs specific PvP tuning"
+    Recommendation: >
+      CC immunity in PvP is DANGEROUS (other players have CC-based kits).
+      Possible approach: reduce to CC RESISTANCE in PvP (-75% duration) rather
+      than full immunity. Alternatively: Momentum builds SLOWER in PvP (harder
+      to reach Tier 4) and CC immunity only at Tier 3+ (conditional in PvP).
+      Full immunity at all times in PvP would require Siegebreaker's damage
+      to be severely reduced as a counterbalance.
+
+  RankProgressionExpansion:
+    Question: "Should Ranks 2-3 add any new ability, even a situational one?"
+    Status: "Currently: NO. Rank progression is passive upgrades only."
+    Recommendation: >
+      HOLD at 8 abilities. If testing reveals that 8 is too few for engagement
+      over hundreds of hours, consider ONE additional GCD at Rank 3 that provides
+      a situational tool (e.g., a backward slam for emergencies). But default
+      position is: 8 abilities, forever. Simple IS the identity.
+
+  HealerInteraction:
+    Question: "Which healer best pairs with Siegebreaker?"
+    Status: "Design space exploration"
+    Recommendation: >
+      Siegebreaker is the MOST healer-dependent frontliner (zero self-heal).
+      Consistent damage intake (no CC spikes) makes predictable healing easy.
+      Shaman's proactive HoTs match well (apply and forget while beetle advances).
+      Elementalist's reactive healing is overkill (no spike damage to react to).
+      Siren's proximity requirement may conflict (Siegebreaker advances away).
+
+  DestructibleTerrainScope:
+    Question: "How much terrain is destructible? Does this make Rank 3 mandatory?"
+    Status: "TBD — depends on level design destructible budget"
+    Recommendation: >
+      Destructible terrain should be a BONUS path, never the REQUIRED path.
+      Non-Siegebreaker parties can always find a way around. Siegebreaker
+      creates SHORTCUTS by breaking walls, not SOLUTIONS to impossible puzzles.
+      Rank 3 terrain destruction opens optional paths, faster routes, and
+      tactical advantages — never gates required progress.
+
+  PartyCompositionWith2Frontliners:
+    Question: "Siegebreaker + Adafold: does this composition work?"
+    Status: "Design space exploration"
+    Recommendation: >
+      Yes. Extremely well. Adafold holds the chokepoint (rear guard).
+      Siegebreaker advances through the enemy formation (vanguard).
+      Enemies caught between advancing Siegebreaker and immovable Adafold
+      are trapped — can't retreat past Siegebreaker, can't advance past
+      Adafold. This is the "hammer and anvil" composition. Siegebreaker
+      is the hammer. Adafold is the anvil.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 20: AUTO-GENERATED CONSTRAINTS (for AI/balance tools)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+Constraints:
+  HardRules:
+    - "Siegebreaker MUST be Wyrpincers race (biological lock: exoskeleton)"
+    - "Super Armor is ALWAYS active while Endurance > 0 (not a buff, not a window)"
+    - "SPD 5 means NO dodge, NO parry, NO reactive defense — NEVER add these"
+    - "SPD does NOT affect movement speed — ONLY reaction/dodge/animation speed"
+    - "Normal walking/running speed — same as all other classes"
+    - "Momentum speed bonus applies ONLY during committed advance, NOT base movement"
+    - "8 abilities MAXIMUM — do not add more without explicit design approval"
+    - "ZERO self-healing — ever. No exceptions. Healer-dependent by design"
+    - "CC immunity cannot be dispelled (biology, not buff)"
+    - "NO burst cadence. NO fixed cycle. NO alignment windows."
+    - "ONE limitation: directional commitment. Do NOT stack multiple weaknesses."
+    - "CC budget: Stage 1 ONLY (physical displacement). No stuns, roots, or disables."
+    - "Crit is positional/conditional. ZERO random crit chance. Zero RNG."
+    - "GCD fixed at 2.0s (SPD 5 provides no haste). Cannot be reduced."
+    - "NO Freecure procs. NO random procs of any kind."
+    - "Rank progression = passive upgrades. NO new abilities at Rank 2 or 3."
+    - ">50% HP rule: Thorax Crush crits ENEMIES above 50% HP (front-loaded damage)"
+    - "Large hitbox: gets hit by everything, hits everything in front. SYMMETRIC."
+
+  SoftRules:
+    - "Endurance depletion (Super Armor drop) should be RARE in normal play"
+    - "Momentum Tier 4 achievable by Rank 2+ only (Rank 1 cap: 70 Momentum)"
+    - "Veteran/newbie DPS gap should be <12%"
+    - "Decision tree should be comprehensible in under 5 minutes of reading tooltips"
+    - "Entrench should be used approximately once per 20-25s in sustained combat"
+    - "Exoskeletal Flare should be used 3-4 times per minute on average"
+
+  DesignOverrides:
+    - "IF a future system adds global CC immunity penetration: Siegebreaker RETAINS immunity (exoskeleton is physical, not magical)"
+    - "IF a future boss requires 'all players dodge': Siegebreaker uses Brace instead (never forced to dodge)"
+    - "IF SPD stat is reworked: Siegebreaker section MUST be updated to reflect new definitions"
+    - "IF new frontliner is added: contrast table (Section 13) must be expanded"
