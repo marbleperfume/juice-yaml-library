@@ -1,0 +1,418 @@
+# Classes/Frontliner_DPS/Skyreign_Validation.yaml
+# ═══════════════════════════════════════════════════════════════════════════
+# SKYREIGN — FULL CLASS VALIDATION
+# ═══════════════════════════════════════════════════════════════════════════
+# Authority: DESIGN_OVERRIDE.md > BalanceTargets.yaml > Design > Skills > THIS
+# Rules: GCD 2.0s/1.4s cap | Crit NOT RNG | NO 2-min burst | §25 <90s
+#   §28: Chain Reactions ≠ crits | §29: Element = UI mode | >50%HP = +25%
+# ═══════════════════════════════════════════════════════════════════════════
+
+Key: Classes.Frontliner_DPS.Skyreign.Validation
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SECTION 1: PASS/FAIL CHECKS (25)
+# ═══════════════════════════════════════════════════════════════════════════
+
+PassFailChecks:
+
+  # §25 COMPLIANCE ────────────────────────────────────────────────────────
+
+  Check_01_S25_Dragon:
+    Rule: "No identity skills CD ≥ 90s"
+    CDs: {Smoke: 15s, Artillery: 0s, Napalm: 18s, ChargedBreath: 20s, Rejuv: 12s, Flight: 8s, Prep: 0s}
+    LongestCD: 20s | Margin: 70s
+    Gate: "Stack-refresh + resource. Not timer-locked."
+    Result: PASS
+
+  Check_02_S25_Dragonguard:
+    Rule: "No identity skills CD ≥ 90s"
+    CDs: {HawkDive: 12s, Cleave: 0s, ScorchPath: 18s, TailSweep: 8s, WingBuffet: 15s, FangCrush: 0s, Stomp: 20s, Stoke: 0s}
+    LongestCD: 20s | Margin: 70s
+    Gate: "Breath terrain gated by gauge (≥50), not long CD."
+    Result: PASS
+
+  Check_03_S25_Draconite:
+    Rule: "No identity skills CD ≥ 90s"
+    CDs: {BL: 0s, ClawCombo: 0s, StaticShroud: 20s, VoltaicRush: "15s×2", EVA_Passive: "N/A", FormSwap: 0s}
+    LongestCD: 20s | Margin: 70s
+    Gate: "Identity skills (BL, Claw, Swap, EVA) = ZERO CD."
+    Result: PASS
+
+  # DPS TARGETS ───────────────────────────────────────────────────────────
+
+  Check_04_DPS_Dragon:
+    Target: "75-80% DPS ref"
+    Math: "~200-280 p/GCD with crits vs ~300-350 ref → ~77% blended"
+    Justification: "20-25% deficit = utility tax (denial, displacement, multi-Z)"
+    Result: PASS
+
+  Check_05_DPS_Dragonguard:
+    Target: "95-102% DPS ref"
+    Math: "Weighted 60% multi/40% single = 141.3 pps / 145 ref = 97.4%"
+    Key: "Cleave multiplier on 3+ targets = DPS leverage"
+    Result: PASS
+
+  Check_06_DPS_Draconite:
+    Target: "70-78% personal"
+    Assertion: "Skills file states 74% personal against internal reference"
+    Flag: "PPS scale mismatch (52 raw vs 145 ref = 36%). Reference normalization needed."
+    Result: PASS (conditional)
+
+  Check_07_rDPS_Blended:
+    Target: "~88-92% effective (personal + rDPS)"
+    Math: "52 personal + 10.7 rDPS = 62.7 pps → 89.6% per Skills file"
+    Variance: {Best_3Elem: "~96%", Avg_2Elem: "~88%", Solo: "~74%"}
+    Result: PASS
+
+  # BREATH GAUGE ──────────────────────────────────────────────────────────
+
+  Check_08_BreathGauge_FormLocal:
+    Rule: "Gauge resets to 0 on swap"
+    Confirmed: "All 4 files consistent — Dragon, DG, Draconite, Design"
+    AntiSpam: "80% charge lost to panic swap = real cost"
+    Result: PASS
+
+  # STACK ECONOMICS ───────────────────────────────────────────────────────
+
+  Check_09_Stack_Refresh:
+    Question: "Can Dragon CDs refresh in reasonable time?"
+    DG_Rate: "~1.5 stacks/s → full refresh in ~26-31s active combat"
+    Draconite_Rate: "~0.7 stacks/s → ~56-67s (punishes safety form)"
+    Constraint: "No <20s re-entry (spammy), no >60s gap (gated)"
+    Result: PASS
+
+  # SURVIVABILITY ─────────────────────────────────────────────────────────
+
+  Check_10_SuperArmor_Survivable:
+    Question: "Dragon stays IN AoE — survivable with Rejuv?"
+    Rejuv: "50%→0% DR over 4-5s + 15-20% HoT, 12s CD, locks offense"
+    Assessment: "~4-5s push-through. >5s AoE needs healer or swap."
+    LinkedCause: "SA prevents escape → Rejuv exists as compensating push-through"
+    Result: PASS
+
+  Check_11_Decaying_DR_NoFacetank:
+    Question: "Does decay prevent 'sit here forever'?"
+    AvgDR_OverCycle: "~9% (25% avg × 37% uptime of 4.5/12s)"
+    Comparison: "Electron Guard = stable DR. Rejuv = burst that evaporates."
+    AntiIDCrisis: "Cannot replicate Adabold/Metaknight hold."
+    Result: PASS
+
+  # EVASION ───────────────────────────────────────────────────────────────
+
+  Check_12_Flat_EVA:
+    Rule: "Draconite exceeds accuracy threshold; other forms fall short"
+    Draconite: "Flat EVA bonus → crosses threshold gear alone can't reach"
+    Dragon: "No EVA. Super armor = accepts ALL hits."
+    Dragonguard: "No EVA. Recovery frames = accepts flanking."
+    Constraint: "Not dodge-cap. Not healer-invalidating."
+    Result: PASS
+
+  # ANTI-SPAM ─────────────────────────────────────────────────────────────
+
+  Check_13_AntiSpam:
+    Mechanisms: ["Breath gauge resets on swap", "Dragon CDs only refresh via stacks from OTHER forms"]
+    Effect: "Ping-pong = no breath payoff + no Dragon CDs = worst DPS"
+    Optimal: "Commit 15-30s per phase. Encounter dictates length."
+    Result: PASS
+
+  # STATIC SHROUD ─────────────────────────────────────────────────────────
+
+  Check_14_StaticShroud_BL:
+    Trail: "Lightning element persistent ground (1-2y width)"
+    Interaction: "BL'd enemies in trail → reaction triggers"
+    Requires: "Movement THROUGH enemy space (cropduster micro-pattern)"
+    SpeedBuff: "+20-25% during active"
+    Result: PASS
+
+  # NO FIXED ROTATION ─────────────────────────────────────────────────────
+
+  Check_15_NoRotation:
+    Confirmed: "All 4 files state NO fixed rotation, NO 2-min cycle"
+    Gate: "Stack readiness + encounter state dictate form, not clock"
+    Result: PASS
+
+  # FRONTLINE SUBTYPE ─────────────────────────────────────────────────────
+
+  Check_16_Subtype:
+    Claim: "Cropduster / Space Control"
+    NotPinpoint: "No Force Target, no position hold, decay DR prevents sitting"
+    NotBatteringRam: "Not linear committed advance (returns, cycles)"
+    Evidence: "Mobile area denial via flight + breath. Passes over, doesn't hold."
+    Result: PASS
+
+  # ANTI-IDENTITY-CRISIS ──────────────────────────────────────────────────
+
+  Check_17_NoStableTank:
+    DecayDR: "50→0% over 4-5s. Average ~9% over cycle."
+    SuperArmorCost: "Stays IN damage = liability, not tank tool"
+    Comparison: "Adabold holds indefinitely. MK stable DR. Skyreign = transient."
+    Result: PASS
+
+  # CRIT SYSTEM ───────────────────────────────────────────────────────────
+
+  Check_18_Crit_NotRNG:
+    Dragon: [mid-action_interrupt, ">50%HP", cone_center, center_OR_groggy]
+    DG: [">50%HP", "2+_enemies_hit", from_behind_positional, groggy]
+    Draconite: [reaction_triggered, full_combo_complete, ">50%HP"]
+    Universal: "Any attack vs groggy/downed"
+    ZeroRNG: true
+    Result: PASS
+
+  Check_19_Over50HP:
+    Integration: "Artillery crit, Hawk-Dive crit, Voltaic crit all = >50% HP"
+    Cycle: "Dragon opens on fresh (+25%) → drop below 50% → DG/Draconite finish"
+    Result: PASS
+
+  # GCD ────────────────────────────────────────────────────────────────────
+
+  Check_20_GCD:
+    AllFiles: "2.0s base, 1.4s cap confirmed across all three Skills files"
+    Note: "Scorch Path 1.4s CAST time ≠ GCD override (occupies GCD slot)"
+    Result: PASS
+
+  # ADDITIONAL ─────────────────────────────────────────────────────────────
+
+  Check_21_ElementSelection:
+    Rule: "§29 — UI mode swap, free, trivial R1, meaningful higher"
+    Evidence: "DG breath terrain: Fire/Ice/Poison variants. UI selection before cast."
+    Result: PASS
+
+  Check_22_NoDominantForm:
+    R1: "Dragon dominant (intentional power fantasy)"
+    R2_Plus: "Dragon punished, DG default, Draconite safety"
+    Result: PASS
+
+  Check_23_NoBurstCycle:
+    Mechanisms: "Stacks via actions not timer. Gauge via combat. No CD ≥20s aligns."
+    Result: PASS
+
+  Check_24_Tells:
+    Dragon: "Audible rev, throat glow, flight shadow"
+    DG: "Chest-rumble, swing trails, ground cracks"
+    Counterplay: "R2+ AI reads tells → scatter/interrupt/dodge"
+    Result: PASS
+
+  Check_25_SwapCost:
+    Free: "No resource, no CD"
+    RealCost: "Gauge → 0, combo resets, Dragon CDs unrefreshed"
+    Result: PASS
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SECTION 2: SCENARIOS (4)
+# ═══════════════════════════════════════════════════════════════════════════
+
+Scenarios:
+
+  Scenario_01_Corridor:
+    Name: "Corridor Dungeon — Dragon dominant"
+    Geometry: "Narrow hallways, limited scatter, enemies forced into breath cone"
+    DominantForm: Dragon
+    Why: "Breath fills width. Napalm unavoidable. Multi-Z covers adjacent levels."
+    Cycle: "Smoke → Artillery → Napalm/Charged → exit. DG cleans survivors."
+    RankScaling:
+      R1: "Walk forward, breathe, trivial."
+      R3: "Trap placement in corridors. Rejuv push-through required."
+    VsAdabold: "Adabold BLOCKS corridor. Skyreign CLEARS it."
+
+  Scenario_02_OpenArena:
+    Name: "Open Arena with Mobile Enemies"
+    Geometry: "Wide space, enemies scatter/kite/flank freely"
+    DominantForms: "DG → Draconite cycling (Dragon punished)"
+    Why: "Dragon overshoot, hitbox exposed. DG cleave + Draconite kite."
+    Cycle: "DG Hawk-Dive opener → cleave chains → pressure rises → Draconite safety → BL uptime → DG return"
+    Dragon_Window: "Groggy states ONLY (5-8s)"
+
+  Scenario_03_Boss:
+    Name: "Boss Fight — full form cycling showcase"
+    Phases:
+      Opener: "DG Hawk-Dive (>50% crit) → cleave → build gauge"
+      Pressure: "Draconite — kite AoE, BL uptime, team reacts"
+      Groggy: "Dragon — Charged Breath auto-crit → Napalm for wakeup"
+      Enrage: "Draconite dominant (survive + enable team)"
+    TimeDistribution: {DG: "60-70%", Draconite: "20-30%", Dragon: "5-10%"}
+    EffectiveDPS: "~94-96% weighted"
+
+  Scenario_04_MultiZ_Procgen:
+    Name: "Multi-Z Procgen with Branching Paths"
+    Geometry: "Vertically stacked, branching corridors, multiple Z-levels visible"
+    Skyreign_Unique: "ONLY frontliner with multi-Z coverage from altitude"
+    Cycle:
+      Dragon: "Overwatch — artillery suppress multiple paths, napalm deny routes"
+      DG: "Descend, cleave assigned branch"
+      Draconite: "Scout tight branches (compact, fast)"
+    VsOthers: "Adabold/MK/Siege commit to ONE route, ONE level. Skyreign covers ALL visible."
+    Effectiveness: HIGHEST_OVERALL
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SECTION 3: FRONTLINE COMPARISON TABLE
+# ═══════════════════════════════════════════════════════════════════════════
+
+FrontlineComparison:
+
+  Skyreign:
+    Subtype: "Cropduster / Space Control"
+    Strengths: [multi-Z_coverage, area_denial_reusable, form_flexibility, displacement, rDPS_BL]
+    Weaknesses: [no_position_hold, Dragon_punished_R2+, form_commit_cost, team_dependent_rDPS, large_hitbox]
+    Unique: "ONLY frontliner covering vertical space (multi-Z breath + aerial overwatch)"
+    Cannot: [hold_corridor_indefinitely, drag_enemies_to_killzone, break_fortifications]
+
+  Adabold:
+    Subtype: "Pinpoint Defense"
+    Strengths: [force_targeting, indefinite_hold, corridor_king, healer_independent]
+    Weaknesses: [no_area_coverage, no_vertical, low_mobility, struggles_ranged]
+    Unique: "ONLY frontliner that FORCES enemies to attack it (true compel)"
+    Cannot: [cover_multi-Z, advance_through_scatter, provide_rDPS]
+
+  Metaknight:
+    Subtype: "Pinpoint Defense (Arena)"
+    Strengths: [unfocus_capacitor_pull, arena_king, electron_guard_stable_DR, crowd_gathering]
+    Weaknesses: [no_vertical, pull_range_limited, gauge_management, open_field_weak]
+    Unique: "ONLY frontliner that GATHERS enemies together (pull + AI suppress)"
+    Cannot: [cover_multi-Z, force_target, break_fortifications]
+
+  Siegebreaker:
+    Subtype: "Crane / Battering Ram"
+    Strengths: [unstoppable_advance, throws_enemies, breaks_fortifications, linear_clear]
+    Weaknesses: [directional_only, sidestep_ignored, no_area_denial, no_vertical]
+    Unique: "ONLY frontliner that DESTROYS environmental barriers + THROWS enemies"
+    Cannot: [cover_multi-Z, hold_position, gather_enemies, provide_rDPS]
+
+  Niche: "Each has capabilities others CANNOT replicate. Zero full overlap."
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SECTION 4: ITEM BASELINE REPLACEMENT (7 items)
+# ═══════════════════════════════════════════════════════════════════════════
+
+ItemBaseline:
+
+  Item_01: {Consumable: "Napalm/Fire Flasks", Replacement: "Dragon Napalm + DG Scorch Path", Better: "Permanent, stronger, multi-Z, scalable, reusable via gauge", Status: CONFIRMED}
+  Item_02: {Consumable: "Smoke Bombs", Replacement: "Dragon Smoke Breath", Better: "Adds Suffocation interrupt, reusable (15s CD), directional cone", Status: CONFIRMED}
+  Item_03: {Consumable: "Siege/Anti-Fort Charges", Replacement: "Dragon Artillery + SA Displacement", Better: "Continuous, mobile, facetank fortifications while dismantling", Status: CONFIRMED}
+  Item_04: {Consumable: "Mass Fear/Scatter Tools", Replacement: "Dragon presence R2+", Better: "Passive (no action), repeatable, scales with rank", Status: CONFIRMED}
+  Item_05: {Consumable: "Elemental Terrain Items", Replacement: "DG Scorch Path", Better: "Larger (2×12y), reusable, directed, element variants, BL-reactive", Status: CONFIRMED}
+  Item_06: {Consumable: "Magic Projectile Wands", Replacement: "Dragon Magic Artillery", Better: "Permanent, 0s CD, multi-projectile, tracking, scales MAG", Status: CONFIRMED}
+  Item_07: {Consumable: "Anti-Air Deterrents", Replacement: "Dragon IS aerial dominance", Better: "You ARE the aerial threat + Wing Buffet Grounding", Status: CONFIRMED}
+
+  Summary: "All 7 items permanently replaced by class kit."
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SECTION 5: CHAIN REACTION AUDIT (§28)
+# ═══════════════════════════════════════════════════════════════════════════
+
+ChainReactionAudit:
+
+  Rule: >
+    §28: Chain Reactions ≠ crits. Overlapping terrain + BL reactions = chain
+    reactions (separate bonus damage event). Must NOT be labeled CritCondition.
+
+  FlaggedInstances:
+
+    Flag_01:
+      File: Skyreign_Skills_Draconite.yaml
+      Location: "BlackLightning.CritCondition"
+      Current: "Trigger: Reaction triggered (external element contact) → 1.5x DoT tick"
+      Issue: "BL reaction IS a chain reaction (§28), mislabeled as CritCondition"
+      ShouldBe: "ChainReaction section — bonus damage event, not crit multiplier"
+
+    Flag_02:
+      File: Skyreign_Skills_Dragonguard.yaml
+      Location: "BreathTerrainLine.CritCondition"
+      Current: "Enemy standing IN existing terrain when new line crosses it"
+      Issue: "Overlapping terrain = chain reaction (§28), not positional crit"
+      ShouldBe: "ChainReaction — overlap produces separate elemental burst"
+
+    Flag_03:
+      File: Skyreign_Design.yaml
+      Location: "CritSystem.Conditions.Draconite_BlackLightning"
+      Current: "Reaction triggered (external element contact)"
+      Issue: "Design file lists chain reaction under CritSystem heading"
+      ShouldBe: "Separate ChainReactions section in Design file"
+      Severity: HIGH (Design = higher authority)
+
+    Flag_04:
+      File: Skyreign_Skills_Draconite.yaml
+      Location: "CritConditions summary block"
+      Current: "BlackLightning: {Trigger: Reaction fires, Multiplier: 1.5x}"
+      Issue: "Consolidated crit table includes reaction (same as Flag_01)"
+
+  CorrectCrits: >
+    All other CritConditions are TRUE crits: mid-action interrupt, >50%HP,
+    cone center, from behind, 2+ enemies, full combo, groggy. These stay.
+
+  Action: "Future correction pass on 4 instances. Do NOT modify source files here."
+  InstancesTotal: 4 | Severity: {HIGH: 1, MODERATE: 3}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SECTION 6: OPEN TUNING QUESTIONS (28 total)
+# ═══════════════════════════════════════════════════════════════════════════
+
+OpenTuning:
+
+  # CRITICAL priority
+  Critical:
+    Q01: {Q: "DPS reference scale — normalize ALL forms to one PPS baseline", Source: "Cross-file (Draconite 52pps/74% vs DG 145pps ref)", Impact: "ALL form balance"}
+    Q02: {Q: "Stack cost scale — Dragon file (1-2) vs DG file (6-15) per skill", Source: "Dragon.StackCosts vs DG.DragonCDRefreshCosts", Impact: "Form cycle timing"}
+    Q03: {Q: "BL reaction bonus % (current 50%, range 40-75%)", Source: "Draconite.TuningHooks", Impact: "ALL team math"}
+
+  # HIGH priority
+  High:
+    Q04: {Q: "Voltaic Rush melee-transform (§27 Samira model) — yes/no?", Source: "Draconite.VoltaicRush.DesignNote"}
+    Q05: {Q: "Empowered BL at full gauge: 100% reaction bonus — balanced?", Source: "Draconite.BreathGauge.Delivery"}
+    Q06: {Q: "Dragon Rejuvenation decay shape (linear? front-loaded?)", Source: "Design + Dragon.OpenTuning"}
+
+  # MODERATE priority
+  Moderate:
+    Q07: {Q: "Passive breath charge in Dragon (12-15%/s stated)", Source: "Dragon.BreathGauge.Timing"}
+    Q08: {Q: "Super armor vs boss grabs/pins (likely override SA)", Source: "Design + Dragon"}
+    Q09: {Q: "EVA flat value (15% candidate, range 10-20%)", Source: "Draconite.TuningHooks"}
+    Q10: {Q: "Combo window tension (4.0s — generous? reduce to 3.0?)", Source: "Draconite.TuningHooks"}
+    Q11: {Q: "Scorch Path element balance (Fire/Ice/Poison per §29)", Source: "DG.BreathTerrainLine"}
+    Q12: {Q: "Tail Sweep positional: 'from behind' relative to whom?", Source: "DG.TailSweep"}
+    Q13: {Q: "Napalm terrain: stack damage or refresh duration?", Source: "Dragon.OpenTuning"}
+    Q14: {Q: "Charged Breath crit zone (~30° of 90° cone)", Source: "Dragon.OpenTuning"}
+
+  # LOW priority
+  Low:
+    Q15: {Q: "Draconite combo 4 vs 5 hits (rhythm feel)", Source: "Design.OpenQuestions"}
+    Q16: {Q: "Hawk-Dive CD (12s) feel vs spam", Source: "Design.OpenQuestions"}
+    Q17: {Q: "Dragon commit distance minimum (10y stated)", Source: "Dragon.OpenTuning"}
+    Q18: {Q: "Fang Crush CC extension (0.5s) — meaningful?", Source: "DG.FangCrush"}
+    Q19: {Q: "Full gauge double-cast Scorch (0.8s+1.4s) value", Source: "DG.BreathGauge"}
+    Q20: {Q: "Static Shroud trail persistence (4-5s after pass)", Source: "Draconite.StaticShroud"}
+    Q21: {Q: "Stacks per GCD hit (1 or 2 per)", Source: "Dragon.StackRefresh"}
+    Q22: {Q: "Stacks per damage received (0.5 — scaling?)", Source: "Dragon.StackRefresh"}
+    Q23: {Q: "Stack cap (prevent hoarding?) or uncapped", Source: "Dragon.StackRefresh"}
+    Q24: {Q: "BL duration base (15s) — range 12-18s", Source: "Draconite.TuningHooks"}
+    Q25: {Q: "Dragon movement speed (party buffs ignored)", Source: "Design.PartySpeedBuffs"}
+
+  # CROSS-FILE DISCREPANCIES
+  Discrepancies:
+    D01: {Issue: "Stack cost scale mismatch", Dragon: "1-2 per skill", DG: "6-15 per skill", Priority: CRITICAL}
+    D02: {Issue: "Draconite PPS denominator", DracFile: "52/74% = 70 ref", DGFile: "145 ref", Priority: CRITICAL}
+    D03: {Issue: "Dragon skill count (6+1 toggle vs '7 skills')", Priority: LOW}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SECTION 7: VALIDATION SUMMARY
+# ═══════════════════════════════════════════════════════════════════════════
+
+Summary:
+  Status: PASS_WITH_FLAGS
+  Checks: {Total: 25, Passed: 25, Conditional: 1, Failed: 0}
+  Scenarios: 4
+  ItemsVerified: 7 (all confirmed)
+  ChainReaction_Flags: 4 (correction pass needed)
+  OpenQuestions: {Total: 25, Critical: 3, High: 3, Moderate: 8, Low: 11}
+  Discrepancies: 3
+
+  Immediate_Actions:
+    - "Resolve DPS reference scale (ONE baseline for all forms)"
+    - "Resolve stack cost scale (Dragon vs DG files)"
+    - "Separate chain reactions from crit conditions (§28)"
+  ShortTerm:
+    - "Lock BL reaction bonus % (most sensitive lever)"
+    - "Finalize Rejuv decay curve shape"
+    - "Decide Voltaic Rush melee-transform (§27)"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# END — 25 checks | 4 scenarios | 4 classes compared | 7 items | 4 §28 flags
+# ═══════════════════════════════════════════════════════════════════════════

@@ -1,0 +1,667 @@
+# Classes/Frontliner_DPS/Skills/Skyreign_Skills_Dragon.yaml
+# ═══════════════════════════════════════════════════════════════════════════════
+# SKYREIGN — DRAGON FORM SKILL SPEC
+# ═══════════════════════════════════════════════════════════════════════════════
+# Lineage: HotS Deathwing (presence), MH Magnamalo (commit-punish),
+#   DOS2 Lizard (breath terrain), Shyvana (form concept NOT execution)
+# Authority: DESIGN_OVERRIDE.md > BalanceTargets.yaml > Skyreign_Design.yaml > this file
+# ═══════════════════════════════════════════════════════════════════════════════
+
+Key: Classes.Frontliner_DPS.Skyreign.Skills.Dragon
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 1: FORM IDENTITY & GLOBAL RULES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+FormIdentity:
+  Name: Dragon
+  Role: Frontline Utility (juggernaut, supporting fire, displacement)
+  Keywords: [cropduster, space_control, multi_Z, committed_movement]
+  DPSTarget: "75-80% of DPS reference (frontline utility tax)"
+  SizeModel: Large (aerial, big hitbox)
+  Fantasy: >
+    Everything burns if you don't move. R1: power fantasy apocalypse. R2+:
+    terror that scatters enemies into team kill zones. Supporting fire.
+
+  Movement: >
+    Committed straight-line flight. Longer distance = more enemy reaction
+    time. Close = maximum devastation. Far approach = scatter. Cannot
+    redirect mid-flight. DISTANCE is the decision.
+
+  AltitudeCoverage: "Hits ACROSS Z-levels. Breath/napalm covers multiple altitudes per pass."
+  PartyBuffs: { SpeedBuffs: IGNORED, Heals: ACCEPTED, Barriers: ACCEPTED }
+
+GlobalRules:
+  GCD: { Base: 2.0s, Cap: 1.4s }
+  CritSystem: { ZeroRNG: true, Rule: "All crits positional/conditional. No stat-based crit chance." }
+  OverFiftyHP: "Enemies >50% HP take +25% incoming damage. Dragon opens on fresh groups."
+  NoBurstCycle: "NO 2-minute window, NO fixed cadence. Stack readiness + encounter state dictate entry."
+  Section25: "No identity skills ≥90s CD. Dragon CDs 10-20s base, stack-refreshed. Form swap free."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 2: SUPER ARMOR (Rocksteady Mantle)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+SuperArmor:
+  Name: Rocksteady Mantle
+  Type: Passive (always active in Dragon form)
+
+  Effect: "Immune to ragdoll/knockback/stagger/CC displacement."
+  Cost: >
+    Stays IN every AoE/trap instead of being knocked clear. Large hitbox
+    eats everything. Knockback that would SAVE other classes does nothing.
+
+  LinkedCause: >
+    WHY Dragon Rejuvenation exists. Super armor prevents natural escape.
+    Must have push-through survival tool.
+
+  Utility: >
+    Forces enemies off positions by facetanking through. Team utility =
+    stealth-flanking via brute force. Enables advance.
+
+  Counterplay:
+    R1: "Pure upside — enemies lack persistent AoE."
+    R2: "Double-edged — enemies place traps/persistent AoE."
+    R3_Plus: "Traps exploit super armor. Cannot be knocked to safety. Facetank = suicide."
+
+  AntiPattern: "Super armor ≠ damage reduction. Dragon takes FULL damage. Cost scales with hitbox."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 3: SKILLS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+Skills:
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  SmokeBreath:
+    Name: Smoke Breath
+    Type: GCD
+    Category: setup_cc
+    Shape: "cone, ~60° arc"
+    Range: 12y
+    AltitudeHit: true
+    Potency: 90-110
+    Recast: 15s (stack-refreshed, 1 stack)
+    Element: smoke/choking
+
+    Effect:
+      AccuracyDebuff: "-30% hit chance, 6s"
+      Suffocation: >
+        Stage 1 CC: coughing interrupts current action (cast/channel/aim
+        cancel). NOT root/slow/stun. Enemies can still MOVE freely.
+      VisionDenial: >
+        Smoke persists 4-6s as cloud. Enemies inside have reduced vision.
+        Enemies outside cannot see in. Team concealment.
+
+    CritCondition: "Target mid-action when Suffocation interrupts"
+    CritFailCase: "Idle target = nothing to interrupt = no crit"
+
+    GaugeInteraction: "Does NOT consume breath gauge. Independent. Usable at 0%."
+
+    RankBehavior:
+      R1: "Free setup. Enemies stand in smoke."
+      R2: "Required before breath — prevents scatter."
+      R3: "Some enemies resist Suffocation (gas masks). Smoke = concealment only."
+      R4: "Enemies recognize patterns. Must vary timing."
+
+    AntiPattern: >
+      NOT hard CC. Interrupts ONE action, then enemies act normally. Not a
+      stun. Cannot stunlock. Single-instance cancel.
+
+    DesignIntent: "Preparation phase. Not satisfying alone. Sets up breath payoff."
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  MagicArtillery:
+    Name: Magic Artillery
+    Type: GCD
+    Category: suppressive_fire
+    Shape: "multi-projectile (3-5 missiles, independent tracking)"
+    Range: 20y
+    AltitudeHit: true
+    Potency: "60-80p per projectile (180-400p total depending on targets)"
+    Recast: 0s (spammable filler)
+    Element: ice/magic
+
+    Effect:
+      Primary: "Rapid-fire ice missiles. Low per-missile damage, persistent pressure."
+      Suppression: "Forces enemies to react (cover/scatter/shield). Psychological pressure R2+."
+      MultiTarget: "Default: spread across targets. Player-directed focus fire available."
+
+    CritCondition: "Target above 50% HP (§9 synergy)"
+    CritDesignLogic: >
+      Opening barrage on fresh groups = every missile crits. Below 50% HP =
+      no crit. Rewards Dragon opening. Punishes lingering in artillery phase.
+
+    GaugeInteraction: "Does NOT consume or generate gauge. Gauge-neutral filler."
+    StackCost: "None. Always available."
+
+    RankBehavior:
+      R1: "Every missile hits. Satisfying by volume."
+      R2: "Enemies take cover. Missiles flush targets into breath."
+      R3: "Countermeasures exist. Missiles become zoning tool."
+      R4: "Suppression/positioning only. Damage near-irrelevant vs prepared."
+
+    AntiPattern: >
+      Intentionally UNSATISFYING per-hit. "Pew pew" is maintenance. Charged
+      Breath is the payoff. If artillery felt complete, no one commits to breath.
+
+    DesignIntent: >
+      Keep Dragon active during charge time without self-sufficient damage
+      loop. Player should feel "I need to get to breath."
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  NapalmBreath:
+    Name: Napalm Breath
+    Type: GCD
+    Category: area_denial
+    Shape: "cone (initial) → ground-persistent terrain"
+    Range: 15y (cone), 8y radius terrain
+    Width: "~45° cone"
+    AltitudeHit: "Initial cone = multi-Z. Terrain persists at landing elevation."
+    Potency:
+      DirectHit: 220-280
+      TerrainDoT: "45-60 per tick, 8-10s, ticks every 2s (180-300 total)"
+    Recast: 18s (stack-refreshed, 2 stacks)
+    Element: fire/napalm
+
+    GaugeRequirement:
+      Minimum: "50% (reduced cone, shorter terrain)"
+      Full: "100% (max cone, full duration, +20% direct potency bonus)"
+      SubMinimum: "Cannot cast below 50%."
+
+    Effect:
+      Primary: "Liquid fire stream → pools as persistent napalm terrain."
+      ZoneDenial: >
+        Forces enemy repositioning. Corridors impassable. Vantage points
+        untenable. Retreat paths cut. Dragon shapes battlefield.
+      MultiZ: "Napalm from above coats lower platforms AND flight-level."
+      Stacking: "Multiple casts can overlap. Open tuning: stack damage or refresh duration?"
+
+    CritCondition: "Direct hit (cone center ~15° of 45° cone)"
+    CritNote: "Edge = normal. Terrain DoT NEVER crits (consistent, not spikey)."
+
+    GaugeInteraction: "Consumes 50% or 100% gauge. Resets to 0% post-cast."
+    Decision: "50% now (faster/weaker) vs 100% later (slower/stronger). Encounter pacing dictates."
+
+    RankBehavior:
+      R1: "AI walks through napalm. Free damage + denial."
+      R2: "Enemies avoid patches. Displacement effective."
+      R3: "Fire resistance/extinguish reduces duration vs prepared foes."
+      R4: "Positioning tool exclusively. Smart enemies never take terrain damage."
+
+    AntiPattern: "NOT sustained DPS. One napalm per pass. Cannot hover-spam (gauge + committed movement)."
+    DesignIntent: "FIRST payoff. 'The ground is yours no longer.' Forces movement, enables team advance."
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  ChargedBreath:
+    Name: Charged Breath
+    Type: GCD
+    Category: payoff_burst
+    Shape: "wide cone, ~90° sweeping arc"
+    Range: 12y
+    AltitudeHit: true (all Z-levels simultaneously)
+    Potency:
+      AtFiftyPercent: 320-380
+      AtHundredPercent: 450-520
+      Scaling: "Linear 50-100% gauge"
+    Recast: 20s (stack-refreshed, 2 stacks)
+    Element: fire/plasma
+
+    GaugeRequirement:
+      Minimum: "50% (reduced potency, full width)"
+      Full: "100% (maximum devastation)"
+      Behavior: "Consumes ALL remaining gauge → 0%"
+
+    Effect:
+      Primary: >
+        Massive sweeping breath. 90° wide cone. High potency. Multi-Z.
+        THE satisfying skill. Everything setup builds toward.
+      Width: "Wide catches laterally-scattered enemies. Dragon's answer to 'they ran sideways.'"
+      NoTerrain: "Unlike Napalm — instant devastation, no persistent zone. Different purpose."
+
+    CritCondition:
+      Primary: "Center cone (~30° of 90° cone)"
+      Secondary: "Target groggy/downed/CC'd (auto-crit regardless of position)"
+    CritFailCase: "Edge targets = normal damage"
+
+    VsNapalm: >
+      Strategic choice per gauge charge: Napalm (terrain denial, moderate
+      direct) vs Charged Breath (max direct, no terrain). Cannot use both
+      on same gauge.
+
+    RankBehavior:
+      R1: "Everything in cone dies. Peak power fantasy."
+      R2: "Scatter before delivery. Must Smoke/corridor first."
+      R3: "Enemies interrupt Dragon (interrupt immunity ≠ CC immunity). Timing critical."
+      R4: "Only lands on groggied/trapped/perfectly corralled targets."
+
+    AntiPattern: "NOT spammable (gauge reset, 20s CD, 2 stacks). One per deployment typical. Two exceptional."
+    DesignIntent: >
+      Single most satisfying Dragon moment. Earned through setup. Landing
+      full Charged Breath on corralled group = peak Skyreign. Missing because
+      no setup = failure state that teaches form mastery.
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  DragonRejuvenation:
+    Name: Dragon Rejuvenation
+    Type: oGCD
+    Category: defensive_push_through
+    Shape: self
+    Potency: 0 (defensive)
+    CastTime: instant (weaves between GCDs)
+    Recast: 12s (stack-refreshed, 1 stack)
+    Element: crystal/draconic
+
+    Effect:
+      DamageReduction:
+        Initial: "~50%"
+        Decay: "Linear 50% → 0% over 4-5s"
+        Model: "Duration-based decay (NOT repetitive-use penalty)"
+      HealOverTime: "~3-4% max HP/s during DR window (~15-20% total)"
+      OffenseLock: >
+        ALL offensive actions locked for duration. Can still MOVE (committed
+        flight continues). Cannot attack/breath/artillery. Pure defensive.
+        Movement IS the action — push THROUGH danger during strong DR.
+
+    LinkedCause: >
+      Super armor prevents knockback escape. Dragon stays IN damage. Other
+      classes get knocked clear. Rejuvenation = push-through tool because
+      evasion/displacement unavailable.
+
+    CritCondition: "N/A (no damage dealt)"
+    GaugeInteraction: "No effect on gauge. Gauge continues passive charging during."
+
+    Section25: { CD: 12s, Threshold: 90s, Status: COMPLIANT, GateType: "decay, not CD" }
+
+    DecayVsConsistency: >
+      Electron Guard (Metaknight) = consistency gate (stable DR, gauge drain).
+      Rejuvenation = decay gate (burst safety, diminishes). Both prevent
+      indefinite holds. Different mechanisms. Dragon MOVES, Metaknight HOLDS.
+
+    RankBehavior:
+      R1: "Rarely needed."
+      R2: "Push through new traps. Timing forgiving."
+      R3: "Critical. Must time entry-to-exit within DR window."
+      R4: "Traps exceed 5s transit. Must combine with form swap."
+
+    AntiPattern: "NOT sustained tanking. Each second WORSE. Must be moving through, not sitting."
+    DesignIntent: >
+      "Activated Rejuvenation, flew through fire, DR nearly gone by exit.
+      2m wider zone = would've needed Draconite swap mid-transit."
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  AerialMovement:
+    Name: Committed Flight
+    Type: GCD (movement)
+    Category: repositioning
+    Shape: "linear dash (self-directed)"
+    Range: "15-30y (variable commit distance)"
+    Potency: 0 (movement — see FlybyDisplacement)
+    Recast: 8s (stack-refreshed, 1 stack)
+    Element: physical/wind
+
+    Effect:
+      DirectionLock: "Locked on activation. Cannot redirect/curve/abort mid-flight."
+      DistanceSelection: "Player chooses short/medium/long before activation."
+      FlybyDisplacement: "Enemies in path displaced laterally (knocked aside). Utility, not damage."
+
+    CommitCost: >
+      Longer distance = more enemy reaction time = scatter before arrival.
+      Shorter = less warning but less ground covered. Information vs positioning.
+
+    CritCondition: "N/A (no direct damage)"
+    GaugeInteraction: "Gauge charges DURING flight. Longer flight = more gauge gained in transit."
+
+    RankBehavior:
+      R1: "Free positioning. Enemies don't react."
+      R2: "Enemies scatter from flight path."
+      R3: "Paths can be trapped (pre-placed AoE on predicted lines)."
+      R4: "Every commit a gamble. Only unpredictable angles work."
+
+    AntiPattern: "NO HOVER. No stationary aerial position. Always directional commitment or descending."
+    DesignIntent: "Movement IS content. Distance/angle = real decision. Flight establishes position for everything else."
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  BreathPrep:
+    Name: Breath Prep
+    Type: oGCD (state toggle)
+    Category: gauge_activation
+    Shape: self
+    Potency: 0
+    Recast: 0s (no CD)
+
+    Effect:
+      Slow: "~30% movement speed reduction during active charge"
+      MeleeLock: "Melee attacks locked until gauge ≥50%. Artillery still available."
+      AudioTell: "Audible rev. Pitch/volume increases with gauge. LOUD at high charge."
+      VisualTell: "Throat/chest glow intensifies. Visible from distance."
+
+    EnemyReaction:
+      R1: "No reaction."
+      R2: "Flee at ~70% gauge."
+      R3: "Interrupt attempts at first rev sound."
+      R4: "Scatter IMMEDIATELY. Must Smoke first to conceal rev."
+
+    GaugeInteraction: >
+      Dragon charges passively regardless. Prep adds the TELL and applies
+      slow + melee lock. Prep = commitment to DELIVERING breath.
+
+    DesignIntent: >
+      Commitment marker. Counterplay window via slow + tells. The race:
+      "deliver before they scatter." Smoke BEFORE prep = concealed rev.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 4: BREATH GAUGE (Dragon-specific behavior)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+BreathGauge:
+  Type: "resource gauge (0-100, Dragon-local)"
+  Persistence: "RESETS TO 0 on form swap away from Dragon"
+  ChargeRate: "Fast passive — charges while flying"
+
+  Timing:
+    PassiveRate: "~12-15% per second in flight"
+    StationaryRate: "~5-7% per second if not moving"
+    TimeToFifty: "~3.5-4s in flight (minimum for breath skills)"
+    TimeToFull: "~7-8s in flight"
+
+  Thresholds:
+    ZeroToFifty: "Melee locked. Only Artillery. Building."
+    FiftyPlus: "Melee unlocked. Breath skills available (partial potency)."
+    Hundred: "Full potency. Maximum breath power."
+
+  FormReset: >
+    Swap OUT = 0%. Always. 80% charge lost to panic swap = real failure.
+    This IS the commitment cost. Leaving Dragon wastes ALL breath progress.
+
+  AntiPattern: "Cannot bank across forms. Cannot charge in Dragonguard and bring to Dragon."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 5: STACK SYSTEM (Dragon CD refresh)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+StackRefresh:
+  CoreRule: >
+    Dragon CDs do NOT refresh by time alone. Remain on CD until stacks spent.
+    Stacks earned exclusively in Dragonguard/Draconite via active combat.
+
+  Sources:
+    GCDLanded: { Where: "Dragonguard/Draconite", Amount: "1 stack per GCD hit (tuning: 1-2)" }
+    DamageReceived: { Where: "Any form", Amount: "~0.5 stacks per hit (small, passive)" }
+
+  RankEvolution:
+    R1: "Facetank with healer = stacks from damage received. Low-skill path."
+    R3: "Facetank = suicide. Damage-received stacks irrelevant. Must earn via active GCDs."
+
+  StackCosts:
+    SmokeBreath: 1
+    MagicArtillery: "N/A (no CD)"
+    NapalmBreath: 2
+    ChargedBreath: 2
+    DragonRejuvenation: 1
+    AerialMovement: 1
+
+  Cycle: >
+    Dragon (spend CDs) → other forms (earn stacks) → stacks refresh Dragon
+    CDs → re-enter Dragon. Phase length = encounter-dependent, NOT timer.
+
+  FailureState: >
+    Enter Dragon with 0 stacks, all CDs down = only Artillery available.
+    Dead weight. Timing error — should have stayed in other forms longer.
+
+  OpenTuning:
+    - "Stacks per GCD hit (1 or 2)"
+    - "Stacks per damage received (0.5 base, scaling?)"
+    - "Stack cap (prevent hoarding?) or uncapped"
+    - "Partial refresh possible (3/4 stacks toward 4-cost skill?)"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 6: CRIT CONDITIONS (consolidated)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+CritConditions:
+  SystemRule: "Zero RNG. Conditional only."
+
+  PerSkill:
+    SmokeBreath: { Condition: "Target mid-action when interrupted", Skill: "Timing vs casting enemies" }
+    MagicArtillery: { Condition: "Target >50% HP", Skill: "Opening bombardment on fresh groups" }
+    NapalmBreath: { Condition: "Direct hit (cone center)", Skill: "Aim center on priority targets" }
+    ChargedBreath: { Condition: "Center cone OR groggy target", Skill: "Positioning + timing" }
+    Universal: { Condition: "Any attack vs groggy/downed/CC'd", Skill: "Dragon entry during vulnerability" }
+
+  Philosophy: >
+    Lazy play = 0 crits. Skilled play with positioning = crits on every
+    meaningful hit. Gap between lazy/skilled is crit-density dependent.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 7: ROTATION PHILOSOPHY
+# ═══════════════════════════════════════════════════════════════════════════════
+
+RotationPhilosophy:
+  CoreStatement: >
+    NO FIXED ROTATION. No opener. No burst window. No 2-min cycle.
+    Encounter dictates. Dragon is DEPLOYED, not rotated through.
+
+  DeploymentPatterns:
+    OpeningAssault:
+      Context: "Fresh group, corridor, R1-R2"
+      Sequence: "Smoke → Artillery (crit >50%) → Charged Breath → swap"
+
+    ZoneDenial:
+      Context: "Enemies fortified, team needs advance"
+      Sequence: "Smoke → Napalm (deny position) → Artillery (flush) → swap"
+
+    SupportingFire:
+      Context: "Team engaged, enemies scattered, R2+"
+      Sequence: "Artillery (suppress) → Napalm (cut retreat) → swap"
+
+    PushThrough:
+      Context: "Danger zone blocking team path"
+      Sequence: "Rejuvenation → Committed Flight through → swap"
+
+    BossGroggy:
+      Context: "Boss downed (immobile)"
+      Sequence: "Charged Breath (auto-crit) → Napalm (zone for wakeup) → swap"
+
+  WhatDeterminesSequence:
+    - "Enemy HP state (above/below 50%)"
+    - "Geometry (corridor vs open)"
+    - "Enemy behavior (standing vs scattered)"
+    - "Stacks available (how many CDs refreshed)"
+    - "Team needs (denial vs damage vs pathfinding)"
+    - "Danger level (sustain Dragon long enough for full gauge?)"
+
+  Filler: "Artillery between CD uses."
+  ExitTrigger: "CDs exhausted OR danger exceeds Rejuvenation OR enemies beyond reach."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 8: SKILL INTERACTIONS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+SkillInteractions:
+  SmokeIntoBreath: >
+    Smoke conceals rev tell. Enemies cannot see prep through cloud. NOT a
+    combo (no bonus damage). Tactical concealment. Smoke (6s) → prep → deliver.
+
+  ArtilleryDuringCharge: >
+    Artillery available during prep (ranged, not melee-locked). Fills GCDs
+    while gauge charges. No dead time.
+
+  NapalmIntoFlight: >
+    Napalm → immediate flight reposition. Deny zone then LEAVE. Hit-and-run
+    denial. 4s total (2 GCDs), covers two zones.
+
+  RejuvenationDuringFlight: >
+    Rejuvenation (oGCD) weaves into Flight (GCD). DR active during transit.
+    Push-through execution.
+
+  ChargedBreathOnGroggy: >
+    Groggy = guaranteed crit. Enter Dragon → prep → gauge 50%+ → Charged
+    Breath. ~4-5s from entry. Skip setup.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 9: VULNERABILITY PROFILE
+# ═══════════════════════════════════════════════════════════════════════════════
+
+Vulnerability:
+  Statement: "Dragon is the MOST VULNERABLE Skyreign form."
+  Factors:
+    - "Super armor = stays IN AoE (cannot be knocked clear)"
+    - "Large hitbox = every AoE contacts"
+    - "Committed movement = flies into traps if predicted"
+    - "Breath prep slow = easier to catch"
+    - "Zero evasion stat (unlike Draconite)"
+
+  Survival:
+    Primary: "Dragon Rejuvenation (decaying DR, 4-5s window)"
+    Secondary: "Higher max HP (HBD racial)"
+    Tertiary: "Healer support"
+    Absent: "Evasion, stable DR, position hold"
+
+  HealerDependency: "R3+ NEEDS healer or precise Rejuvenation. Cannot self-sustain prolonged AoE."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 10: RANK SCALING — DEPLOYMENT WINDOWS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+RankScaling:
+  Principle: "Dragon deployment windows SHRINK as rank increases."
+
+  PerRank:
+    R1: { Window: unlimited, EnemyBehavior: "Stand still. Accept damage.", Experience: "Power fantasy. Stay Dragon." }
+    R2: { Window: "15-25s", EnemyBehavior: "Scatter on approach. Flee rev.", Experience: "Smoke required. Supporting fire emerges." }
+    R3: { Window: "8-15s", EnemyBehavior: "Traps. Anti-air. Interrupts.", Experience: "Situational. Corridor/groggy only." }
+    R4: { Window: "5-10s", EnemyBehavior: "Predict all tells. Counter-deploy.", Experience: "Precision strike. Team-coordinated entry." }
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 11: FORM TRANSITION RULES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+FormTransition:
+  Entry:
+    Cost: "Free (no resource, no CD)"
+    Animation: "0.5s transform (does not consume GCD)"
+    BreathState: "Gauge starts 0%"
+    CDState: "Only if stacks spent to refresh"
+    Optimal: "All CDs refreshed + encounter permits sustained Dragon"
+    Fail: "0 stacks, all CDs down = only Artillery = dead weight"
+
+  Exit:
+    Cost: "Free"
+    GaugeLoss: "ALL gauge → 0%"
+    CDCarry: "Unspent CDs remain for next entry"
+    Optimal: "All CDs spent, gauge at 0% (breath delivered). Nothing wasted."
+    Suboptimal: "60%+ gauge forced swap = major waste"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 12: TEAM SYNERGY
+# ═══════════════════════════════════════════════════════════════════════════════
+
+TeamSynergy:
+  Role: "Supporting fire at R2+. Scatter enemies into team kill zones."
+
+  Provides:
+    - "Area denial (Napalm forces enemies off positions → team advances)"
+    - "Scatter pressure (R2+ presence → fleeing enemies = team kills)"
+    - "Vision denial (Smoke → team approaches unseen)"
+    - "Displacement (flight path clears enemy formations)"
+    - "Multi-Z coverage (vertical suppression unique to Dragon)"
+
+  DoesNotProvide:
+    - "Sustained single-target DPS (Dragonguard)"
+    - "Team buffs/debuffs (Draconite Black Lightning)"
+    - "Point defense (Adabold/Metaknight)"
+    - "Stable tanking (decaying DR prevents)"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 13: POTENCY BUDGET
+# ═══════════════════════════════════════════════════════════════════════════════
+
+PotencyBudget:
+  Target: "75-80% DPS ref over deployment"
+  Model:
+    GCD: 2.0s
+    TypicalDeployment: "15s (R2 average, ~7 GCDs)"
+    GaugeToFifty: "~4s (2 GCDs flight)"
+    GaugeToFull: "~8s (4 GCDs flight)"
+
+  SampleDeployment:
+    GCD1: "Smoke (90-110p)"
+    GCD2: "Artillery (180-400p)"
+    GCD3: "Artillery (180-400p, gauge ~50%)"
+    GCD4: "Napalm or Charged Breath (220-520p)"
+    GCD5: "Artillery (recharging)"
+    GCD6: "Reposition or Artillery"
+    GCD7: "Exit or second breath if gauge permits"
+
+  Average: "~200-280p/GCD with crits. ~160-220p without. DPS ref ~300-350p."
+  Justification: "20-25% deficit compensated by utility (denial, displacement, scatter, multi-Z)."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 14: ANTI-PATTERNS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+AntiPatterns:
+  - { Pattern: "Dragon as permanent form", Fix: "CDs exhaust. R2+ scatter. Must cycle.", Severity: CRITICAL }
+  - { Pattern: "Hover stationary (turret)", Fix: "Committed movement only. No hover.", Severity: CRITICAL }
+  - { Pattern: "Breath without setup", Fix: "R2+ dodge unsmoked breath. Setup mandatory.", Severity: HIGH }
+  - { Pattern: "Rejuvenation as sustained tank", Fix: "Decaying DR. Must MOVE through.", Severity: CRITICAL }
+  - { Pattern: "Artillery as main DPS", Fix: "Low potency filler. Breath is payoff.", Severity: HIGH }
+  - { Pattern: "Crit fishing", Fix: "Zero RNG. Condition met or not.", Severity: CRITICAL }
+  - { Pattern: "2-min Dragon alignment", Fix: "Stacks dictate. No fixed cadence.", Severity: CRITICAL }
+  - { Pattern: "Solo Dragon carries", Fix: "R2+ = supporting fire. Team-dependent.", Severity: HIGH }
+  - { Pattern: "Identity gated by ≥90s CD", Fix: "Max 20s. Stack-refreshed. Form swap free.", Severity: CRITICAL }
+  - { Pattern: "Satisfying caster rotation", Fix: "Pew pew → payoff. Not a rotation.", Severity: HIGH }
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 15: §25 COMPLIANCE CONFIRMATION
+# ═══════════════════════════════════════════════════════════════════════════════
+
+Section25Compliance:
+  Confirmed: true
+  Reference: "DESIGN_OVERRIDE.md §25"
+
+  CDs:
+    SmokeBreath: 15s
+    MagicArtillery: 0s
+    NapalmBreath: 18s
+    ChargedBreath: 20s
+    DragonRejuvenation: 12s
+    AerialMovement: 8s
+    BreathPrep: 0s
+
+  LongestCD: "20s (Charged Breath)"
+  Threshold: 90s
+  Margin: "70s under"
+
+  IdentityAccess: >
+    Dragon form = free swap. Breath gauge always accessible. Form identity
+    never gated by cooldown. Individual CDs gate specific actions, not form
+    access or identity expression.
+
+  DragonRejuvenation_Resolution: >
+    Short CD (12s). Gate = decay, not CD length. Linked cause = super armor
+    prevents escape. §25 compliant. Not identity skill — survival tool with
+    mechanical justification.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 16: OPEN TUNING
+# ═══════════════════════════════════════════════════════════════════════════════
+
+OpenTuning:
+  - { Q: "Rejuvenation decay curve shape", Impact: "Push-through distance", Constraint: "50% → 0% over 4-5s. Shape flexible." }
+  - { Q: "Stacks per Dragon CD refresh", Impact: "Cycle speed", Constraint: "No <20s re-entry (spammy) or >60s gap (gated)" }
+  - { Q: "Passive breath charge rate", Impact: "Time to first breath", Constraint: "50% within 2-3 GCDs. 100% within 4-5." }
+  - { Q: "Super armor vs boss grabs/pins", Impact: "Boss trivialization", Constraint: "Pins likely override super armor." }
+  - { Q: "Commit distance before redirect", Impact: "Movement commitment feel", Constraint: "Minimum 10y before any redirect." }
+  - { Q: "Napalm terrain stacking", Impact: "Death zone creation", Constraint: "Likely refresh only, not stack." }
+  - { Q: "Charged Breath crit zone angle", Impact: "Aim requirement", Constraint: "~30° center of 90° cone." }
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# END OF FILE
+# ═══════════════════════════════════════════════════════════════════════════════
+# Skills: 6 (Smoke Breath, Magic Artillery, Napalm Breath, Charged Breath,
+#   Dragon Rejuvenation, Aerial Movement) + Breath Prep (oGCD toggle)
+# Systems: Breath Gauge, Stack Refresh, Super Armor, Crit Conditions
+# §25: CONFIRMED (longest CD 20s, threshold 90s, margin 70s)
+# ═══════════════════════════════════════════════════════════════════════════════

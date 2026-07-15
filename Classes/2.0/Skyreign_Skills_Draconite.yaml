@@ -1,0 +1,602 @@
+# Classes/Frontliner_DPS/Skyreign_Skills_Draconite.yaml
+# ═══════════════════════════════════════════════════════════════════════════════
+# SKYREIGN — DRACONITE FORM SKILLS [SKILLS HALF]
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Fantasy: "Already gone." — Speed, evasion, team enabler.
+# Lineage: AQ Draconian (fast claw), MH Nargacuga (evasive), DOS2 (chain reactions)
+#
+# Form Identity: Mobile Safety + rDPS enabler. LEAST PERSONAL DAMAGE of all
+#   three forms. NOT a boss killer. NOT a DPS form. The CONVENIENCE/SAFETY form.
+#   You go here to SURVIVE and ENABLE, not to kill.
+#
+# Authority: DESIGN_OVERRIDE.md > BalanceTargets.yaml > Skyreign_Design.yaml > this file
+# ═══════════════════════════════════════════════════════════════════════════════
+
+Key: Classes.Frontliner_DPS.Skyreign.Skills.Draconite
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# FORM OVERVIEW
+# ═══════════════════════════════════════════════════════════════════════════════
+
+FormOverview:
+  Name: Draconite
+  FormIndex: 3
+  Role: Mobile Safety / rDPS Enabler
+  SizeClass: Medium (crouched, compact, claw-forward)
+  GCD: {Base: 2.0s, Cap: 1.4s}
+
+  DPSTarget:
+    Personal: "70-78% DPS ref"
+    rDPS_Added: "12-18% DPS ref to PARTY via Black Lightning reactions"
+    Blended: "~88-92% effective (personal + rDPS share)"
+    Solo: "70-78% only — rDPS requires teammates"
+
+  WhyNotDPS: >
+    Dragonguard = 95-102% personal DPS. Draconite exists for mobility.
+    Black Lightning's value is what TEAMMATES do with it. Draconite would
+    break class balance if it dealt full damage while being this mobile.
+
+  KitSize: "4 skills + 1 passive. LEAN — shortest of three forms."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# EVASION PASSIVE (FORM PROPERTY — NOT A SKILL)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+EvasionPassive:
+  Name: Draconic Reflex
+  Type: FORM_PROPERTY (passive, always-on)
+  ButtonRequired: NONE
+
+  Effect: "+FLAT EVA (not %) while in Draconite form. Active on swap-in, removed on swap-out."
+
+  FormComparison:
+    Dragon: "No evasion bonus — super armor (stays IN damage)"
+    Dragonguard: "No evasion bonus — recovery frames = vulnerable"
+    Draconite: "Flat EVA bonus always on. FAST and DODGES as baseline."
+
+  FlatVsPercent: >
+    FLAT evasion, not percentage. ToS evasion model: accuracy must exceed
+    evasion to reliably hit. Other forms CAN build EVA through gear but will
+    inevitably fall short at level-appropriate content because they lack this
+    flat bonus. Draconite's bonus pushes EVA over the accuracy threshold that
+    gear alone cannot reach. Dragon/Dragonguard accept being hit as design
+    (super armor / recovery commitment respectively).
+  TuningNote: "Flat value TBD — must exceed level-range accuracy gap that gear can't close."
+
+  WhyNotASkill: >
+    Survival skills bloat offense classes. Draconite's survival IS the EVA
+    stat — form swap IS the defensive decision. No dodge-roll, no parry,
+    no DR button. The passive replaces all of that.
+
+  Tuning:
+    Value: "Flat EVA (TBD) — enough to cross accuracy threshold at level range"
+    Constraint: "Cannot reach dodge-cap or invalidate healer role"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SKILL: BLACK LIGHTNING
+# ═══════════════════════════════════════════════════════════════════════════════
+
+Skills:
+  BlackLightning:
+    ID: SKY_DRAC_001
+    Type: GCD
+    DamageType: Magical (Lightning)
+    Weapon: Breath organ (miniaturized arc discharge)
+
+    Potency:
+      Initial: 40
+      DoT_Tick: 20
+      DoT_Duration: 15s
+      TickRate: 3.0s (5 ticks)
+      TotalPersonal: 140  # intentionally weak alone
+
+    Timing:
+      CastTime: instant
+      AnimLock: 0.4s (shortest in kit)
+      Range: 8y (melee-extended)
+      Targets: 1
+      Reapplication: "Refreshes duration. Does NOT stack instances."
+
+    ReactionSystem:
+      Rule: >
+        Debuffed target becomes REACTIVE. External elemental source contact
+        triggers chain reaction — bonus damage attributed to the SOURCE.
+        Draconite ALONE cannot trigger. Skyreign sets up, does not execute.
+      ValidSources:
+        - "Teammate elemental spell"
+        - "Item/flask/bomb (any party member)"
+        - "Dragonguard breath terrain (own, from previous form)"
+        - "Environmental hazard"
+      InvalidSources:
+        - "Draconite's own Claw Combo (physical)"
+        - "BL ticks (cannot self-react)"
+        - "Non-elemental physical damage"
+      ReactionDamage: "50% of triggering skill potency as bonus Lightning"
+      Frequency: "Once per external hit (no ICD between sources)"
+      Attribution: "Attributed to SOURCE character (rDPS for them)"
+
+    CritCondition:
+      Trigger: "Reaction triggered (external element contact)"
+      Crits: "DoT tick coinciding with reaction"
+      Multiplier: 1.5x (20p → 30p — marginal personal gain)
+
+    GaugeCharge: 8 per cast
+    StackGeneration: 1 per cast
+
+    Strategy: >
+      THE rDPS tool. Maintain 100% uptime on primary target. Apply to fresh
+      (>50% HP) targets for maximum team value. Solo value = MINIMAL.
+
+    OverFiftyHP_Synergy: >
+      Above-50% targets: team hits get +25% (§9) AND +50% reaction bonus.
+      Multiplicative: 1.25×1.5 = 1.875× on teammate elemental hits vs fresh
+      BL'd targets. Apply early = maximum team value.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SKILL: CLAW COMBO
+# ═══════════════════════════════════════════════════════════════════════════════
+
+  ClawCombo:
+    ID: SKY_DRAC_002
+    Type: GCD Combo (4-hit sequential)
+    DamageType: Physical (Slashing — biological claws + tail)
+    Weapon: Claws (bone-and-keratin racial) + Tail
+
+    ComboHits:
+      Hit1: {Name: Rake, Potency: 55, Width: "narrow 2y", Recovery: 0.3s, Anim: "Right claw diagonal"}
+      Hit2: {Name: Gouge, Potency: 60, Width: "narrow 1.5y", Recovery: 0.3s, Anim: "Left claw thrust"}
+      Hit3: {Name: Rend, Potency: 65, Width: "narrow 2y cone", Recovery: 0.35s, Anim: "Double X-slash"}
+      Hit4: {Name: Tail Lash, Potency: 75, Width: "3y arc low sweep", Recovery: 0.4s, Anim: "180° tail", Bonus: "Trips grounded humanoids (stumble, NOT knockdown)"}
+
+    TotalPotency: 255 (4 GCDs)
+    AvgPotencyPerGCD: 63.75
+    Comparison: "Dragonguard Cleave = ~126p/GCD. Draconite = HALF personal damage."
+    FullComboTime: 8.0s
+    Range: 3y (melee)
+
+    Mobility:
+      Design: >
+        Short recovery frames → 1.6-1.7s free movement per 2.0s GCD.
+        Can reposition between every hit. Never locked in place.
+      ComboWindow: "4.0s between hits before drop. Generous for repositioning."
+      KitingRule: "Hit → move → hit → move. Enemies cannot pin Draconite."
+      DropCondition: "4.0s without landing next hit → reset to Hit 1"
+      MidSwapReset: "Swapping forms mid-combo resets combo on return"
+
+    CritCondition:
+      Trigger: "Full combo completed (Hit 4 lands without dropping)"
+      Crits: "Hit 4 — Tail Lash"
+      Multiplier: 1.5x (75p → 112p)
+      Tension: "Maintain combo through chaos for crit vs break for safety"
+
+    GaugeCharge: 5 per hit (20 per full combo)
+    StackGeneration: 1 per hit (4 per full combo)
+
+    Strategy: "Gauge builder + stack generator. Filler between BL applications."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SKILL: STATIC SHROUD
+# ═══════════════════════════════════════════════════════════════════════════════
+
+  StaticShroud:
+    ID: SKY_DRAC_003
+    Type: oGCD
+    DamageType: Magical (Lightning — residual)
+    Weapon: Body (static discharge from scales)
+
+    Potency: 20 per tick (trail DoT — spacing/BL proc tool, not burst)
+    Cooldown: 20s
+    AnimLock: 0.5s
+    Range: self (activates on Skyreign, trail follows movement path)
+    Duration: 6-8s (extended — promotes weaving in and out)
+
+    Effect: >
+      Skyreign gains movement speed buff (+20-25%) for duration. Leaves a
+      PERSISTENT TRAIL of lightning on the ground behind movement path.
+      Trail persists after Skyreign leaves the position (ground-persistent
+      like Dragonguard breath terrain but narrower — 1-2y width).
+      Enemies crossing or standing in trail: 20p Lightning tick + applies
+      Black Lightning proc (counts as elemental source for BL reaction on
+      any BL'd target that touches it). Trail duration: persists 4-5s after
+      Skyreign passes through.
+
+    MovementSpeedBuff: >
+      +20-25% movement speed while active. Promotes weaving IN and OUT —
+      dash through enemies, leave lightning behind, circle back through trail
+      for combo hits. The trail IS the damage, the speed IS the survival.
+
+    TrailAsBlProc: >
+      Trail counts as elemental Lightning source. Any BL'd enemy that crosses
+      or stands in trail triggers BL reaction. This is the Draconite
+      self-reaction path — but requires MOVEMENT through enemy space, not
+      standing still. Cropduster pattern at micro scale.
+
+    Strategy: >
+      Activate → weave through enemies → trail procs BL reactions → circle
+      back for Claw Combo hits. Speed buff enables repositioning that would
+      otherwise cost DPS uptime. The "aggressive evasion" tool.
+    CritCondition: "None — utility skill."
+    GaugeCharge: 0
+    StackGeneration: 0
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SKILL: VOLTAIC RUSH
+# ═══════════════════════════════════════════════════════════════════════════════
+
+  VoltaicRush:
+    ID: SKY_DRAC_004
+    Type: GCD
+    DamageType: Physical (Impact — shoulder/wing check)
+    Weapon: Body (compact charge, folded wings as ram)
+
+    Potency:
+      Base: 70
+      WithBL: 95 (+25 if target has Black Lightning debuff)
+
+    Timing:
+      CastTime: instant (dash)
+      AnimLock: 0.6s
+      Range: "3-12y (minimum 3y distance to activate)"
+      Targets: 1 (first in path)
+      Charges: 2
+      RechargeTime: 15s per charge
+
+    Effect: >
+      Short dash to target, deals damage, resumes melee range.
+      Does NOT break Claw Combo if used within 4.0s window.
+      Pattern: Claw Hit 2 → disengage → Voltaic Rush → Claw Hit 3.
+
+    CritCondition:
+      Trigger: "Target above 50% HP (§9)"
+      Multiplier: 1.5x (70→105, or 95→142 with BL bonus)
+
+    GaugeCharge: 3 per use
+    StackGeneration: 1 per use
+
+    Strategy: >
+      Re-engage after dodge/kite. Two charges = never stuck at range.
+      Rewards BL uptime (+25p). Use as opener on fresh targets for crit.
+
+    DesignNote_MeleeTransform: >
+      OPEN QUESTION: May need melee-range transformation to prevent dash-skill
+      redundancy (artifact from FFXIV design excusing gap closers as damage
+      buttons). Consider Samira (League) model: gun at range → sword at melee.
+      Basic attacks transform based on distance rather than separate dash skill.
+      See DESIGN_OVERRIDE_SYSTEMS.md §27 for system-level rule if adopted.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# BREATH GAUGE — DRACONITE RULES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+BreathGauge:
+  Range: 0-100
+  FormLocal: true (resets to 0 on swap)
+  PassiveCharge: NONE
+
+  ChargeRates:
+    ClawCombo_PerHit: 5
+    BlackLightning_PerCast: 8
+    VoltaicRush_PerUse: 3
+    StaticShroud: 0
+
+  TimeToFull:
+    Sustained: "~45-50s mixed rotation"
+    PureCombo: "~40s (5 full combos)"
+    Comparison: "SLOWEST — Dragon ~20s, Dragonguard ~25-30s"
+
+  WhySlowest: >
+    No passive fill, no being-hit contribution. Evasion means fewer hits
+    taken. Must genuinely sustain combat to reach full. Cost of safety.
+
+  Delivery:
+    Method: "BreathPrep (oGCD) → next Black Lightning consumes gauge"
+    BreathPrep: "Brief slow (0.5s) + visible static tell. R2+ enemies may scatter."
+    Partial_50:
+      Duration: "15s → 22s"
+      ReactionBonus: "50% → 75%"
+    Full_100:
+      AoE: "8y radius, spreads to 3 additional nearby enemies"
+      Duration: "25s"
+      ReactionBonus: "50% → 100%"
+      Note: "Area rDPS bomb. Draconite PAYOFF equivalent to Dragon Napalm."
+
+  CommitmentCost: "40-50s active combat. Swapping resets all progress."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# STACK GENERATION — DRAGON CD REFRESH
+# ═══════════════════════════════════════════════════════════════════════════════
+
+StackSystem:
+  Currency: "Dragon Readiness Stacks (shared pool with Dragonguard)"
+  Purpose: "Refresh Dragon form cooldowns"
+
+  Sources:
+    ClawCombo: "1 per hit, 4 per full combo"
+    BlackLightning: "1 per cast"
+    VoltaicRush: "1 per use"
+    DamageReceived: "0.5 per hit (fewer hits received due to EVA = fewer passive stacks)"
+
+  Rate: "~6-7 stacks per 10s sustained combat"
+  Comparison: "Dragonguard ~7-9/10s. Draconite = SECONDARY stack form."
+  DragonRefresh: "10-20 stacks per Dragon skill. ~15-25s from Draconite vs ~12-18s from Dragonguard."
+
+  Decay:
+    Trigger: "4.0s without ANY offensive action (full disengage)"
+    Rate: "2 stacks/s after decay begins"
+    Prevention: "Any GCD landed resets decay timer"
+    KitingNote: "Repositioning between combo hits does NOT trigger decay."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# KITING MODEL
+# ═══════════════════════════════════════════════════════════════════════════════
+
+KitingModel:
+  Statement: >
+    Draconite CAN kite and maintain everything. Hitting while moving = fine.
+    Never penalized for repositioning mid-combat.
+
+  MovementBudget: "~80% of GCD time is free movement (0.3-0.4s lock per 2.0s GCD)"
+  FormSpeed: "+10% base movement speed (fastest ground form)"
+  ComboMaintenance: "4.0s window between hits. Dodge mechanics, reposition, resume."
+  StackMaintenance: "Any GCD within 4.0s prevents decay. Kiting ≠ disengaging."
+
+  WhenKitingFails: >
+    Surrounded with no exit, multiple ranged enemies, enclosed space.
+    Swap to Dragonguard (clear with cleave) or Dragon (super armor through).
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# rDPS MATH
+# ═══════════════════════════════════════════════════════════════════════════════
+
+rDPS_Math:
+  PersonalPPS: 52.0  # potency/second from mixed rotation
+  PersonalPercent: "~74% DPS ref"
+
+  rDPS_Model:
+    Assumption: "2-3 elemental teammates, ~2.7 reactions/s on debuffed target"
+    ReactionBonus: "50% of triggering potency (~40p avg bonus per reaction)"
+    Total_rDPS_Per_BL: "~1600p team bonus over 15s duration"
+    SkyreIgn_Credit: "~10.7 PPS effective contribution (party-distributed)"
+
+  EffectiveTotal: "~62.7 PPS → ~89.6% DPS ref (within 88-92% target)"
+
+  Variance:
+    Best: "3 elemental teammates, boss = ~96% effective"
+    Average: "2 elemental teammates = ~88% effective"
+    Worst: "Solo / no elemental team = ~74% (personal only)"
+
+  Validation: "Form is weak solo, strong in groups. This IS the team enabler identity."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# ROTATION PHILOSOPHY
+# ═══════════════════════════════════════════════════════════════════════════════
+
+Rotation:
+  CoreLoop: "BL → Claw×4 → reposition → refresh BL → Claw×4 → repeat"
+  oGCD_Weaves: "Static Shroud when pressured. Voltaic Rush to re-engage."
+
+  Priority:
+    P1: "BL uptime 100% (refresh at 3-4s remaining)"
+    P2: "Complete Claw Combo cycles (crit on Hit 4)"
+    P3: "Voltaic Rush to re-engage after disengage"
+    P4: "Static Shroud for spacing (oGCD, no DPS loss)"
+    P5: "Gauge full → BreathPrep → empowered BL"
+
+  Decision_BL_vs_Combo: >
+    BL 4s+ remaining → continue combo. BL 3s or less → refresh.
+    Exception: on Hit 3 (one from crit) → finish combo then refresh.
+
+  GaugeSpend: "Don't hoard. Spend at 100% when team is fighting target."
+
+  NoBurst: >
+    No burst phase. No 2-min alignment. Flat consistent pressure. Gauge
+    arrives organically every 45-50s. Encounter dictates, not timer.
+
+  SampleTimeline_10s:
+    T0: "BL (40p, 8g, 1s)"
+    T2: "Rake (55p, 5g, 1s)"
+    T4: "Gouge (60p, 5g, 1s)"
+    T6: "Rend (65p, 5g, 1s)"
+    T8: "Tail Lash (112p crit, 5g, 1s)"
+    T10: "BL refresh (40p, 8g, 1s)"
+    Total: "520p personal + reactions, 36 gauge, 6 stacks"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# CRIT CONDITIONS SUMMARY
+# ═══════════════════════════════════════════════════════════════════════════════
+
+CritConditions:
+  ZeroRNG: true
+  Reference: "§12 — positional/conditional only"
+
+  BlackLightning: {Trigger: "Reaction fires", Multiplier: 1.5x, Control: "Team presence"}
+  ClawCombo_Hit4: {Trigger: "Full combo without drop", Multiplier: 1.5x, Control: "Combo maintenance"}
+  VoltaicRush: {Trigger: "Target >50% HP", Multiplier: 1.5x, Control: "Engage timing"}
+  StaticShroud: "None"
+  AllForms_Groggy: {Trigger: "Target downed/CC'd", Multiplier: 1.5x, Control: "Recognize states"}
+
+  Note: "Crits reward MAINTENANCE and TIMING. Lazy play = 0 crits."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# §25 COMPLIANCE
+# ═══════════════════════════════════════════════════════════════════════════════
+
+Section25:
+  Rule: "No identity skills gated by CD ≥ 90s. Resource/state gating preferred."
+
+  Audit:
+    BlackLightning: {CD: none, Gate: GCD, Identity: true, Compliant: true}
+    ClawCombo: {CD: none, Gate: "GCD + combo window", Identity: true, Compliant: true}
+    StaticShroud: {CD: 20s, Gate: short_CD, Identity: false, Compliant: true}
+    VoltaicRush: {CD: "15s×2 charges", Gate: charge_system, Identity: false, Compliant: true}
+    FormSwap: {CD: none, Gate: "progress loss", Identity: true, Compliant: true}
+    EvasionPassive: {CD: "N/A", Gate: "form presence", Identity: true, Compliant: true}
+
+  Result: "ALL compliant. Max CD = 20s. Identity skills have ZERO CD gating."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# FORM SWAP CONTEXT
+# ═══════════════════════════════════════════════════════════════════════════════
+
+FormSwapContext:
+  SwapCost: "FREE (no resource, no CD)"
+  RealCosts:
+    BreathGauge: "Resets to 0 (up to 50s lost)"
+    ComboState: "Resets to Hit 1 on return"
+    StacksRetained: "Dragon Readiness Stacks persist across forms"
+
+  EnterDraconiteWhen:
+    - "Pressure increasing — need mobility"
+    - "Target mobile — need speed to maintain contact"
+    - "Team has elemental DPS — maximize BL value"
+    - "Dragon CDs spent — rebuild in safe form"
+    - "Tight geometry — wide arcs hitting walls"
+
+  LeaveDraconiteWhen:
+    - "Target immobile (groggy) — Dragon for free damage"
+    - "Gauge spent — switch to DPS form"
+    - "Solo/no elemental team — BL value = 0"
+    - "Dragon stacks full — time to deploy"
+    - "No pressure — staying safe = wasted DPS"
+
+  Guideline: >
+    Draconite is REACTIVE. Enter in response to pressure. Leave when danger
+    passes. Dragonguard is default. Dragon is deployment. Draconite is refuge.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SKILL INTERACTIONS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+Interactions:
+  Internal:
+    VoltaicRush_MidCombo: "Preserves combo state within 4.0s window. Dash → resume."
+    StaticShroud_BL: "If BL'd target enters field → reaction triggers (self-react, requires chase)."
+    VoltaicRush_BL: "Close gap (crit >50%) → immediate BL. Clean opener."
+
+  CrossForm:
+    DragonguardTerrain_then_BL: "Lay terrain → swap Draconite → apply BL → terrain triggers reactions"
+    BL_then_Dragon: "Apply BL → swap Dragon → Napalm fires reactions. BL persists 15-25s after swap."
+
+  Team:
+    ElementalDPS: "Any elemental teammate benefits passively. No coordination needed."
+    PhysicalTeam: "BL value plummets. Stay Dragonguard."
+    Healer: "EVA reduces healing demand. Indirect party value."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# ENCOUNTER PATTERNS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+Encounters:
+  Boss:
+    Opening: "BL on >50% HP target → Voltaic crit → Claw while team bursts"
+    Sustained: "Maintain BL, kite mechanics. Swap Dragonguard in safe windows."
+    Groggy: "LEAVE Draconite → Dragon (free Napalm). Return when boss recovers."
+    Rule: "Draconite during dangerous phases. Leave during free-damage windows."
+
+  Fodder: "Dragonguard cleave preferred. Draconite for pulling/kiting into kill zones."
+
+  Elites:
+    Safe: "Dragonguard for committed DPS"
+    Dangerous: "Draconite — kite heavy swings, BL uptime, let team DPS"
+    Solo: "Terrible. Low DPS, no rDPS. Swap immediately."
+
+  TightSpaces: "Draconite preferred — compact stance, narrow hits, no wasted width."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# FAILURE STATES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+FailureStates:
+  StayingTooLong: {Cost: "26% DPS loss vs Dragonguard per second", Signal: "No dodging needed for 10s+", Severity: MODERATE}
+  SoloBL: {Cost: "Wasted GCDs on setup that yields nothing", Signal: "No teammates", Severity: LOW}
+  DroppingCombo: {Cost: "Lost crit + reset", Signal: "Over-kiting", Severity: LOW}
+  WastingGauge: {Cost: "Overcap = wasted generation", Signal: "100% gauge, no spend 10s+", Severity: MODERATE}
+  SwapMidCharge: {Cost: "25-45s investment lost", Signal: ">50% gauge + swap", Severity: HIGH}
+  NeverLeaving: {Cost: "Permanent DPS deficit", Signal: "Full Dragon stacks, still Draconite", Severity: HIGH}
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# RANK SCALING — DRACONITE RELEVANCE
+# ═══════════════════════════════════════════════════════════════════════════════
+
+RankScaling:
+  R1: {Usage: RARE, Reason: "No threats. Dragon handles everything. Safety unnecessary."}
+  R2: {Usage: SITUATIONAL, Reason: "Mobile enemies, first pressure. BL starts showing value."}
+  R3: {Usage: REGULAR, Reason: "Traps punish Dragon, flankers punish Dragonguard. EVA+speed needed."}
+  R4: {Usage: FREQUENT, Reason: "Enemies recognize tells. Low-commitment Draconite = safest sustained combat."}
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# ANTI-PATTERNS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+AntiPatterns:
+  - {Pattern: "Draconite as permanent form", Fix: "MUST cycle. 26% DPS loss if you stay.", Severity: CRITICAL}
+  - {Pattern: "Self-sufficient BL (no team needed)", Fix: "Cannot self-react. Team required.", Severity: CRITICAL}
+  - {Pattern: "Draconite as DPS form", Fix: "Half damage vs Dragonguard. NOT for killing.", Severity: CRITICAL}
+  - {Pattern: "Evasion as a button", Fix: "Passive stat. No button. Form swap = defense.", Severity: CRITICAL}
+  - {Pattern: "Crit via RNG", Fix: "Conditional only. §12.", Severity: CRITICAL}
+  - {Pattern: "Burst window alignment", Fix: "No burst. Flat pressure. Gauge is organic.", Severity: HIGH}
+  - {Pattern: "Passive breath charge", Fix: "Combo-hit ONLY. Slowest of all forms.", Severity: HIGH}
+  - {Pattern: "Draconite as boss-killer", Fix: "DPS phases = Dragon/Dragonguard. Draconite for danger only.", Severity: HIGH}
+  - {Pattern: "Adding defensive skills", Fix: "EVA passive IS defense. No parry/block/DR.", Severity: CRITICAL}
+  - {Pattern: "BL stacking intensity", Fix: "Single instance, refreshes duration.", Severity: MODERATE}
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# TUNING HOOKS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+TuningHooks:
+  Potency:
+    BL_Initial: {Current: 40, Range: "30-50", Sensitivity: LOW}
+    BL_Tick: {Current: 20, Range: "15-30", Sensitivity: LOW}
+    Claw_Hits: {Current: "55/60/65/75", Range: "±10 each", Sensitivity: MODERATE}
+    VoltaicRush: {Current: "70/95", Range: "55-110", Sensitivity: MODERATE}
+    StaticShroud: {Current: 30, Range: "20-40", Sensitivity: LOW}
+
+  Reaction:
+    BonusPercent: {Current: "50%", Range: "40-75%", Sensitivity: CRITICAL}
+    Empowered_Partial: {Current: "75%", Range: "60-90%", Sensitivity: HIGH}
+    Empowered_Full: {Current: "100%", Range: "75-125%", Sensitivity: CRITICAL}
+    Note: "Reaction multiplier = MOST SENSITIVE tuning lever. Ripples through all team math."
+
+  Survivability:
+    EVA_Bonus: {Current: "15%", Range: "10-20%", Sensitivity: HIGH}
+    MoveSpeed: {Current: "10%", Range: "8-15%", Sensitivity: MODERATE}
+
+  Gauge:
+    PerClawHit: {Current: 5, Range: "4-7", Sensitivity: MODERATE}
+    PerBLCast: {Current: 8, Range: "5-12", Sensitivity: MODERATE}
+    TimeToFull: {Current: "45-50s", Range: "35-60s", Sensitivity: HIGH}
+
+  Timing:
+    ComboWindow: {Current: "4.0s", Range: "3.0-5.0s", Sensitivity: HIGH}
+    BL_Duration: {Current: "15s", Range: "12-18s", Sensitivity: HIGH}
+    BL_Empowered: {Current: "22s/25s", Range: "18-30s", Sensitivity: MODERATE}
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# DESIGN BOUNDARIES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+DesignBoundaries:
+  NotHere:
+    - "Dragon form skills → Skyreign_Skills_Dragon.yaml"
+    - "Dragonguard form skills → Skyreign_Skills_Dragonguard.yaml"
+    - "Racial details → Skyreign_Design.yaml §2"
+    - "Class narrative → Skyreign_Design.yaml §1"
+    - "Item baseline → Skyreign_Design.yaml §12"
+
+  StatedOnce:
+    - "GCD 2.0s base / 1.4s cap (from BalanceTargets.yaml)"
+    - "Crit is NOT RNG (§12)"
+    - "No 2-minute burst cycles (§3b)"
+    - "§25 compliant — confirmed above"
+    - ">50% HP rule integrated (§9)"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# END OF FILE
+# ═══════════════════════════════════════════════════════════════════════════════
+# Skills: 4 (Black Lightning, Claw Combo, Static Shroud, Voltaic Rush)
+# + 1 Form Property (Draconic Reflex — passive EVA)
+# Kit: LEAN (shortest of three forms)
+# Identity: Mobile Safety + rDPS Enabler = "Already gone."
+# ═══════════════════════════════════════════════════════════════════════════════

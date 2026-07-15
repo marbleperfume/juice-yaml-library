@@ -1,0 +1,589 @@
+# Classes/Frontliner_DPS/Skills/Skyreign_Skills_Dragonguard.yaml
+# ═══════════════════════════════════════════════════════════════════════════════
+# SKYREIGN — DRAGONGUARD FORM SKILL SPECIFICATION
+# ═══════════════════════════════════════════════════════════════════════════════
+# Lineage: MH Magnamalo (commit-and-punish), DOS2 Lizard (breath terrain),
+#   AQ Draconian (fast hybrid), Zac (aerial impact + crowd disruption)
+# Fantasy: "I fight where I land."
+# Authority: DESIGN_OVERRIDE.md > BalanceTargets.yaml > Skyreign_Design.yaml > THIS FILE
+# ═══════════════════════════════════════════════════════════════════════════════
+
+Key: Classes.Frontliner_DPS.Skyreign.Skills.Dragonguard
+
+# ───────────────────────────────────────────────────────────────────────────────
+# FORM IDENTITY
+# ───────────────────────────────────────────────────────────────────────────────
+
+FormIdentity:
+  Name: Dragonguard
+  DefaultForm: true
+  Role: "Committed Melee — HIGHEST PERSONAL DPS FORM"
+  SizeCategory: Medium-Large (grounded, wings folded)
+  DamageType: mixed (physical wing/claw + magical breath)
+  DPSTarget: "95-102% of DPS reference"
+  Specializations:
+    - Fodder packs (cleave hits entire groups per swing)
+    - Elites/minibosses with adds (cleave punishes spawned reinforcements)
+    - Zone denial (breath terrain forces pathing decisions)
+    - Punish windows (hawk-dive knockup → free follow-up)
+  CoreTradeoff: >
+    Highest damage, MOST commitment per action. Wider arcs = longer recovery
+    frames = vulnerable to flanking. WRONG form when you need to LEAVE.
+  StatScaling: {Physical: "STR 15 (sweeps, dive)", Magical: "MAG 15 / MAGICCAP 18 (breath)"}
+
+# ───────────────────────────────────────────────────────────────────────────────
+# COMBAT PARAMETERS
+# ───────────────────────────────────────────────────────────────────────────────
+
+CombatParameters:
+  GCD: {Base: 2.0s, Cap: 1.4s}
+  CritModel: positional_and_conditional_only (zero RNG)
+  BurstCycles: prohibited (no 2-min alignment, no fixed cadences)
+  OverFiftyHPRule: "Enemies >50% HP take +25% incoming damage (§9)"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SKILLS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+Skills:
+
+  # ─── HAWK-DIVE ──────────────────────────────────────────────────────────────
+  HawkDive:
+    DisplayName: "Hawk-Dive"
+    Type: GCD
+    DamageType: physical (STR)
+    Range: 6-18y dash
+    AoE: 3y radial on impact (100% center, 70% splash)
+    Potency: 220
+    Cooldown: 12s
+    AnimationCommit: 0.6s travel + 0.3s landing recovery
+    Effect:
+      - "Aerial dash → impact first enemy → small AoE knockup (1.2s airborne)"
+      - "Cannot redirect mid-flight (committed trajectory)"
+      - "Minimum 6y distance prevents melee-range spam"
+    FollowUp: "Charge breath while enemies recover; first melee GCD post-knockup = crit"
+    CritCondition: "Target above 50% HP (§9 synergy — gap closer shreds healthy targets)"
+    CommitmentCost:
+      Whiff: "12s CD wasted, out of position, recovery leaves you exposed"
+      Success: "Enemies grouped by knockup = perfect cleave setup"
+    StackGeneration: 2
+    BreathGaugeGain: 8
+    DesignIntent: >
+      PRIMARY engage tool. Sets up cleave grouping, crit window, gauge jump-start.
+      Decision: engage NOW on healthy pack or save for next fresh group?
+
+  # ─── CLEAVE COMBO (RENDING ARC) ────────────────────────────────────────────
+  CleaveCombo:
+    DisplayName: "Rending Arc"
+    Type: GCD_combo (3-hit chain)
+    DamageType: physical (STR)
+    Range: melee (3y)
+    ComboWindow: 4.0s between hits (drop if no input)
+
+    Strike1:
+      Name: "Wing Rake"
+      Potency: 140
+      Arc: 120° frontal, 3y depth
+      Recovery: 0.4s
+      Targets: all enemies in arc (no cap)
+      Stacks: 1 | Gauge: +4
+
+    Strike2:
+      Name: "Claw Rend"
+      Potency: 160
+      Arc: 90° frontal, 4y depth (lunging)
+      Recovery: 0.5s
+      Targets: all enemies in arc (no cap)
+      Stacks: 1 | Gauge: +4
+
+    Strike3:
+      Name: "Tail Guillotine"
+      Potency: 200
+      Arc: 180° frontal, 3.5y depth
+      Recovery: 0.8s (LONGEST — most punishable)
+      Targets: all enemies in arc (no cap)
+      Stacks: 2 | Gauge: +6
+      CritCondition: "Connects on 2+ enemies simultaneously"
+
+    TotalPotency: 500 per chain (×N targets hit — no falloff in arc)
+    TotalRecoveryCommit: 1.7s locked across full chain
+    ComboBreak: "Knockback/stagger during recovery drops combo"
+    FlankingVulnerability: >
+      0.8s Tail Guillotine recovery = enemies behind are uncontested.
+      Commit to sweeping FRONT, leave BACK exposed. Walls or allies mitigate.
+    DesignIntent: >
+      Bread-and-butter sustained DPS. Repeat endlessly when safe. WIDENESS
+      is both strength (cleave everything) and weakness (long recovery).
+
+  # ─── BREATH TERRAIN LINE (SCORCH PATH) ─────────────────────────────────────
+  BreathTerrainLine:
+    DisplayName: "Scorch Path"
+    Type: GCD
+    DamageType: magical (MAG, capped by MAGICCAP)
+    AoE: line (2y wide × 12y long, ground-persistent)
+    Potency:
+      Placement: 120 (enemies in path on lay)
+      Tick: 45 per 2.0s (4 ticks over 8s = 180 total)
+      CrossingBurst: 80 (entering zone from outside)
+      TotalMinimum: "300+ per enemy"
+    Cast: 1.4s (LONG — the commitment)
+    Cooldown: 18s
+    GaugeRequirement: 50 (consumed on use)
+    Duration: 8s ground persistence
+
+    AnimationCommit:
+      Startup: "1.4s channel — chest glows, audible rev, movement SLOWED 40%"
+      Tell: "SR2+ enemies hear rev → scatter/interrupt/dodge perpendicular"
+      Release: "Head sweeps forward, breath ignites ground in line"
+
+    CritCondition: "Enemy standing IN existing terrain when new line crosses it"
+    ElementVariation:
+      Fire: "Highest raw potency ticks"
+      Ice: "Slow effect in zone, lower damage"
+      Poison: "Ticks + healing reduction debuff"
+
+    Synergy:
+      PostHawkDive: "Knockup 1.2s → lay terrain under airborne enemies → they land IN fire"
+      WithCleave: "Terrain bisects pack; stay = tick+cleave, scatter = separated targets"
+      BlackLightning: "BL-marked enemies in terrain trigger chain reaction (form-swap combo)"
+    CommitmentCost:
+      Whiff: "1.4s cast + 50 gauge + 18s CD wasted on empty ground. WORST failure."
+      Success: "12y persistent damage denying escape routes for 8s."
+    StackGeneration: 3
+    BreathGaugeGain: 0 (SPENDS gauge)
+    DesignIntent: >
+      DOS2 lizard breath fantasy. Deliberate, devastating, environment-shaping.
+      NOT spammable. A DECISION. The payoff for committed gauge investment.
+
+  # ─── TAIL SWEEP (LASHING TAIL) ─────────────────────────────────────────────
+  TailSweep:
+    DisplayName: "Lashing Tail"
+    Type: GCD
+    DamageType: physical (STR)
+    Range: melee (3y)
+    AoE: 150° rear arc
+    Potency: 130
+    Cooldown: 8s
+    Recovery: 0.3s (fastest Dragonguard action)
+    Effect:
+      - "Damage enemies behind you"
+      - "2s Stagger (interrupts action, brief hitstun)"
+      - "Rotates character 180° (now facing flankers)"
+    CritCondition: "Hits enemy from behind (positional — they were flanking you)"
+    StackGeneration: 1 | BreathGaugeGain: 3
+    DesignIntent: >
+      Anti-flank safety valve. Lower potency than Cleave = DPS LOSS to need it.
+      Prevents total collapse when enemies circle. 180° rotation enables
+      immediate cleave resumption on flankers.
+
+  # ─── WING BUFFET ────────────────────────────────────────────────────────────
+  WingBuffet:
+    DisplayName: "Wing Buffet"
+    Type: GCD
+    DamageType: physical (STR)
+    Range: 4y (wing reach)
+    AoE: 140° frontal cone
+    Potency: 100 (utility action — low damage)
+    Cooldown: 15s
+    Recovery: 0.5s
+    Effect:
+      - "4y pushback (fixed distance)"
+      - "2s Grounding (airborne enemies forced down)"
+      - "Pushes enemies INTO adjacent breath terrain zones"
+    Synergy:
+      WithTerrain: "Place terrain → cluster at edge → Buffet pushes them IN (forcing crossing damage)"
+      WithTeam: "Push into ally CC zones, off ledges, into environmental hazards"
+    CritCondition: none (utility skill)
+    StackGeneration: 1 | BreathGaugeGain: 2
+    DesignIntent: >
+      Space creation tool. Sacrifice DPS for CONTROL. 15s CD enforces decision:
+      WHEN to create space vs WHEN to stay and cleave.
+
+  # ─── FANG CRUSH ─────────────────────────────────────────────────────────────
+  FangCrush:
+    DisplayName: "Fang Crush"
+    Type: GCD
+    DamageType: physical (STR)
+    Range: 2y (point-blank only)
+    AoE: single target
+    Potency: 280 (highest single-hit in Dragonguard kit)
+    Cooldown: none (GCD only)
+    Condition: "ONLY usable on Stagger/Knockup/Groggy targets"
+    Recovery: 0.6s
+    Effect:
+      - "280p single-target damage"
+      - "Extends CC duration by 0.5s on affected target"
+    CritCondition: "Target is Groggy/Downed (shared all-forms crit)"
+    StackGeneration: 2 | BreathGaugeGain: 5
+    DesignIntent: >
+      Single-target spike during punish windows ONLY. Dead button otherwise.
+      Rewards setting up OWN CC (Hawk-Dive knockup, Tail Sweep stagger) or
+      recognizing ally CC. Conditional gate = highest potency justified.
+
+  # ─── GROUND POUND (EARTHSHATTER STOMP) ──────────────────────────────────────
+  GroundPound:
+    DisplayName: "Earthshatter Stomp"
+    Type: GCD
+    DamageType: physical (STR)
+    Range: self
+    AoE: 5y radial (point-blank)
+    Potency: 110
+    Cooldown: 20s
+    Recovery: 0.6s
+    Effect:
+      - "110p to all enemies within 5y"
+      - "1.5s Stagger (interrupts, enables Fang Crush)"
+    CritCondition: none (utility/interrupt)
+    Synergy:
+      IntoFangCrush: "Mass stagger → Fang Crush highest-value target (280p)"
+      IntoCleave: "1.5s free window — enemies stunned, cannot flank"
+      IntoBreath: "Stagger locks enemies during breath cast startup"
+    StackGeneration: "1 per enemy hit (up to 4)"
+    BreathGaugeGain: 3
+    DesignIntent: >
+      Emergency crowd control and Fang Crush enabler. Low potency = DPS LOSS
+      to use for damage alone. Value from stagger enabling follow-ups.
+
+  # ─── BREATH PREP (STOKE FLAMES) ────────────────────────────────────────────
+  BreathPrep:
+    DisplayName: "Stoke Flames"
+    Type: oGCD (weave between GCDs)
+    DamageType: none (preparatory)
+    GaugeRequirement: 50
+    AnimationLock: 1.0s
+    Cooldown: none
+    Effect:
+      - "Enters Breath Ready state → enables Breath Terrain Line cast"
+      - "SLOWS movement 40% while active"
+      - "LOCKS melee skills until breath delivered or 4s timeout"
+      - "4s timeout = Breath Ready expires, gauge NOT consumed, no penalty"
+    Tell: "Chest-rumble + throat glow. SR2+ enemies recognize and react."
+    CanStillUse: "Hawk-Dive (escape/reposition), Form Swap (emergency exit)"
+    DesignIntent: >
+      Transition oGCD from melee to breath delivery. SLOW + melee lock =
+      commitment window. Enemies hearing the tell forces commit-or-cancel decision.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# BREATH GAUGE (DRAGONGUARD-SPECIFIC)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+BreathGauge:
+  Type: "Form-local (0–100), resets to 0 on swap OUT"
+  ChargeModel: "Moderate — via combat (hitting AND being hit)"
+  PassiveCharge: false
+
+  Sources:
+    CleaveCombo: "4 + 4 + 6 = 14 per full chain"
+    HawkDive: 8
+    TailSweep: 3
+    WingBuffet: 2
+    FangCrush: 5
+    GroundPound: 3
+    DamageReceived: "2 per hit taken (any source, no ICD)"
+
+  ChargeTimeline:
+    To50: "8-12s active combat (Hawk-Dive opener + ~3 combos + damage taken)"
+    To100: "18-24s active combat (reinforces COMMITMENT — stay fighting to earn)"
+
+  SpendingOptions:
+    Standard: {Cost: 50, Effect: "Single Breath Terrain Line (1.4s cast)"}
+    FullGauge: {Cost: 100, Effect: "First cast at 0.8s (reduced), second at 1.4s (double terrain)"}
+
+  Thresholds:
+    0_49: "Cannot Breath Prep. Melee only."
+    50_99: "Can Breath Prep → single terrain line"
+    100: "Fast first cast (0.8s) + option to double-lay"
+
+  ResetCost: >
+    Swapping OUT resets gauge to 0. 45 gauge at swap = 45 gauge LOST.
+    This IS the commitment mechanic — stay to deliver or accept the waste.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# STACK GENERATION (DRAGON CD REFRESH)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+StackGeneration:
+  Role: "Dragonguard = PRIMARY stack-earning form (combat-heavy, always hitting)"
+
+  PerAction:
+    HawkDive: 2
+    CleaveCombo: "1 + 1 + 2 = 4 per chain"
+    TailSweep: 1
+    WingBuffet: 1
+    FangCrush: 2
+    GroundPound: "1 per enemy hit (max 4)"
+    BreathTerrainLine: 3
+    DamageReceived: "0.5 per hit (every 2 hits = 1 stack)"
+
+  Rate: "~1.5 stacks/s in active combat (vs Draconite ~1.0 stacks/s)"
+  PerFullEngagement: "~21 stacks per 14s (Hawk + 3 combos + breath + damage taken)"
+
+  DragonCDRefreshCosts:
+    SmokeBreath: 8
+    MagicArtillery: 6
+    NapalmBreath: 15
+    DragonRejuvenation: 10
+    Note: "Auto-spent on Dragon entry. Excess carries. Insufficient = partial refresh."
+
+  Decay:
+    Trigger: "5s without dealing or taking damage (full disengage)"
+    Rate: "2 stacks/s after trigger"
+    DragonguardAdvantage: "Always hitting → decay practically never triggers in this form"
+
+  TheCycle: >
+    Dragonguard (earn stacks + gauge + deliver breath) → Dragon (spend refreshed CDs)
+    → return Dragonguard (repeat). Longer DG phases = more stacks = more Dragon access.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# DPS MATH (95-102% TARGET PROOF)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+DPSMath:
+  Assumptions:
+    GCD: 2.0s (base, worst case)
+    Window: 60s
+    CritMultiplier: 1.5x
+    CritUptime: "~40% Hawk-Dive crits (>50% HP), ~30% finisher crits"
+
+  SingleTarget: # Dragonguard's weakest case
+    GCDs: 30
+    Breakdown:
+      HawkDive: "2× = 440 (1 crit: +110) = 550"
+      CleaveCombo: "7 chains = 3500 (2 finisher crits: +400) = 3900"
+      FangCrush: "3× = 840 (1 groggy crit: +140) = 980"
+      TailSweep: "2× = 260"
+      BreathTerrain: "2× = 600"
+      GroundPound: "1× = 110"
+    Total: "~5900p / 60s = ~98.3 pps"
+    VsReference: "~92% (no cleave leverage)"
+
+  MultiTarget_3Pack: # Designed sweet spot
+    Breakdown:
+      HawkDive: "2× (center+splash) = ~1250"
+      CleaveCombo: "7 chains × 3 targets = 10500 + crits = ~11100"
+      BreathTerrain: "2× (300p × 3) + crossing = ~2280"
+      TailSweep: "2× on 2 targets = ~390"
+      WingBuffet: "1× on 3 = 300"
+      GroundPound: "1× on 3 = 330"
+      FangCrush: "2× = 560"
+    Total: "~16210p / 60s = ~270 total pps"
+
+  BlendedResult:
+    Method: "60% multi-target, 40% single-target (dungeon encounter mix)"
+    WeightedPPS: "(0.4 × 98.3) + (0.6 × 170.0) = 141.3"
+    ReferencePPS: 145.0
+    Ratio: "97.4% — within 95-102% band"
+    Note: "Personal DPS only. Does not include rDPS from Draconite BL or Dragon utility."
+
+  WhyHighest:
+    VsDragon: "Dragon = 75-80% (utility form). DG exceeds by 15-20%."
+    VsDraconite: "Draconite = 70-78% personal. DG exceeds by 20-30%."
+    Key: "Cleave multiplier. 3+ targets = 3× damage per GCD vs single-target forms."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# ROTATION PHILOSOPHY
+# ═══════════════════════════════════════════════════════════════════════════════
+
+RotationPhilosophy:
+  CoreStatement: "NO FIXED ROTATION. Action priority is REACTIVE to encounter state."
+
+  DecisionTree:
+    FreshPack: "Hawk-Dive (>50% crit) → Cleave combo (post-knockup crit on hit 1)"
+    Sustained: "Cleave combo chains (repeat 1-2-3 loop)"
+    Gauge50_Safe: "Breath Prep (oGCD weave) → Scorch Path"
+    Gauge50_Mobile: "WAIT. Continue cleave. Save gauge for better opportunity."
+    Flanked: "Tail Sweep (crit, stagger, 180° turn) → Fang Crush if staggered"
+    Overwhelmed: "Ground Pound (mass stagger) → Wing Buffet (pushback) → reset"
+    EliteFocus: "Hawk-Dive → Ground Pound → Fang Crush → Cleave"
+    NeedToLeave: "SWAP DRACONITE. Accept gauge loss. DG cannot flee."
+
+  Priorities:
+    Always: "Land GCDs — every miss = lost stacks/gauge/DPS"
+    Default: "Cleave combo (repeatable, no CD, sustained output)"
+    OnCD: "Hawk-Dive on fresh >50% HP targets"
+    OnGauge: "Deliver breath ASAP when gauge ≥50 + opportunity"
+    Reactive: "Tail Sweep / Ground Pound / Wing Buffet (use on NEED, not on CD)"
+    Conditional: "Fang Crush (CC windows only — dead button otherwise)"
+
+  Prohibitions:
+    - "NO fixed opener sequence"
+    - "NO burst window alignment"
+    - "NO hold-then-dump patterns"
+    - "NO pre-pull ritual"
+
+  FlowState: >
+    Continuous combat with punctuated decisions. Cleave rhythm bends around
+    encounter events — flanker appears? Tail Sweep. Gauge ready? Breath weave.
+    The rhythm never stops, it ADAPTS.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SKILL INTERACTION MATRIX
+# ═══════════════════════════════════════════════════════════════════════════════
+
+Interactions:
+  HawkDive_Cleave: "Knockup → Strike 1 crit (post-knockup). Grouped enemies for full chain."
+  HawkDive_Breath: "Knockup 1.2s → Breath Prep → Scorch Path under airborne. Tight window."
+  GroundPound_Fang: "Mass stagger → Fang Crush priority target (280p + CC extend)"
+  TailSweep_Fang: "Rear stagger → bite flanker (punishes the punisher)"
+  Buffet_Terrain: "Terrain placed → Buffet pushes enemies IN (forces crossing damage)"
+  Terrain_Cross: "Two terrains crossing = crit on enemies in first when second placed"
+  FullOpener:
+    Sequence: "Hawk-Dive → Cleave1 (crit) → Cleave2 → Cleave3 (multi-crit) → Prep → Scorch"
+    Condition: "3+ enemies >50% HP, Hawk-Dive off CD, gauge ≥50"
+    Note: "NOT a fixed opener. Occurs when conditions met naturally."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# COMMITMENT FRAMEWORK
+# ═══════════════════════════════════════════════════════════════════════════════
+
+CommitmentSpectrum:
+  Lowest: "Tail Sweep (0.3s recovery)"
+  Low: "Cleave Strike 1 (0.4s — can abort after)"
+  Medium: "Cleave Strike 2 (0.5s — deeper in chain)"
+  High: "Cleave Strike 3 (0.8s — finisher, widest, most exposed)"
+  Highest: "Scorch Path (1.4s cast + 40% slow + melee lock)"
+
+  PunishmentForOvercommit:
+    - "Flanked during recovery → damage from behind"
+    - "Breath whiff → 50 gauge + 18s CD wasted"
+    - "AoE under committed position → can't dodge during recovery"
+    - "Resolution: swap Draconite (emergency) — gauge resets. ALWAYS costs something."
+
+  WhyNotAlwaysDragonguard:
+    - "Cannot kite or chase mobile targets"
+    - "No evasion stat (Draconite only)"
+    - "Recovery frames expose flanks"
+    - "Cannot cover multi-Z (Dragon only)"
+    - "Breath terrain misses mobile targets"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# FORM SWAP INTERACTIONS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+FormSwap:
+  ToDragon:
+    Trigger: "Stacks sufficient + tactical window (groggy/corridor)"
+    Cost: "Breath gauge resets"
+    Decision: "Dragon CDs ready AND targets immobile? → swap. Otherwise stay."
+
+  ToDraconite:
+    Trigger: "Pressure too high / need mobility / mobile target"
+    Cost: "Breath gauge resets + leaving highest DPS form"
+    Decision: "Will I die or miss everything? → swap. Can I stay? → stay."
+
+  FromDragon:
+    Entry: "Wings fold, resume cleave immediately. Gauge at 0."
+    Priority: "Hit things ASAP — every idle second = lost stacks/gauge."
+
+  FromDraconite:
+    Entry: "Stance shifts, resume cleave. Gauge at 0. Stacks carry over."
+    Synergy: "BL applied in Draconite → swap DG → terrain on BL'd targets → reaction"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# ENCOUNTER SPECIALIZATIONS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+Encounters:
+  FodderPacks: {Rating: HIGHEST, Strategy: "Hawk-Dive center → cleave chains → terrain escape routes"}
+  ElitesWithAdds: {Rating: HIGHEST, Strategy: "Cleave elite + adds simultaneously, terrain denies reinforcement"}
+  SingleElite: {Rating: MODERATE, Strategy: "Hawk-Dive → stagger → Fang Crush → cleave (no multi bonus)"}
+  BossGroggy: {Rating: HIGH, Strategy: "Fang Crush (groggy crit) → cleave → terrain under"}
+  MobileTargets: {Rating: LOW, Strategy: "1-2 cleave hits then target escapes. Swap Draconite instead."}
+  Corridors: {Rating: HIGH, Strategy: "Terrain fills width (unavoidable). Cleave in choke. No flanks."}
+  OpenField: {Rating: MODERATE, Strategy: "Accept flanking exists. Tail Sweep needed more. DPS drops."}
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# RANK SCALING (DRAGONGUARD EXPERIENCE)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+RankScaling:
+  R1:
+    EnemyBehavior: "Stand still, don't flank, don't dodge breath"
+    Experience: "Power fantasy. Hawk-Dive → cleave → everything dead. Trivial."
+  R2:
+    EnemyBehavior: "Begin flanking, dodge breath startup, spawn adds"
+    Experience: "Tail Sweep necessary. Breath timing matters. Add management via cleave."
+  R3:
+    EnemyBehavior: "Exploit recovery frames. Place AoE under committed positions."
+    Experience: "Abort combos early. Form swaps frequent. Read-based breath only."
+  R4:
+    EnemyBehavior: "Bait commitment. Punish EVERY extended recovery frame."
+    Experience: "Partial chains only (1-2 hits). Breath during stagger windows. Mastery."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# FAILURE STATES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+FailureStates:
+  BreathWhiff: {Severity: HIGH, Cost: "1.4s + 50 gauge + 18s CD wasted", Prevention: "Only during knockup/stagger/corridor"}
+  ComboInterrupted: {Severity: MODERATE, Cost: "Chain drops, restart from 1", Prevention: "Fight near walls, preemptive stagger"}
+  OvercommitDeath: {Severity: CRITICAL, Cost: "Death + all progress lost", Prevention: "Abort at Strike 2, swap Draconite"}
+  GaugeWastedToSwap: {Severity: HIGH, Cost: "All gauge progress lost", Prevention: "Deliver at 50 ASAP or commit to stay"}
+  HawkDiveWhiff: {Severity: MODERATE, Cost: "12s CD + bad position", Prevention: "Shorter range = less dodge window"}
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# POTENCY REFERENCE TABLE
+# ═══════════════════════════════════════════════════════════════════════════════
+
+PotencyTable:
+  # Name           | Type  | Base | Crit  | CD  | AoE            | Gauge | Stacks | Commit
+  HawkDive:        {Type: GCD,  Base: 220, Crit: 330, CD: 12s,  AoE: "3y radial",    Gauge: "+8",  Stacks: 2,  Commit: Medium}
+  RendingArc_1:    {Type: GCD,  Base: 140, Crit: "—", CD: "—",  AoE: "120° 3y",      Gauge: "+4",  Stacks: 1,  Commit: Low}
+  RendingArc_2:    {Type: GCD,  Base: 160, Crit: "—", CD: "—",  AoE: "90° 4y",       Gauge: "+4",  Stacks: 1,  Commit: Medium}
+  RendingArc_3:    {Type: GCD,  Base: 200, Crit: 300, CD: "—",  AoE: "180° 3.5y",    Gauge: "+6",  Stacks: 2,  Commit: High}
+  ScorchPath:      {Type: GCD,  Base: "120+180t", Crit: "varies", CD: 18s, AoE: "2×12y line", Gauge: "-50", Stacks: 3, Commit: Highest}
+  LashingTail:     {Type: GCD,  Base: 130, Crit: 195, CD: 8s,   AoE: "150° rear",    Gauge: "+3",  Stacks: 1,  Commit: Lowest}
+  WingBuffet:      {Type: GCD,  Base: 100, Crit: "—", CD: 15s,  AoE: "140° 4y",      Gauge: "+2",  Stacks: 1,  Commit: Medium}
+  FangCrush:       {Type: GCD,  Base: 280, Crit: 420, CD: "—",  AoE: "single",       Gauge: "+5",  Stacks: 2,  Commit: Medium}
+  EarthshatterStomp: {Type: GCD, Base: 110, Crit: "—", CD: 20s, AoE: "5y radial",    Gauge: "+3",  Stacks: "1-4", Commit: Medium}
+  StokeFlames:     {Type: oGCD, Base: 0,   Crit: "—", CD: "—",  AoE: "self",         Gauge: "req50", Stacks: 0, Commit: "N/A"}
+
+  Totals: "8 GCD + 1 oGCD = 9 actions"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# TELLS & READABILITY
+# ═══════════════════════════════════════════════════════════════════════════════
+
+Tells:
+  Principle: >
+    All actions have visible/audible tells proportional to commitment level.
+    Enemy AI reads tells at SR2+ to punish over-commitment.
+  HawkDive: {Visual: "Wings snap open, shadow at landing zone", Audio: "Wind rush → thud"}
+  CleaveCombo: {Visual: "Escalating swing trails", Audio: "Whoosh (low→mid→high pitch)"}
+  BreathPrep: {Visual: "Chest/throat glow builds", Audio: "Rumbling rev (growing)"}
+  ScorchPath: {Visual: "Ground ignites in line", Audio: "Exhale roar → crackling"}
+  TailSweep: {Visual: "Minimal (intentionally unreactable)", Audio: "Sharp whip-crack"}
+  GroundPound: {Visual: "Radial ground cracks", Audio: "Bass thud + shake"}
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# §25 COMPLIANCE
+# ═══════════════════════════════════════════════════════════════════════════════
+
+Section25_Compliance:
+  Status: COMPLIANT
+  LongestCD: "20s (Earthshatter Stomp) — well below 90s threshold"
+  PrimaryGating: "Breath Terrain gated by RESOURCE (gauge ≥50), not long CD"
+  FormSwap: "Free, no CD (§25 N/A — mode switch, not identity skill)"
+  StackSystem: "Gated by gameplay performance, not timers"
+  AllCDs: {HawkDive: 12s, TailSweep: 8s, WingBuffet: 15s, ScorchPath: 18s, GroundPound: 20s}
+  Confirmation: "No Dragonguard identity skill uses CD ≥90s. Resource/state gating preferred throughout."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# DESIGN CONSTRAINTS (STATED ONCE — NO DUPLICATION)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+Constraints:
+  AuthorityChain: "DESIGN_OVERRIDE.md > BalanceTargets.yaml > Skyreign_Design.yaml > this file"
+  NoDuplication: >
+    System rules (GCD timing, crit model, §9, §25, form-swap costs, breath
+    reset, stack decay) are defined in Skyreign_Design.yaml. This file
+    provides IMPLEMENTATION (potencies, CDs, interactions) not repetition.
+  GCD: {Base: 2.0s, Cap: 1.4s}
+  Crit: "Positional/conditional only. Zero RNG."
+  NoBurstCycle: "No 2-min alignment. No fixed cadences. Encounter-reactive."
+  Section25: "No identity skills on CD ≥90s."
+  OverFiftyHP: "Enemies >50% HP take +25%. Integrated into Hawk-Dive crit + opener curve."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# END OF DRAGONGUARD SKILL SPECIFICATION
+# ═══════════════════════════════════════════════════════════════════════════════
