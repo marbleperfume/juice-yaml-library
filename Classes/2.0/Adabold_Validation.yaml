@@ -1,0 +1,392 @@
+# ▲ CONTINUES FROM: Adabold_Design.yaml, Adabold_Skills.yaml
+# ═══════════════════════════════════════════════════════════════════════════════════
+# ADABOLD (Rawrotin) — Validation & Balance Specification
+# juice-yaml-library | github.com/marbleperfume/juice-yaml-library
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+header:
+  class_name: "Adabold"
+  race: "Rawrotin (cultural lock — bodyguard tradition)"
+  role: "Frontliner (Defensive — Force Targeting / Escort)"
+  execution_tier: "Experienced"
+  design_authority: "Adabold_Design.yaml"
+  skills_authority: "Adabold_Skills.yaml"
+  last_updated: "2026-07-14"
+  validation_status: "Qualitative Complete — Awaiting Layer 1 Numerical Pass"
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# SECTION 1: BALANCE TARGETS
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+balance_targets:
+  reference: "Generic Experienced-tier DPS = 100%"
+
+  dps_band: [82, 85]  # Frontliner role: 80-87%. Adabold specific: consistent floor.
+  pps_by_rank:
+    rank_1: {optimal: 107, realistic: 82}
+    rank_2: {optimal: 115, realistic: 87}
+    rank_3: {optimal: 130, realistic: 95}
+  deductions: "-15% reposition, -10% missed crits, -5% gauge starve"
+
+  gcd_timing:
+    base: "2.0s"
+    spd_14: "~1.85s"
+    cap: "1.4s"
+    weave: "Single-weave only (0.6s lock, 0.3s Iron Body)"
+
+  racial_stats: {SPD: 14, STR: 11}
+
+  shield_gauge:
+    cap: "80 (R1) / 100 (R2+)"
+    gen_rate: "~9-12/s engaged"
+    sustain_spend: "~8-10/s"
+    burst_spend: "40-50 in 4s (rebuild required)"
+    first_spend: "8-10s"
+    full_gauge: "30-35s"
+    recovery_empty: "4-6s to Lob threshold"
+    budget_16s: {gen: 80, spend: 78, net: "+2 (barely sustainable)"}
+
+  self_sustain:
+    rate: "~2-2.5% HP/s"
+    sources: "Pack Fang mark heal (1-1.7%/s) + block recovery (1%/hit)"
+    solo: {SR1: "Unkillable", SR2: "Viable", SR3: "Needs healer", SR4: "Healer required"}
+
+  mitigation:
+    iron_body_frontal: "50% DR (120° arc) — 55% R3"
+    shield_passive: "15% frontal (always)"
+    combined: "~57% (multiplicative)"
+    flanked: "0%"
+    invuln: "NONE. Never immune."
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# SECTION 2: MATCHUP SCENARIOS
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+matchup_scenarios:
+
+  SR1_corridor:
+    geometry: "3y-wide corridor, walls both sides"
+    enemies: "3× trash (attack closest)"
+    party: "Adabold + 1 caster"
+    flow: "Iron Body ON → Consecrate → combo. Enemies walk into zone + wall."
+    results:
+      backline_damage: "0%"
+      pin_rate: "100% (walls guaranteed)"
+      pps: "~138 (AoE zone + contacts)"
+      gauge: "Net positive (blocks > spend)"
+    verdict: "PASS — trivial. Force Targeting overkill. Identity not fully engaged."
+
+  SR2_flanker:
+    geometry: "T-junction. Main corridor + side passage to caster."
+    enemies: "2× frontal + 1× flanker using side passage"
+    party: "Adabold + 1 caster (8y behind)"
+    flow: >
+      [Sentinel 1.5s warning] → Lob flanker (crit) → Pull (oGCD, 4y) →
+      Star toward wall (crit near ally) → Bash Pin (crit)
+    gauge: "Start 60, spend 70, deficit -10. Rebuild next."
+    results:
+      backline_damage: "0%"
+      tether_uptime: "Established GCD 1, maintained"
+      pin_rate: "100% (Star → wall setup)"
+      sentinel_used: "1.5s warning sufficient for Lob at 15-20y"
+    verdict: "PASS — core identity scenario. Gauge-negative = intended pressure."
+    skill_expression: "Lob timing, Pull vs Dash choice, Star direction."
+
+  SR3_coordinated:
+    geometry: "Open room, 3 entry points (N/E/S), center pillar"
+    enemies: "5× coordinated: 2 from N, 1 from E, 2 from S"
+    party: "Adabold + caster + DPS + healer (clustered)"
+    flow: >
+      [AMBUSH 2.5s] → Dash to S (rear, priority) → Iron Body face S →
+      Consecrate on E chokepoint → ACCEPT N pair reaches DPS (DPS handles) →
+      Pivot after S resolved.
+    gauge: "Full → 97 spent → empty. 4-6s rebuild."
+    results:
+      backline_damage: "30-40% of potential (E leaks through Consecrate)"
+      triage_quality: "Player choice = which vector leaks. Situational."
+      survival: "All alive (healer covers leak)"
+    verdict: "CONDITIONAL PASS — cannot solo 3 vectors. Limitation intentional."
+    weakness_exposed: "Multi-angle = designed failure. 1 tether, 1 body, 1 facing."
+
+  procgen_split:
+    geometry: "Narrow branch corridor (4y), 60m, no healer"
+    enemies: "4× trash (paired) + 1 elite at end"
+    party: "Adabold + 1 caster (sub-group)"
+    flow: "Trash: Iron Body + Consecrate + combo. Elite: full Tether→Pin cycle."
+    results:
+      self_sustain: "Indefinite at SR2 (2-2.5%/s vs incoming after DR)"
+      caster_damage: "0% (corridor = impassable)"
+      elite_kill_time: "45-60s (BalanceTargets Solo TTK)"
+      hp_at_finish: "40-55% (stable equilibrium)"
+    verdict: "PASS — core escort fantasy. Solo-viable at SR2. Corridor king."
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# SECTION 3: PASS/FAIL CRITERIA
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+pass_fail_criteria:
+
+  shield_gauge:
+    VAL-SG-01: {check: "First spend ≤16s", target: "8-10s", fail: ">16s", status: "PASS"}
+    VAL-SG-02: {check: "Full gauge ≤40s", target: "30-35s", fail: ">45s or <20s", status: "PASS"}
+    VAL-SG-03: {check: "Sustain rate net positive", target: "Gen 9-12/s vs spend 8-10/s", fail: "Net negative in SR2", status: "PASS"}
+    VAL-SG-04: {check: "Overcap <10%", target: "<10% wasted", fail: ">15%", status: "PASS"}
+
+  force_tether:
+    VAL-FT-01: {check: "Uptime ≥60% SR2+", target: "60-80%", fail: "<50%", status: "PASS"}
+    VAL-FT-02: {check: "Pull is oGCD (instant response)", target: "0.6s lock, no GCD wait", fail: "Requires GCD", status: "PASS"}
+    VAL-FT-03: {check: "Dash positions between target and ally", target: "Auto-positioning", fail: "Behind/beside target", status: "PASS"}
+
+  backline_protection:
+    VAL-BP-01: {check: "Damage prevented ≥80% at SR2", target: "80-95%", fail: "<70%", status: "PASS (qual)"}
+    VAL-BP-02: {check: "Caster never interrupted SR1-2", target: "0 forced interrupts", fail: "Any interrupt while gauge >0", status: "PASS"}
+
+  pin_success:
+    VAL-PN-01: {check: "Pin rate ≥80% corridor", target: "80-100%", fail: "<70%", status: "PASS"}
+    VAL-PN-02: {check: "Pin rate ≥40% open", target: "40-60%", fail: "<30%", status: "PASS"}
+
+  zone_denial:
+    VAL-ZD-01: {check: "Consecrate fills corridor width", target: "4-5y radius vs 3-4y corridor", fail: "Zone < corridor width", status: "PASS"}
+    VAL-ZD-02: {check: "Zone forces pathing decision", target: "Cross = punished OR detour = intercept time", fail: "Trivially better to cross", status: "PASS"}
+
+  sentinel_instinct:
+    VAL-SI-01: {check: "Warning sufficient for intercept", target: "1.5s at 8-10y range", fail: "<1.0s", status: "PASS"}
+    VAL-SI-02: {check: "Warning only (no auto-resolve)", target: "Pure information", fail: "Any auto-mitigation", status: "PASS"}
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# SECTION 4: §25 COMPLIANCE
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+section_25_compliance:
+  rule: "No CDs ≥90s on identity skills. Gate via Shield Gauge."
+  built_native: "Adabold designed §25-compliant from inception. No retrofit."
+
+  audit:
+    PackStrike:       {cd: "GCD", gate: "free", status: "COMPLIANT"}
+    FangFollow:       {cd: "GCD", gate: "free", status: "COMPLIANT"}
+    PackFang:         {cd: "GCD", gate: "free", status: "COMPLIANT"}
+    ShieldLob:        {cd: "GCD", gate: "20g",  status: "§25 COMPLIANT"}
+    ShieldBash:       {cd: "GCD", gate: "15g",  status: "§25 COMPLIANT"}
+    Consecrate:       {cd: "GCD", gate: "30g",  status: "§25 COMPLIANT"}
+    ShootingStar:     {cd: "GCD", gate: "25g",  status: "§25 COMPLIANT"}
+    IronBody:         {cd: "None", gate: "3/s", status: "§25 COMPLIANT"}
+    TetherPull:       {cd: "None", gate: "10g + tether", status: "§25 COMPLIANT"}
+    TetherDash:       {cd: "None", gate: "15g + tether", status: "§25 COMPLIANT"}
+    SentinelInstinct: {cd: "N/A", gate: "passive", status: "COMPLIANT"}
+
+  verification:
+    max_cd_in_kit: "2.0s (GCD recast)"
+    no_90s: "CONFIRMED"
+    no_60s: "CONFIRMED"
+    no_30s: "CONFIRMED"
+    gauge_gated: "7/11 abilities"
+    free: "4/11 (combo ×3 + passive)"
+    full_sequence_cost: "~118 (exceeds cap = must prioritize)"
+    empty_gauge_state: "4-6s rebuild. Basic combo functional. Weakened, not helpless."
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# SECTION 5: FORCE TARGETING VALIDATION
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+force_targeting_validation:
+  core_claim: >
+    Works REGARDLESS of Strategy Rank. Operates on PHYSICS (collision,
+    displacement, zone), not COGNITION (AI priority, enmity). A Rank 4
+    genius cannot walk through a wall or resist a 6y knockback.
+
+  sr_proof:
+    SR1: {method: "Proximity (closest)", tools: "Exist", difficulty: "TRIVIAL"}
+    SR2: {method: "Iron Body (impassable) + Consecrate + Pull", tools: "3-4 skills", difficulty: "MODERATE"}
+    SR3: {method: "Full toolkit cycling, prioritize angles", tools: "All", difficulty: "HIGH"}
+    SR4: {method: "Sentinel AMBUSH + pre-Consecrate + instant Dash", tools: "Everything simultaneously", difficulty: "VERY HIGH"}
+
+  vs_madolt_unfocus:
+    madolt: "AI suppression. Enemies FORGET to flank. Cognitive. Fails vs SR4 immune."
+    adabold: "Physical blockade. Enemies CANNOT flank. Geometric. Fails vs multi-angle."
+    overlap: "ZERO. Different problem spaces. Complementary in same party."
+
+  critical_distinctions:
+    - "NO enmity table. No threat value."
+    - "NO taunt. No provoke. No 'attack me' button."
+    - "NO AI manipulation. That's Madolt."
+    - "YES collision. YES displacement. YES slow zone. YES physical tether."
+    - "FORCE = physical force applied to enemy body. Not 'forced' via AI."
+
+  why_physical_not_cognitive:
+    - "Iron Body: enemy pathing engine treats Adabold as impassable terrain"
+    - "Tether Pull: 4-5y displacement toward self (physics)"
+    - "Shooting Star: 6y knockback in chosen direction (physics)"
+    - "Shield Bash: 3y knockback or Pin (physics)"
+    - "Consecrate: 30-40% slow zone (physics)"
+    - "None of these interact with AI priority tables"
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# SECTION 6: WEAKNESS BUDGET
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+weakness_budget:
+  philosophy: "Weaknesses are structural and CANNOT be specced away."
+
+  weaknesses:
+    multi_angle:
+      severity: "PRIMARY"
+      description: "1 body, 1 tether, 1 facing (120°). 3+ vectors = leaks."
+      exposed_at: "SR3+ coordinated assaults, 3+ entry open rooms"
+      mitigation: "Consecrate one, body another. Third leaks."
+      unfixable: true
+      target: "Protection drops to 60-70% at 3+ angles"
+
+    ranged_beyond_tether:
+      severity: "HIGH"
+      description: "Tether max 20y. Enemies at >20y = untouchable."
+      exposed_at: "Open arenas, elevated positions, archer enemies"
+      mitigation: "Close distance or party handles ranged."
+      unfixable: true
+      target: "0% force targeting on targets >20y"
+
+    no_aoe:
+      severity: "MODERATE"
+      description: "Single-target focused. Only AoE: Consecrate (ground) + Iron Body contact."
+      exposed_at: "6+ spread enemies in open space"
+      mitigation: "Consecrate + corridor funneling"
+      unfixable: true
+      target: "AoE contribution ~40% of dedicated AoE DPS"
+
+    gauge_depletion:
+      severity: "MODERATE"
+      description: "Full sequence (118) > cap (100). Sustained burst = empty in 8-10s."
+      exposed_at: "SR3-4 multi-wave, back-to-back demands"
+      mitigation: "Smart prioritization. Iron Body blocks generate."
+      unfixable: true
+      target: "4-6s vulnerability windows 1-2× per 30s at SR3+"
+
+    separation_from_protectee:
+      severity: "HIGH"
+      description: "Sentinel warns 1.5s. SPD 14 covers 8-10y. Beyond 12y = cannot intercept."
+      exposed_at: "Party spread, caster wanders, Adabold overextends"
+      mitigation: "Tether Dash (6y). But requires correct tether target."
+      unfixable: true
+      target: "Protection = 0% when protectee >12y away"
+
+    open_arena_drop:
+      severity: "MODERATE"
+      description: "No guaranteed Pins (no walls). Consecrate walked around. Flanks exposed."
+      exposed_at: "Boss arenas, wide chambers"
+      mitigation: "Star creates wall proximity. Pillar exploitation."
+      unfixable: true
+      target: "PPS -15-20%. Pin rate 40-60% (vs 80-100% corridor)."
+
+  summary: {total: 6, primary: 1, high: 2, moderate: 3, removable: 0}
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# SECTION 7: FRONTLINE COMPARISON
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+frontline_comparison:
+
+  adabold:
+    sentence: "I physically block the path."
+    archetype: "Corridor king / DEFENSE / Escort"
+    mechanism: "Force Targeting (geometry, displacement, zone denial)"
+    metric: "Backline damage prevented %"
+    best: "Narrow corridors, escort splits, single-vector defense"
+    worst: "Open arenas, multi-angle, ranged enemies"
+    dps: [82, 85]
+    resource: "Shield Gauge (0-100)"
+
+  madolt:
+    sentence: "I keep enemies stupid."
+    archetype: "Arena king / SUPPRESSION / Control"
+    mechanism: "Unfocus (AI suppression, deprioritization)"
+    metric: "Unfocus uptime % / parry success rate"
+    best: "Open arenas, complex AI, large packs"
+    worst: "Corridors (physically blocked already), SR4 immune"
+    dps: [80, 87]
+    resource: "Guard Point gauge"
+
+  siegebreaker:
+    sentence: "I walk THROUGH enemies."
+    archetype: "Siege king / OFFENSE / Momentum"
+    mechanism: "Momentum (charge through, CC immunity, kill on advance)"
+    metric: "Enemies killed on advance / CC immunity uptime"
+    best: "Multi-wave siege, enemy formations, breakthrough"
+    worst: "Single high-HP target, tight spaces (can't charge)"
+    dps: [83, 87]
+    resource: "Momentum gauge"
+
+  scenario_matrix:
+    narrow_corridor:      {best: "Adabold", why: "Iron Body fills. Pins guaranteed."}
+    open_arena_boss:      {best: "Madolt", why: "No walls. Suppress keeps adds dumb."}
+    siege_multi_wave:     {best: "Siegebreaker", why: "Charges through. Kills on advance."}
+    party_split_escort:   {best: "Adabold", why: "Self-sustains. Caster untouched."}
+    sr4_coordinated:      {best: "Madolt", why: "Suppression > geometry at 4+ angles."}
+    single_flanker:       {best: "Adabold", why: "Tether + Dash + Sentinel = designed for this."}
+    ranged_suppression:   {best: "Madolt", why: "Unfocus works at range. Adabold caps 20y."}
+
+  overlap_check:
+    adabold_vs_madolt: "ZERO. Physics vs psychology. Complementary."
+    adabold_vs_siegebreaker: "ZERO. Defense (contain) vs offense (break through). Opposite force vectors."
+    madolt_vs_siegebreaker: "MINIMAL. Control vs momentum. Different execution."
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# VALIDATION SUMMARY
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+validation_summary:
+  identity:
+    VAL-ID-01: {check: "Force Targeting is physical not AI", status: "PASS"}
+    VAL-ID-02: {check: "Works at all Strategy Ranks", status: "PASS"}
+    VAL-ID-03: {check: "Distinct from Madolt Unfocus", status: "PASS"}
+    VAL-ID-04: {check: "Distinct from Siegebreaker momentum", status: "PASS"}
+    VAL-ID-05: {check: "Cultural lock justified (pack-bond → Sentinel)", status: "PASS"}
+
+  mechanical:
+    VAL-MC-01: {check: "§25 compliance (max CD = 2.0s GCD)", status: "PASS"}
+    VAL-MC-02: {check: "Anti-rotation (reactive)", status: "PASS"}
+    VAL-MC-03: {check: "Zero RNG crits (all conditional)", status: "PASS"}
+    VAL-MC-04: {check: "No enmity/taunt/threat", status: "PASS"}
+
+  balance:
+    VAL-BL-01: {check: "DPS 82-85% of reference", status: "PASS (qual)"}
+    VAL-BL-02: {check: "Self-sustain SR1-2", status: "PASS"}
+    VAL-BL-03: {check: "Gauge timing within BalanceTargets", status: "PASS"}
+    VAL-BL-04: {check: "No invulnerability", status: "PASS"}
+
+  weakness:
+    VAL-WK-01: {check: "Multi-angle weakness unfixable", status: "PASS"}
+    VAL-WK-02: {check: "Ranged weakness present", status: "PASS"}
+    VAL-WK-03: {check: "Gauge depletion window exists", status: "PASS"}
+
+  totals: {total: 16, pass: 15, pass_qual: 1, fail: 0}
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# TUNING LEVERS & OPEN QUESTIONS
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+tuning_levers:
+  if_too_strong:
+    - "Reduce Iron Body DR (50% → 40%)"
+    - "Reduce Tether range (20y → 15y R2)"
+    - "Increase Iron Body drain (3/s → 4/s)"
+    - "Reduce self-heal (3% → 2%)"
+  if_too_weak:
+    - "Increase passive gen (+2/s → +3/s)"
+    - "Reduce Consecrate cost (30 → 25)"
+    - "Extend Sentinel warning (1.5s → 2.0s base)"
+    - "Increase Pin duration (1.5s → 2.0s R1)"
+
+open_questions:
+  - "Iron Body hitbox size vs corridor width ratio"
+  - "Tether Pull exact arrival position"
+  - "Shooting Star knockback vs enemy weight classes"
+  - "Consecrate tick timing vs enemy crossing speed"
+  - "SPD 14 → exact GCD haste value confirmation"
+
+integration_tests:
+  - "Adabold + Madolt: corridor + arena coverage — zero conflict"
+  - "Adabold + Reaver: hold group + commit wounded — non-competing"
+  - "Adabold escort split vs full party clear time comparison"
+  - "Iron Body hitbox vs procgen corridor variety (3y/4y/5y)"
+  - "Gauge overcap/depletion frequency across 3-min boss"
+
+# ▼ AWAITING: Layer 1 Spatial Quantification Pass
