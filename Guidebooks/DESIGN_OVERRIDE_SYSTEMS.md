@@ -220,43 +220,50 @@ Low-STR classes use elemental/poison weapons (damage from weapon properties, not
 
 ## 23. File Structure — Class-Chain Split Principle
 
-Class specifications MUST split into a two-file chain when combined size exceeds **50 KB**:
+Class specifications MUST split into a multi-file chain. **Target 20-30 KB per file.** Never hardcode to exactly 2 files — use as many as the content naturally demands.
 
 | File | Target Size | Contains |
 |------|-------------|----------|
-| `{Class}_Design.yaml` | 25-45 KB | Identity, race lock, role objective, class mechanic (resource system, state machine), class-specific systems, rotation philosophy, anti-patterns, design notes |
-| `{Class}_Skills.yaml` | 25-45 KB | Full GCD/oGCD skill roster with potencies, rank progression, balance targets, system interactions (Aggro, >50% HP, Crit, Procgen), matchup analysis, item baseline comparison, balance validation, visualization hooks, constraints |
+| `{Class}_Design.yaml` | 20-30 KB | Identity, race lock, role objective, class mechanic (resource system, state machine), rotation philosophy, anti-patterns, design notes |
+| `{Class}_Systems.yaml` | 20-30 KB | Class-specific systems (unique subsystems, gauges, companion AI, stance logic — anything mechanically complex enough to warrant its own file) |
+| `{Class}_Skills.yaml` | 20-30 KB | Full GCD/oGCD skill roster with potencies, rank progression |
+| `{Class}_Validation.yaml` | 15-25 KB | Balance targets, system interactions, matchup analysis, item baseline comparison, balance validation, visualization hooks, constraints |
 
 **Header cross-references (mandatory):**
 ```yaml
 # In {Class}_Design.yaml footer:
-# ▼ CONTINUES IN: {Class}_Skills.yaml
-# ▼ PICK UP AT: Section N (first skills section)
+# ▼ CONTINUES IN: {Class}_Systems.yaml, {Class}_Skills.yaml, {Class}_Validation.yaml
 
-# In {Class}_Skills.yaml header:
+# In each continuation file header:
 # ▲ CONTINUES FROM: {Class}_Design.yaml
-# ▲ GAP: Sections 1-M NOT in this file (identity, mechanic, systems)
+# ▲ THIS FILE COVERS: [brief scope statement]
 ```
 
 **Chain extension for complex classes:**
 ```
 Colony_Design.yaml
+Colony_Systems.yaml
 Colony_Skills_Builder.yaml
 Colony_Skills_Flutter.yaml
 Colony_Skills_Nightfly.yaml
+Colony_Validation.yaml
 ```
 
-**Rationale:**
-- LLM generation trims quality on sections past ~50 KB context load
-- Design identity and numerical implementation have different change cadences
-- Either file can be regenerated independently without full context
-- Git diffs become meaningful (design change vs number tweak)
+**Splitting philosophy:**
+- **AIM FOR MORE FILES, NOT FEWER.** 3-5 files per class is normal. 2 is the minimum, not the target.
+- 20-30 KB per file keeps each file readable in one pass and generatable without trim.
+- If a section (e.g., altitude system, companion AI, stance logic) is complex enough to explain independently, it gets its own file.
+- LLM generation quality degrades past ~30 KB output. Stay under.
+- Each file must be independently readable (no dangling references).
+- Files are cheap. Comprehension is expensive. Err toward more splits.
 
 **Rules:**
 - Design file is WHAT THE CLASS IS. Skills file is WHAT IT DOES.
+- Systems file is HOW IT WORKS (mechanical subsystems in detail).
+- Validation file is HOW WE CHECK IT (numbers, matchups, pass/fail).
 - Potency changes, skill additions/deletions, balance tweaks → Skills file ONLY.
 - Mechanic redesigns, identity shifts, resource reworks → Design file.
-- Both files must be independently readable (no dangling references).
+- Subsystem tuning (gauge rates, companion behavior) → Systems file.
 - `_Complete.yaml` naming is DEPRECATED for new work. Existing files converted on next rebuild.
 
 ---
@@ -327,5 +334,63 @@ Tactical cooldowns (5-15s) that gate individual skill FREQUENCY without removing
 
 ---
 
-*Last updated: 2026-07-14*
-*Source conversation: Healer identity session + file structure reform + resource gating principle*
+---
+
+## §27. Melee-Range Transformation (Anti-Dash-Button Redundancy)
+
+**Problem:** FFXIV design excuses gap closers as damage buttons (Plunge, Stardiver, etc.). These are dash skills that deal damage as a bonus for pressing them — the actual purpose is "move to melee." This creates redundancy: the dash IS the damage, so you always press it on cooldown regardless of positioning need.
+
+**Potential Solution (Samira model):** Basic attacks transform based on distance to target. Gun at range → sword at melee. No separate dash skill needed — movement itself changes what your attacks do.
+
+**Implications if adopted:**
+- Gap closers stop being damage buttons. They become PURE movement (no potency, or token potency).
+- OR: gap closers don't exist at all. Walking/running into range transforms your attack automatically.
+- Ranged attacks at range → melee attacks at melee. Same button, different output.
+- Prevents "I dash on CD for damage even though I'm already in melee" anti-pattern.
+
+**Scope:** Potentially affects multiple classes (any with a dash/gap closer). Not Skyreign-specific.
+
+**Status:** OPEN QUESTION. Not yet adopted as rule. Flagged for evaluation during quantitative pass.
+
+**Classes to evaluate:** Skyreign (Voltaic Rush), Strix (dive), Lancer (jump in/out), any melee with gap closer.
+
+---
+
+## §28. Chain Reactions vs Crits (Distinct Systems)
+
+**Problem:** Skills files conflate "overlapping effect bonuses" with crit conditions. Overlapping terrain, stacking debuffs, and combined elemental effects are CHAIN REACTIONS (Layer 3 of Hierarchy of Fun: Synergy). They are NOT crits.
+
+**Crits** = positional/conditional damage multiplier on a SINGLE action.
+- Backstab, flank, CC exploit, >50% HP, cone center, combo finisher.
+- One skill, one condition, one multiplier. No setup from separate source needed.
+
+**Chain Reactions** = bonus effect triggered by COMBINATION of multiple sources.
+- Overlapping terrain zones (fire + poison = explosion).
+- Black Lightning + external elemental hit = reaction damage.
+- Debuff A + Debuff B on same target = amplified effect.
+- Two terrain lines crossing = enhanced zone at intersection.
+- Requires setup from SEPARATE action/source/ally. Reward for coordination.
+
+**Why this matters:**
+- Crits reward INDIVIDUAL execution (position yourself correctly).
+- Chain reactions reward COORDINATION (team play, setup→payoff, spatial planning).
+- If chain reactions are labeled as "crits," the crit system loses meaning (becomes "everything is a crit").
+- Chain reaction bonuses can exceed crit multipliers because they require more investment.
+
+**Rule:** When writing skills files, categorize bonus damage sources correctly:
+- Single-action conditional bonus → CritCondition field
+- Multi-source/multi-action combinatorial bonus → ChainReaction field (separate)
+- Do NOT put chain reactions in CritCondition. Do NOT put crits in ChainReaction.
+
+**Scope:** Affects all classes with terrain, debuff stacking, elemental interactions, or overlapping zone mechanics. Particularly: Skyreign (breath terrain overlap), Tryll Elemental Scholar (saturation cross-element), Shaman (hex stacking), Colony (structure interactions).
+
+## §29. Element Selection as UI Mode Swap
+
+Breath/element selection (e.g. Dragonguard fire/ice/poison) is a **UI button mode swap** — trivial if unnecessary (Rank 1 content where any element works) but provides meaningful choice at higher ranks. Not a rotation. Not a combo. A menu selection that changes what your next breath DOES.
+
+**Scope:** Any class with multiple element/damage type options on the same skill slot. The swap is free, instant, out-of-combat or between casts. NOT an in-combat decision cost — the COST is choosing wrong for the situation, not the act of switching.
+
+---
+
+*Last updated: 2026-07-15*
+*Source conversation: Healer identity session + file structure reform + resource gating principle + Skyreign review*

@@ -70,9 +70,24 @@ Instead: Classes act when the SITUATION demands. Resources build through engagem
 
 **Madolt Warrior = Frontliner.** Primary identity is damage-first, survives by killing and parrying. NOT a traditional tank that absorbs for the party.
 
-Two frontliner identities:
-- **Adafold** = Force Targeting (physically compel enemies, facetank everything, dungeon escort king)
-- **Madolt Warrior** = Unfocus suppression (keep enemies at lower Strategy Rank so they don't flank/target split party)
+### Frontline Subtypes
+
+**Pinpoint Defense** (stationary, hold position, deny passage):
+- **Adabold** = Force Targeting (physically compel enemies onto self, corridor king)
+- **Madolt Metaknight** = Unfocus + Capacitor Pull (suppress AI + drag enemies into kill field, arena king)
+- Strength: nothing passes. Weakness: can't cover wide areas.
+
+**Cropduster / Space Control** (mobile, deny area through movement):
+- **Skyreign** = Breath terrain + displacement + suppressive fire (covers area by flying over it)
+- Does NOT hold ground — DENIES ground by passing over it. Cropduster (because it flies).
+- Strength: area coverage, multi-Z suppression, forcing enemy scatter.
+- Weakness: cannot hold a single point indefinitely (decaying DR, no stable defense).
+
+**Crane + Battering Ram** (linear committed advance, displacement):
+- **Siegebreaker** = Picks up and throws (crane, STR 18) + unstoppable forward momentum (battering ram)
+- Does NOT hold ground OR deny area — MOVES THROUGH and displaces everything in the path.
+- Strength: CC immunity, unstoppable advance, throws enemies out of formation entirely.
+- Weakness: directional commitment, cannot reverse, enemies that sidestep are ignored.
 
 ---
 
