@@ -1,0 +1,729 @@
+# Classes/DPS/Strix_Design.yaml
+# ═══════════════════════════════════════════════════════════════════════════════
+# STRIX (Talon) — Altitude Dive-Bomber DPS | DESIGN SPECIFICATION
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Design lineage:
+#   EDF Wing Diver: aerial combat class, sustained flight as engagement mode
+#   Yu-Gi-Oh Raidraptors: aggressive energy-driven aerial predator (XYZ overlay → altitude stacks)
+#   Monster Hunter Insect Glaive: air-to-ground commitment, vault → plunge cycle
+#   Dragoon (FFXIV): jump commitment, fixed trajectory, landing vulnerability
+#   Peregrine Falcon: terminal velocity dive → maximum kinetic force at impact
+#   Birds of Prey: circling → reading → committing → striking → escaping
+#
+# Core identity: "Pre-calculation dive bomber"
+#   Altitude is the PRIMARY RESOURCE. Time airborne = time LOADING the next
+#   attack. The skill is in the READ: what to hit, from what angle, at what
+#   altitude, with what timing. Once committed, trajectory is FIXED. Cannot
+#   abort. Cannot redirect. Must be RIGHT before commit.
+#
+# Fantasy: The raptor that drops from the sky like a missile.
+#   Circle above → see everything → choose perfect moment → fold wings and
+#   DROP → fixed-trajectory kinetic strike → massive damage at impact → then
+#   grounded: fragile, fast, weapon-dangerous until re-ascend.
+#
+# Flight distinction from Colony (Harvester):
+#   Colony flight = UTILITY (scouting, positioning, seed-drops, pollen clouds).
+#   Strix flight = PREDATORY (altitude as weapon charge, dive as delivery).
+#   Colony = hummingbird. Strix = peregrine falcon.
+#
+# References:
+#   - Combat/BalanceTargets.yaml
+#   - Combat/AggroSystem.yaml
+#   - Combat/ClassMechanicModuleDesign.md
+#   - Classes/Support/Colony_Complete.yaml
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 1: CLASS IDENTITY
+# ─────────────────────────────────────────────────────────────────────────────
+
+ClassIdentity:
+  Name: Strix
+  Title: "Talon"
+  Role: DPS
+  SubRole: single_target_burst
+  DamageModel: commit_or_miss
+  ResourceModel: altitude_as_damage_multiplier
+  FlavorSummary: >
+    A Featherin aerial predator treating altitude as weapon charge. Reads the
+    battlefield, selects the perfect target, and delivers devastating kinetic
+    strikes from terminal velocity. Untouchable when moving, devastating when
+    diving, fragile when grounded.
+
+  CoreStatements:
+    - "Altitude IS the weapon. Higher = harder hit."
+    - "Commitment IS the risk. Once diving, trajectory is LOCKED."
+    - "The READ is the skill. Not APM, not rotation memorization."
+    - "Grounded IS the weakness. Fragile, fast, but not in its element."
+    - "Motion IS defense. Stop moving = die."
+
+  StatPriority:
+    Primary: DEX   # dive accuracy, weapon precision, Exploit bonus scaling (purely offensive)
+    Secondary: SPD # i-frame duration, dash CD, dash distance, GCD haste, evasion (differential model)
+    Tertiary: NTU  # battlefield reading → Raptor's Read UI (racial base 12 = all thresholds through NTU_12 innate)
+    DumpStat: STR  # STR 6 (racial). Damage from MOMENTUM (dive) + WEAPON PROPERTIES (ground).
+    # Hollow bones = flight capable, CANNOT generate physical force via muscle.
+    # Dive = kinetic (altitude → velocity). Ground = weapon enchantments.
+
+  TertiaryFocus: ground_weapon_element_status_and_evasion_cooldowns
+
+  FailureStates:
+    BadDive:
+      Cause: "Committed on wrong target, bad angle, or into danger zone"
+      Cost: "Dive damage wasted. Grounded in bad position."
+      Recovery: "Survive ground time (8-12s) via SPD 15 and dashes."
+      Severity: HIGH
+    GroundedTooLong:
+      Cause: "Failed re-ascend (interrupted, no stamina, cave)"
+      Cost: "DPS drops to ~55% of aerial cycle."
+      Recovery: "Wall-jumps/hops for partial altitude. Find re-ascend window."
+      Severity: MODERATE
+    CeilingLocked:
+      Cause: "Low ceiling removes high-altitude option"
+      Cost: "Limited to shallow dives + ground combos."
+      Recovery: "Adapt to low-ceiling mode. Find open areas."
+      Severity: MODERATE  # Intentional environmental weakness
+    PredictedDive:
+      Cause: "Rank 3+ enemies read dive commit and move/shield/counter"
+      Cost: "Dive hits empty ground. Full commitment wasted."
+      Recovery: "Party CC/root before dive, feint dives, or Featherbomb blind."
+      Severity: "HIGH vs smart enemies → LOW with coordination/consumables"
+    StationaryOnGround:
+      Cause: "Stopped moving (stunned, rooted, paralysis)"
+      Cost: "Fragile body + no evasion = rapid death."
+      Recovery: "Don't stop. Dash. Wall-jump. Re-ascend. Motion = life."
+      Severity: CRITICAL
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 2: RACIAL LOCK — FEATHERIN
+# ─────────────────────────────────────────────────────────────────────────────
+
+RacialLock:
+  Race: Featherin
+  Enforcement: hard_lock
+  BiologicalLock: wings_and_flight
+  LockJustification: >
+    Requires TRUE FLIGHT — sustained powered flight allowing hovering, altitude
+    adjustment, high-speed diving. Requires wing anatomy (hollow bones for
+    mass:lift, flight muscles for sustained lift, wing structure for powered
+    flight AND controlled dive, aerial physiology for sustained altitude).
+    No wings = no Strix. Period.
+  NPCException: >
+    Non-Featherin "aerial" NPCs use magical flight (hover/levitation). Provides
+    POSITION but not KINETIC DIVE — magic flight doesn't generate mass×velocity²
+    for lethal dive damage. Biological dive requires wing-folding aerodynamics
+    and hollow-bone mass optimization only Featherin possess.
+  RacialSynergy:
+    - "TRUE FLIGHT — sustained powered flight allows persistent altitude as resource"
+    - "Hollow bones — light for flight, fragile to justify glass-cannon identity"
+    - "SPD 15 — light body = fast ground movement = escape velocity"
+    - "STR 6 — MUST rely on momentum (dive) and weapon properties (ground)"
+    - "Wing-fold aerodynamics — controlled dive trajectory at terminal velocity"
+    - "Aerial vision — physiological far-sight (wider FOV, distance acuity)"
+    - "Predator instinct — lore justification for dive trajectory preview UI"
+    - "NTU 12 (racial) — biological predator perception feeds Raptor's Read UI system"
+  RacialStatBase:
+    STR: 6
+    SPD: 15
+    DEX: 14
+    NTU: 12
+    STA: 6
+    Note: "High DEX/SPD/NTU, low STR/STA. Pure glass-cannon read-predator."
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 3: ROLE OBJECTIVE FUNCTION
+# ─────────────────────────────────────────────────────────────────────────────
+
+RoleObjective:
+  Function: "Maximize single-target burst damage via altitude-loaded kinetic strikes"
+  Metric: "Damage per dive cycle (ascend → read → commit → impact → ground → repeat)"
+  SkillExpression: >
+    Deciding WHEN and WHERE to dive. Not rotation execution.
+    The pre-calculation: target selection, angle evaluation, counter-read (NTU),
+    timing window identification. BETTER reads = more dives per fight = more total
+    damage. Bad reads = wasted dives, bad ground positions, death.
+  CoreLoop: >
+    Ascend (2-4s, builds altitude resource) → Read (variable, NTU-assisted) →
+    Commit (instant, locks trajectory) → Impact (burst damage) → Grounded
+    (4-6s, weapon combos + evasion + feather throws) → Re-Ascend (2s cast) → Repeat.
+  DPSModel:
+    AerialCycle: "100% efficiency — dive damage is the PRIMARY output"
+    GroundedState: "55-60% — weapon combos + feather throws while evading"
+    OptimalPlay: "Rapid cycling with NTU-informed commits. Never grounded longer than minimum."
+  DesignPhilosophy: >
+    "Skilled Strix" means better READS (NTU + experience), not faster APM.
+    The best player sees the right moment sooner, commits cleaner, and spends
+    less time grounded. Output difference comes from decision quality, not
+    FROM WHAT HEIGHT. Best players read the battlefield best, not highest APM.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 4: CLASS MECHANIC — ALTITUDE SYSTEM
+# ─────────────────────────────────────────────────────────────────────────────
+
+ClassMechanic:
+  Name: "Altitude System"
+  Resource: "Altitude Units (AU)"
+  Range: "0–100 AU"
+  CoreConcept: "Altitude = damage multiplier. Higher flight = harder hit on descent."
+
+  AltitudeBands:
+    Ground: "0 AU — weapon combos, evasion, feather throws"
+    Low: "1-30 AU — weak dives, partial benefit, read phase"
+    Mid: "31-60 AU — standard dives, good damage"
+    High: "61-100 AU — maximum dives, full kinetic scaling"
+
+  DiveScaling:
+    Formula: "DiveDamage = BaseDamage × (1 + AU/100 × ScalingCoeff)"
+    Minimum: "1 AU = barely stronger than ground attack"
+    Maximum: "100 AU = ×2.4 base damage (kinetic energy from terminal velocity)"
+    MomentumNote: "MOMENTUM damage, not STR. Altitude → acceleration → kinetic energy. STR irrelevant."
+
+  WingStamina:
+    MaxValue: 100
+    DrainRates:
+      Hovering: "3/s (expensive — intended as brief transition)"
+      Ascending: "5/s (climbing is hard work)"
+      Gliding: "1/s (efficient cruising)"
+      HighAltitude: "2/s passive (thin air tax above 60 AU)"
+      Diving: "0/s (gravity does the work)"
+    RegenRates:
+      Grounded: "12/s (full regen)"
+      Descending: "4/s (thermal regen during controlled descent)"
+    EmptyPenalty: "Must land. Cannot hover/ascend. Grounded until 30+ stamina."
+
+  ImpactMechanics:
+    Name: "Raptor Dive"
+    Type: committed_trajectory
+    TravelTime: "0.5-2.0s (height dependent)"
+    Description: >
+      Once committed, Strix follows a FIXED trajectory to impact point. Cannot
+      abort. Cannot redirect. Target MUST be where Strix aims. Miss = total waste.
+    SelfEffect: "GROUNDED at impact. Cannot re-ascend for Grounded Duration (6/5/4s by Rank)."
+    DesignNote: >
+      The commitment is the DESIGN. Every dive is a YES/NO decision. The entire
+      class skill expression lives in making that decision correctly. NTU reads
+      + battlefield awareness + timing = the class mastery path.
+
+  ExploitConditions:
+    DiveExploit_Marked: "Exploit on Raptor Marked targets (player-inflicted condition)"
+    GroundExploit_Poisoned: "Exploit at 5 Neurotoxin stacks (element-inflicted condition)"
+    DiveExploit_Featherful: "Exploit on Featherbomb-blinded targets (player-inflicted condition)"
+    SkillGap: "Skilled = ~70% Exploit uptime. Unskilled = ~20%. ~20% DPS gap from system mastery."
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 5: CLASS-SPECIFIC SYSTEMS
+# ─────────────────────────────────────────────────────────────────────────────
+
+GroundState:
+  Philosophy: >
+    Different class expression — weaker but FUNCTIONAL. Uses elemental/poison
+    weapons because STR 6 = no meaningful physical force. Weapon COMPENSATES.
+    Maintains altitude THEME via low hops, wall-jumps, short glides.
+    Feather projectiles provide ranged fallback. Evasion (SPD) is CRITICAL
+    here — grounded Strix lives or dies by dash quality.
+
+  WeaponSystem:
+    Name: "Storm Talons"
+    Type: dual_short_blades_clawed
+    Description: >
+      Raptor-talon curved blades. Negligible physical damage (STR 6). ALL ground
+      damage from WEAPON PROPERTIES: elemental infusions (wind/lightning) activate
+      on contact regardless of swing force. Strix TOUCHES and weapon does the rest.
+    ElementalIdentity:
+      Primary: wind_lightning
+      Secondary: poison_neurotoxin
+      Thematic: "Wind/lightning = aerial predator. Poison = efficiency over brute force."
+      MechanicalRoles:
+        Wind: "Bonus vs airborne. Extends glide. Enhances dash speed."
+        Lightning: "Primary ground DPS. Arcs to nearby targets. Stuns on Exploit trigger."
+        Poison: "DoT stacking. Hit-and-leave damage while re-ascending."
+    InfusionCycling:
+      Name: "Stormweave"
+      Description: "Toggle between Wind-infused and Lightning-infused (oGCD, no CD)."
+      WindState: "Faster attacks (+15%), longer dash, more evasive. Lower per-hit, higher sustained."
+      LightningState: "Arc damage (30% to nearby), stun on Exploit trigger. Higher per-hit, burst windows."
+    PoisonCoating:
+      Name: "Neurotoxin Sheath"
+      Description: "Buff (oGCD). Each weapon hit applies 1 stack. 5 max. Ticks damage + utility debuff."
+      DesignRole: >
+        Bridges dive cycles. Land → slash (3 stacks) → re-ascend → poison ticks
+        12s while rebuilding altitude → dive → repeat. Hit-and-run predator pattern.
+
+  GroundMovement:
+    LowHop: "Thermal Kick — 10 AU micro-jump, 1.2s airtime, 1 aerial action. Dodge ground AoE."
+    WallJump: "Crag Launch — off wall at 45°, reach 20 AU, 1.5s. Indoor substitute for full ascent."
+    ShortGlide: "Windcoast — horizontal glide from any 5+ AU. 3s, 120% speed. Thrown weapons only."
+
+  GroundCombatIdentity:
+    PowerLevel: "55-60% of full aerial cycle DPS"
+    Fantasy: "Raptor on ground — still fast, still venomous, still dangerous. Not in its element."
+    Strengths: ["i-frame dashes", "poison DoT persists after re-ascend", "lightning arcs", "SPD 15", "partial altitude via hops", "feather projectiles (ranged fallback)", "Featherbomb (blind → dive window)"]
+    Weaknesses: ["no burst without altitude", "no large AoE", "fragile HP", "STR 6 = elements only"]
+
+EvasionSystem:
+  Philosophy: >
+    "Fragile but UNTOUCHABLE when moving." NOT chance-based. Dashes provide
+    GUARANTEED i-frames — IMMUNE during dash. Player FEELS untouchable because
+    they ARE. Getting hit = you FAILED to dash. The dash IS the defense.
+  CorePrinciple:
+    Name: "Kinetic Invulnerability"
+    Rule: "ALL dashes grant guaranteed i-frames. IMMUNE during dash. 100%. Always."
+    StatInteraction:
+      SPD: "ALL evasion scaling. i-frame duration (0.3s → 0.5s), dash CD (4s → 2.5s), dash distance (6m → 10m)"
+      DEX: "Does NOT affect evasion. Purely offensive (dive accuracy, weapon precision, Exploit bonus)."
+      DesignNote: >
+        EVA as a separate stat is REMOVED. Speed is the sole evasion stat per
+        Base_Attributes.yaml tenets. The differential model (attacker Accuracy vs
+        defender Evasion from Speed) governs miss rates. DEX stays purely offensive.
+    GearProgression: >
+      Fresh: 0.3s i-frames, 4s CD, 6m. Must be precise.
+      BiS: 0.5s i-frames, 2.5s CD, 10m dash. Feels untouchable = endgame fantasy.
+      All evasion scaling from SPD investment. DEX goes into dive/weapon damage.
+    GroundRelevance: >
+      Evasion is MOST IMPORTANT during ground time. Grounded Strix throwing feathers
+      + dashing through attacks = the intended ground gameplay loop. SPD investment
+      pays off as both i-frame quality AND ability to maintain feather pressure while evading.
+  AerialEvasion:
+    PassiveBonus: "Above 30 AU: differential evasion formula grants +25% miss rate vs ground attackers (Speed advantage at altitude vs attacker accuracy at range — deterministic output, NOT RNG)"
+    BarrelRoll: "Replaces ground dashes while airborne. Lateral i-frame dodge. Costs 3 Wing Stamina."
+
+BarrierSystem:
+  Philosophy: >
+    Emergency backup, NOT the plan. ONE free pass before death (hollow bones).
+    "I made a mistake, barrier catches it. Now MOVE or die."
+  Name: "Featherward"
+  Type: emergency_barrier
+  Value: "25% MaxHP absorbed. Regenerates after 60s out of combat."
+  DesignNote: >
+    Replaced Feathercloak (physical absorption) — conflicted with evasion
+    identity. Featherward is an EMERGENCY catch, not routine defense.
+  HPPool: "70% of standard DPS HP (hollow bones)"
+
+SurvivalSummary: >
+  PRIMARY: Evasion (i-frame dashes, SPD-scaled). Move = live.
+  SECONDARY: Altitude (above 30 AU = passive miss rate bonus). Stay up = safe.
+  TERTIARY: Featherward (one-time emergency barrier). Mistake catch.
+  FALLBACK: Feather throw + dash loop (ground mode with ranged pressure).
+  DEAD: Standing still, grounded, no stamina, no dashes. Instant death.
+
+ColonyDistinction:
+  Context: "Both Strix (Featherin) and Colony (Flutter Harvester) fly. MUST be distinct."
+  Strix: "Flight = WEAPON CHARGE. Altitude generates kinetic energy for lethal dives."
+  Colony: "Flight = POSITIONING. Altitude provides vantage for seed-drops and pollen routing."
+  Key: "Strix ascends TO KILL. Colony ascends TO SUPPORT."
+  FlightCosts: >
+    Strix: EXPENSIVE flight (Wing Stamina drains fast at altitude). Brief windows.
+    Colony: CHEAP flight (Harvester physiology = sustained hover). Persistent.
+  DesignDivergence:
+    - "Strix = peregrine falcon (soars to kill). Colony = hummingbird (hovers to support)."
+    - "Strix: dive = COMMITMENT (grounded after). Colony: land/takeoff = FREE."
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 5B: NTU EXPRESSION — RAPTOR'S READ
+# ─────────────────────────────────────────────────────────────────────────────
+
+RaptorsRead:
+  Philosophy: >
+    NTU is INFORMATION. It grants no damage, no evasion, no stats. It tells
+    the player WHAT IS HAPPENING that they cannot otherwise perceive. Higher NTU
+    = more battlefield data = better decisions = fewer wasted dives = more uptime
+    = DPS via opportunity, not per-hit scaling.
+
+    This is NOT Strix-specific. NTU is a UNIVERSAL STAT. Every class benefits
+    from reading the battlefield. The READ expression differs per class:
+      - Strix: "Is this dive safe? What will I land into?"
+      - MetaKnight: "Will this target block/reflect? Will they counter my burst? Will they intercept me?"
+      - Frontliners (Adabold, etc.): LOW NTU — they can TAKE hits. Less critical to avoid damage.
+      - Healers: "Who is about to take spike damage? Where is pressure shifting?"
+
+    Frontliners have low NTU because their Defense/HP handles bad reads.
+    Glass-cannon divers have HIGH NTU because one bad read = death.
+
+  UnlockTiming: "ALL RANKS. Basic battlefield reading from Rank 1. Scales with NTU stat investment."
+  StatSource: NTU
+  RacialBase: "Featherin racial NTU base: 12 (high — predator reading is biological)"
+
+  Activation:
+    Condition: "Airborne (>30 AU) OR during dive descent OR grounded within 3s of landing"
+    Passive: true
+    Toggle: false
+    Note: "Always active when conditions met. Cannot be turned off. YOU SEE."
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # NTU THRESHOLD TABLE
+  # ─────────────────────────────────────────────────────────────────────────
+  #
+  # Each threshold ADDS information. They stack — NTU 12 gets all of 5/8/12.
+  # UI elements are non-intrusive: halos, pulses, subtle icons. NOT screen clutter.
+  #
+
+  ThresholdTable:
+
+    NTU_5:
+      Name: "Threat Ring"
+      UIElement: "Colored halo on enemies visible from altitude"
+      Reads:
+        Green: "Safe dive — no active AoEs in impact zone, target not in counter-stance"
+        Yellow: "Active AoEs present in dive path or landing zone — dodge-able but present"
+        Red: "Target will counter/shield/dodge — dive commit will be punished"
+        EnemyInfo: "See enemy HP%, active buffs/debuffs without targeting (former Predator Instinct)"
+      DesignNote: >
+        RISKY (Yellow) specifically means AoE hazards in the dive corridor or
+        landing zone. The bird sees fire on the ground and knows not to land there.
+        This is the BASE READ — available to all Strix from character creation
+        because Featherin racial NTU starts at 12 (well above 5).
+
+    NTU_8:
+      Name: "Counter Tell"
+      UIElement: "Brief icon flash showing WHAT defense the enemy will use"
+      Reads:
+        Shield: "Target will raise shield/barrier (wait for drop or flank)"
+        Dodge: "Target will sidestep (lead the dive or bait first)"
+        Reflect: "Target will reflect projectile/kinetic damage (DO NOT DIVE)"
+        Grab: "Target will attempt aerial catch/grapple on approach"
+      DesignNote: >
+        Tells the player the TYPE of counter. Strix can now PLAN around it
+        (feint dive, wait for window, attack from angle that bypasses shield).
+        MetaKnight equivalent: sees block/reflect before committing burst.
+
+    NTU_12:
+      Name: "Timing Window"
+      UIElement: "Narrow pulse on Threat Ring showing when counter is DOWN"
+      Reads:
+        WindowOpen: "Counter on cooldown — safe to commit NOW"
+        WindowClosing: "Counter returning in <2s — commit immediately or wait"
+        WindowLocked: "Counter is passive/always-on — cannot be timed, must be bypassed"
+      DesignNote: >
+        The WHEN layer. NTU 5 says 'dangerous'. NTU 8 says 'how dangerous'.
+        NTU 12 says 'when the danger window drops'. This is where good Strix
+        players convert reads into rapid-fire dives during enemy cooldown gaps.
+
+    NTU_15:
+      Name: "Predator Sight"
+      UIElement: "Reveals HIDDEN information invisible to all other perception"
+      Reads:
+        Traps: "Ground traps, buried mines, pressure plates glow through terrain"
+        HiddenEnemies: "Stealthed/burrowed/phased enemies shown as spectral outlines"
+        Ambush: "Pre-placed ambush positions highlighted before trigger radius"
+      DesignNote: >
+        This is NOT 'better dive info'. This is BATTLEFIELD AWARENESS that
+        protects the entire party. Strix at NTU 15+ is the party's eyes —
+        calling out traps before the frontliner walks into them, spotting
+        hidden enemies before the ambush triggers. Information the player
+        CANNOT obtain by any other means. Universal utility, not class-specific.
+        Any class at NTU 15+ gets equivalent hidden-threat perception.
+
+  EnemySuppression:
+    Tag: "Unpredictable"
+    Effect: "Suppresses one tier of NTU read (15→12 effective, 12→8 effective, etc.)"
+    Usage: "Boss mechanic lever. Forces reads back to lower tier during phases."
+    Stacking: "Multiple Unpredictable tags suppress multiple tiers (rare, endgame)"
+
+  ScalingWithContent:
+    Rank1Enemies: "Few counters. NTU 5 (Threat Ring) is sufficient — most targets Green."
+    Rank2Enemies: "Counters appear. NTU 8 (Counter Tell) becomes valuable — know WHAT to avoid."
+    Rank3Enemies: "Complex counter patterns. NTU 12 (Timing Window) becomes critical — know WHEN to commit."
+    Endgame: "Hidden enemies, traps, ambushes. NTU 15 (Predator Sight) reveals unseen threats."
+    Note: "NTU reads MATTER MORE as enemy complexity increases. System scales with content, not level."
+
+  DesignConstraints:
+    - "INFORMATION ONLY — no damage, no evasion, no healing, no stats"
+    - "All NTU reads are universal expressions — NOT Strix-exclusive mechanics"
+    - "Class-specific flavor (Strix sees dive corridors, MetaKnight sees burst windows) but same underlying system"
+    - "NTU gear exists — any class can invest into higher reads at opportunity cost"
+    - "Frontliners naturally de-prioritize NTU because their Defense handles bad reads"
+    - "Glass-cannons naturally prioritize NTU because they die to what they don't see coming"
+
+  SupersedesPassive: "Predator Instinct (see HP%/buffs) is FOLDED INTO Raptor's Read NTU 5 tier — always active, not a Rank 3 unlock"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 5C: FEATHER PROJECTILE SYSTEM
+# ─────────────────────────────────────────────────────────────────────────────
+
+FeatherProjectiles:
+  Philosophy: >
+    Diving isn't always smart. Low ceiling, AoE-saturated landing zones, Rank 3+
+    enemies reading your commit, or NTU read shows Red on all targets. Strix needs
+    a RANGED FALLBACK that maintains relevance without replacing the dive cycle.
+    Feather projectiles are the answer: lower DPS than diving, but consistent,
+    safe, and enabling.
+
+  CoreMechanic:
+    Name: "Pin Feathers"
+    Type: ranged_physical_projectile
+    DamageStat: DEX  # Ranged weapon → DEX for PhysATK per Base_Attributes.yaml
+    Range: "30m (thrown)"
+    Description: >
+      Strix plucks and throws sharpened flight feathers as projectiles. Low per-hit
+      damage (feathers are light, STR 6 irrelevant — damage from DEX precision
+      and feather sharpness). NOT a primary damage source. Used to:
+      1. Maintain DPS when diving is unsafe
+      2. Apply conditions at range (poison tip, elemental coat)
+      3. Trigger Exploit on pre-marked targets without committing
+      4. Harass while re-ascending (throw during ascent animation)
+    Resource: "Feather Count (passive regen, 1/3s while airborne, holds 12 max)"
+    GCD: "Shares GCD with ground combos (1.2s floor per haste system)"
+
+  GroundedRelevance: >
+    Feather throws WORK while grounded. Strix on the ground can throw feathers
+    to maintain pressure while dash-evading. This makes EVASION (SPD) more
+    relevant during ground time — you're not just waiting out Grounded Duration,
+    you're actively throwing + dodging + poisoning. SPD investment pays off as
+    both i-frame quality AND uptime-while-evading.
+
+  AerialUse: >
+    While airborne, feathers are thrown DOWNWARD — wider spread, less precision,
+    but covers area below. Used during Read phase to soften targets or apply
+    conditions before committing dive.
+
+  DamageProfile:
+    SingleFeather: "~15% of a Raptor Dive hit"
+    BurstVolley: "3 feathers rapid (Rank 3 unlock, costs 3) = ~45% of dive hit"
+    Role: "Filler, NOT replacement. Diving always wins when safe."
+    DesignCap: "Feather-only play maxes at ~40% of dive-cycle DPS. Cannot turtle at range."
+
+  FeatherTypes:
+    Standard: "Clean sharpened feather. DEX-scaled physical pierce."
+    Poisoned: "Coated in Neurotoxin. Applies 1 Neurotoxin stack on hit."
+    Elemental: "Infused with current Storm Talon element. Wind/Lightning on hit."
+    Note: "Feather type matches current weapon state — no separate selection."
+
+# ─────────────────────────────────────────────────────────────────────────────
+# FEATHERBOMB — SIGNATURE THROWN TOOL
+# ─────────────────────────────────────────────────────────────────────────────
+
+Featherbomb:
+  Type: thrown_consumable_tool
+  Description: >
+    A compressed bundle of barbed down-feathers that BURSTS on impact, showering
+    targets in clinging plumage. Feathers stick to face, eyes, joints — target
+    cannot see, cannot track, cannot aim. Creates the WINDOW for safe re-ascend
+    and immediate follow-up dive.
+
+  Mechanics:
+    Throw: "Ground or Air. 20m range. 1.5m AoE on impact."
+    Resource: "Crafted consumable (Gather/Craft system). Carries 6 max."
+    Cooldown: "None (consumable-limited). Cannot spam — must craft/buy more."
+
+  AppliesCondition:
+    Name: "Featherful"
+    Category: "Player-Inflicted Condition (Exploit.PlayerInflicted)"
+    Duration: "4s"
+    Effects:
+      AccuracyReduction: "-60% accuracy (feathers in eyes — cannot track targets)"
+      CounterSuppression: "Cannot use counter/reflect abilities (cannot SEE the incoming attack)"
+      MovementPenalty: "-30% movement speed (feathers in joints, weight on body)"
+      ThreatRingOverride: "Target shows GREEN on NTU Threat Ring for Featherful duration"
+    ExploitInteraction:
+      Enabled: true
+      Type: "PlayerInflicted"
+      ExploitBonus: "Standard Exploit bonus (DEX-scaled) on attacks vs Featherful targets"
+      Note: "Featherful is a valid Exploit condition — diving a blinded target = Exploit damage"
+
+  TacticalLoop:
+    Setup: "NTU reads Red (target will counter) → cannot dive safely"
+    Action: "Throw Featherbomb → Featherful applied (4s)"
+    Window: "Target blinded → Counter suppressed → Threat Ring flips GREEN"
+    Payoff: "Fast re-ascend → immediate dive on blinded target → Exploit bonus"
+    Counterplay: "Enemies can brush off feathers (2s channel). Bosses shake 1s. Some immune."
+
+  CraftingNote:
+    Materials: "Strix's own shed feathers (passive drop) + binding agent"
+    GatherSynergy: "Strix Gather stat determines feather regrowth rate for Featherbomb supply"
+    Economy: "Not infinite. Must be managed. Running out = no blind tool = must read better."
+
+  DesignIntent: >
+    Featherbomb is the ANSWER to PredictedDive failure state. Rank 3+ enemies
+    read your dive? Blind them first. But it's CONSUMABLE — you can't blind
+    everything forever. Forces resource management alongside read management.
+    Also gives party utility: blinded enemies are easier for everyone.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 6: RANK PROGRESSION (Design-Level)
+# ─────────────────────────────────────────────────────────────────────────────
+
+RankProgression:
+  Philosophy: >
+    Rank unlocks DIVE VARIANTS and REDUCES GROUND VULNERABILITY TIME.
+    Core loop (ascend → read → commit → recover) IDENTICAL across ranks.
+    Margins and options improve. NTU reads exist at ALL ranks (racial NTU 12).
+
+  Rank1:
+    Name: "Fledgling Talon"
+    GroundedDuration: "6s"
+    DiveTypes: "Raptor Dive only"
+    Tools: "Pin Feathers (single throw), Featherbomb (if crafted)"
+    NTUReads: "Full Raptor's Read through NTU 12 (Timing Window) — racial base covers it"
+    DesignIntent: "Full cycle with ONE dive type. Decision = when/where, not which. Simple but deep."
+
+  Rank2:
+    Name: "Proven Talon"
+    GroundedDuration: "5s"
+    NewDiveTypes: "Piercing Plunge (ST boss-killer), Scatterfall (wide AoE pack-killer)"
+    NewTools: "Dive Accelerant (+30% next dive), Feint Dive (AI manipulation)"
+    DesignIntent: "Adds DIVE CHOICE to pre-calculation. Which dive + when/where."
+
+  Rank3:
+    Name: "Apex Talon"
+    GroundedDuration: "4s"
+    NewTools: "Terminal Velocity (×7 AU scaling, 12s)"
+    NewPassives:
+      - "Feather Volley: throw 3 Pin Feathers simultaneously (burst option, costs 3 feathers)"
+      - "Thermal Mastery: descent regen → 4%/s (from 3%)"
+      - "Dive Tempo: ground combo completion reduces remaining ground time by 1s"
+    DesignIntent: "Rapid cycling. Ground = brief pause, not vulnerability window."
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 7: ROTATION PHILOSOPHY
+# ─────────────────────────────────────────────────────────────────────────────
+
+RotationPhilosophy:
+  Statement: >
+    NO fixed rotation. NO repeating button sequence. The "rotation" is the
+    DIVE CYCLE — a loop governed by altitude, Wing Stamina, and battlefield
+    state. Each cycle differs because the READ differs.
+    1. Airborne? → Read (NTU Threat Ring), mark target, prep dive.
+    2. READ right? → Commit (choose dive type).
+    3. Grounded? → Weapon combos, poison, feather throws, dash-evade, find re-ascend window.
+    4. Can re-ascend? → Lift Off. Repeat.
+  CycleTiming:
+    Minimum: "8s (instant read, shallow dive, fast ground)"
+    Optimal: "12-15s (fast reader, efficient ground)"
+    Slow: "18-20s (cautious reader, extended ground)"
+  Decision: >
+    NO fixed rotation cadence — dive when READ is right, not on timer.
+    Core flow: Ascend (2-4s) → Read (variable, NTU-assisted) → Commit Dive
+    (instant, trajectory locked) → Impact → Grounded (weapon combos + feathers + dashes)
+    → Lift Off → Repeat.
+  GCDFloor: "1.2s (per haste system). Combo finishers floor ~1.5s."
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 8: ANTI-PATTERNS
+# ─────────────────────────────────────────────────────────────────────────────
+
+AntiPatterns:
+  - Pattern: "Staying grounded voluntarily"
+    Why: "Ground = 55-60% DPS. Every second past Grounded Duration is wasted output."
+    Correct: "Re-ascend IMMEDIATELY when Grounded Duration expires."
+
+  - Pattern: "Diving without reading"
+    Why: "Unread dives miss, hit counters, or land in AoE. NTU exists — use it."
+    Correct: "Check Threat Ring. If Red → don't dive (use feathers or Featherbomb). If Green → commit."
+
+  - Pattern: "Hoarding Featherbombs"
+    Why: "Featherbombs exist to CREATE dive windows. Unused bombs = missed DPS."
+    Correct: "Use Featherbomb when NTU shows Red and you NEED to dive NOW."
+
+  - Pattern: "Ignoring feather throws during ground time"
+    Why: "Standing idle between dashes = 0 DPS. Feathers fill the gaps."
+    Correct: "Throw feathers between dash i-frames. Every GCD should be used."
+
+  - Pattern: "Treating NTU reads as optional"
+    Why: "NTU reads prevent failed dives. Failed dives = 8-15s of wasted cycle time."
+    Correct: "The READ is the skill. Always check before commit. Always."
+
+  - Pattern: "Variable dive cycle length = BAD"
+    Why: "Cycle is READ-DEPENDENT, not timer-dependent. Variable timing = correct."
+    Correct: "Accept that some cycles are 8s, some 20s. Quality over speed."
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 8b: ITEM BASELINE — WHAT THIS CLASS REPLACES
+# ─────────────────────────────────────────────────────────────────────────────
+
+ItemBaseline:
+  Philosophy: >
+    Every Strix ability must justify why it's BETTER than a consumable item
+    that does something similar. If an item matches the ability, the ability
+    has no reason to exist as a class feature.
+
+  Comparisons:
+    Dive_vs_ThrowingWeapon:
+      Item: "Heavy thrown weapon (javelin, boulder)"
+      ClassAdvantage: "×2.4 damage scaling from altitude. Items don't scale with height."
+      Verdict: "Dive wins via scaling. Items are flat damage."
+    Poison_vs_PoisonBottle:
+      Item: "Poison vial (thrown AoE DoT)"
+      ClassAdvantage: "Neurotoxin stacks to 5, triggers Exploit. Item poison is flat damage."
+      Verdict: "Class poison creates Exploit conditions. Item poison just ticks."
+    Featherbomb_vs_Flashpod:
+      Item: "Generic flash/smoke bomb"
+      ClassAdvantage: "Featherbomb specifically enables Exploit (Featherful condition). Generic flash just blinds."
+      Verdict: "Featherbomb creates offensive window + Exploit. Flash is pure defense."
+    Feathers_vs_Arrows:
+      Item: "Bow/crossbow ranged attacks"
+      ClassAdvantage: "Pin Feathers auto-regen while airborne. Arrows require quiver/purchase."
+      Verdict: "Feathers are sustainable ranged filler. Arrows require resupply investment."
+    DesignRule: >
+      Strix abilities are proactive (read → calculate → commit → exploit).
+      Items are reactive (throw NOW). The Strix is proactive (read → calculate →
+      create window → exploit). Fundamentally different engagement philosophy.
+      Items complement but cannot replace the dive cycle.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 9: DESIGN NOTES
+# ─────────────────────────────────────────────────────────────────────────────
+
+DesignNotes:
+  ResolutionDecisions:
+    AltitudeModel: "RESOLVED → Continuous 0-100 AU with 4 bands (Ground/Low/Mid/High)"
+    GroundState: "RESOLVED → Weaker but functional (55-60%). Elemental/poison weapons + feather throws."
+    DefensiveModel: "RESOLVED → Evasion (i-frame dashes) primary. Featherward emergency. No absorption."
+    RegenTiming: "RESOLVED → Starts on descent. Dive travel = recovery time."
+    WeaponType: "RESOLVED → Storm Talons (dual short blades, infusion cycling + poison)"
+    FlightVsColony: "RESOLVED → Predatory vs Utility. Altitude-as-damage vs altitude-as-positioning."
+    STR6Solution: "RESOLVED → Momentum (dive) + Weapon Properties (ground). Zero physical force."
+    NTUExpression: "RESOLVED → Raptor's Read UI. Information-only. All ranks. Racial NTU 12 base."
+    RangedFallback: "RESOLVED → Pin Feathers (DEX-scaled projectiles). Sustainable filler, not primary."
+    BlindTool: "RESOLVED → Featherbomb (consumable). Creates Featherful condition → dive window."
+
+  NTU_Universality_Note: >
+    NTU is NOT a Strix-exclusive mechanic. The Read system is UNIVERSAL.
+    MetaKnight needs NTU to: see if targets block/reflect ranged attacks,
+    detect if they'll counter precise burst windows, and especially detect
+    intercept attempts. MetaKnight's NTU expression also needs FOLLOW-UP
+    SHIELDING — post-burst breathing room that DPS classes don't get.
+    Frontliners (Adabold, Siegebreaker) have LOW NTU because their Defense
+    stat + HP pool handles misreads. They take hits; Strix cannot.
+    See: NTU_Expression_Universal.yaml (TODO: create cross-class NTU doc)
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # §25 AUDIT: LONG COOLDOWN IDENTITY SKILLS
+  # ─────────────────────────────────────────────────────────────────────────
+  # Per §25 (resource gating over cooldown gating), the following identity-adjacent
+  # skills carry long CDs (>15s). Flagged for Skills task to evaluate conversion:
+  #
+  # - Terminal Velocity (120s CD): ×7 AU scaling for 12s.
+  #   NEEDS RESOURCE GATING CONVERSION — consider altitude-spent threshold.
+  #
+  # - Dive Accelerant (45s CD): +30% next dive + 50% reduced travel.
+  #   NEEDS RESOURCE GATING CONVERSION — consider Wing Stamina overcap gate.
+  #
+  # - Raptor's Eye (60s CD): Full battlefield vision through walls.
+  #   SUPERSEDED by Raptor's Read NTU 15 (Predator Sight). Fold or remove.
+  #
+  # - Updraft Burst (30s CD): Emergency +40 AU instant altitude.
+  #   NEEDS RESOURCE GATING CONVERSION — consider ground-combo-completion gate.
+  #
+  # - Feint Dive (20s CD): Dummy dive baiting AI.
+  #   Borderline (20s). May stay as short-CD tactical tool or convert to
+  #   altitude-spend (costs 20 AU to fake-dive without damage).
+  #
+  # NOTE: Skills NOT rewritten here. Skills file handles conversion.
+  # ─────────────────────────────────────────────────────────────────────────
+
+  OpenQuestions:
+    - "Anti-air enemy catalog — which enemies have dedicated anti-air? How common?"
+    - "Ceiling height per zone — what % of content is high-ceiling vs low-ceiling?"
+    - "Party split implications — does Strix choose path?"
+    - "Altitude visual representation — how does player perceive 70 AU vs 40 AU spatially?"
+    - "Dive hit registration — what counts as 'target moved out of impact zone'?"
+    - "Storm Talon upgrade path — new elements at higher tiers?"
+    - "Weather system interaction — does wind affect flight stability?"
+    - "PvP implications — flying vs ground-only opponents?"
+    - "Featherward refresh cycling — exploitative barrier-cycling prevention?"
+    - "Neurotoxin resistance — boss poison resistance / diminishing returns?"
+    - "Featherbomb economy — how many encounters per zone? Carry limit vs demand?"
+    - "Pin Feather regen while grounded — should it be 0 or just reduced?"
+
+# ▼ CONTINUES IN: Strix_Skills.yaml
