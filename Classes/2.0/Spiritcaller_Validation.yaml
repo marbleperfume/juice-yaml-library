@@ -1,0 +1,500 @@
+# ▲ CONTINUES FROM: Spiritcaller_Design.yaml, Spiritcaller_Skills.yaml
+# ═══════════════════════════════════════════════════════════════════════════════
+# SPIRITCALLER (Tidebinder) — Validation & Balance Specification
+# ═══════════════════════════════════════════════════════════════════════════════
+
+header:
+  class_name: "Spiritcaller"
+  alternate_name: "Tidebinder"
+  file_scope: "Balance targets, matchup scenarios, pass/fail checks, §25 compliance, dual-entity efficiency"
+  design_authority: "Spiritcaller_Design.yaml"
+  skills_authority: "Spiritcaller_Skills.yaml"
+  last_updated: "2026-07-14"
+  validation_status: "Qualitative Complete — Awaiting Layer 1 Numerical Pass"
+  racial_lock: "Lower Drakol (Biological)"
+  execution_tier: "Experienced"
+  role: "Healer (Sustain / Positional / Dual-Entity)"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# BALANCE TARGETS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+balance_targets:
+  reference: "BalanceTargets.yaml — Healer baseline 65%, PureDPS mode 80%"
+
+  dps_by_mode:
+    # Mode                         | % of DPS Ref | Condition
+    healing_active_slime_far:       [53, 58]       # Slime 20-30y, attention split
+    healing_passive_slime_near:     [60, 67]       # Slime <15y on Follow, full melee
+    pure_dps_slime_damage:          [68, 75]       # Slime Damage mode, full combo
+    convergence_window:             [80, 90]       # 15s merge (free water + amp)
+    forced_ranged_only:             [25, 35]       # Torrent Lance spam (costly)
+
+  encounter_averaged:
+    perfect_play: [63, 68]   # Full melee uptime, optimal pulsing
+    average_play: [55, 62]   # Some Moisture mistakes, delayed recalls
+    poor_play:    [40, 50]   # Frequent Desiccated, Slime idle
+
+  healing_throughput_pct_party_hp_per_min:
+    slime_passive_nearby:     50   # Heal mode, close, unmodified
+    slime_repositioned:       80   # Sent to damaged allies, Surge windows
+    extreme_sacrifice:        110  # Full Moisture sacrifice, Surge + Swell spam
+    convergence_burst:        140  # Merge window only (15s cap)
+    note: "Throughput >80% costs personal DR. 110% = Desiccated imminent."
+
+  timing:
+    gcd_base: 2.0s
+    gcd_haste_cap: 1.4s
+    ogcd_lock: 0.6s
+    slime_command_lock: 0.3s
+    weave_model: single_weave_only
+
+  moisture_economy:
+    full_recharge: "~20s (Slime 0-10y, net +6-7/3s)"
+    full_recharge_intensity: "~13s (hard content +50% gen)"
+    depletion_distance: "~30s (Slime 30y+, no skills)"
+    depletion_aggressive: "~15s (Slime far + water spam)"
+    safe_extension: "~12s at 80 before danger zone (40)"
+    convergence_cycle: "30-45s normal, 20-30s hard content"
+
+  potency_bands:
+    melee_combo_avg: "~143p/GCD (100→130→200 / 3)"
+    slime_heal_per_sec: "50-67 (150-200p / 3s)"
+    slime_damage_per_sec: "17-23 (50-70p / 3s)"
+    swell_burst: 350
+    convergence_total: "600-700p equiv over 15s"
+
+  hard_caps:
+    - "DPS (Drakol + Slime) ≤ 75% of pure DPS reference"
+    - "Healing throughput ≤ 120% of Elementalist baseline"
+    - "Moisture DR + class DR ≤ 35% total (20% + 10% Scale Hardening = 30% max)"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# MATCHUP SCENARIOS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+matchup_scenarios:
+
+  sr1_dungeon_clustered:
+    name: "SR1 — Party Clustered, Simple Healing"
+    party_spread: "10-15y cluster"
+    enemy_behavior: "Attack nearest. No tactics."
+    healing_pressure: "Low (2-3% party HP/3s)"
+    spiritcaller_play:
+      slime: "Heal mode, center of cluster. Follow Ally. Nearly autonomous."
+      drakol: "Full melee combo. Undertow Slam for puddles. Depth Pressure on CD."
+      moisture: "Saturated 75-90. No drain."
+    expected:
+      dps: "68-75% ref (pure DPS mode)"
+      healing: "50% HP/min passive (sufficient)"
+      deaths: 0
+    pass_criteria:
+      - "Party HP ≥ 60% at all times"
+      - "Moisture ≥ 60 for >90% of combat"
+      - "GCD timeline = 100% damage (zero GCD heals)"
+    validation: "Comfort zone. No tension. Confirms floor."
+
+  sr2_party_split:
+    name: "SR2 — Party Split 25y, Slime Must Choose"
+    party_spread: "25-30y between groups"
+    enemy_behavior: "Path to casters. Flanking."
+    healing_pressure: "Group A taking 5-8% HP/3s without heals"
+    spiritcaller_play:
+      optimal: "Pulse pattern — send 6-9s (2-3 ticks, 300-600p) → recall → regen 4-6s → repeat"
+      moisture_timeline: "80→55 (9s extend) → recall+15=70 → regen→80 (6s) → repeat"
+      emergency: "Flash Command (15 Moisture) for instant delivery if Group A critical"
+    expected:
+      dps: "55-62% ref (attention split)"
+      healing: "60-70% HP/min on Group A (intermittent)"
+      moisture_avg: "55-75 (oscillating)"
+      deaths: "0-1"
+    pass_criteria:
+      - "Moisture never reaches 0 during normal oscillation"
+      - "Group A receives healing ≥ 50% of combat duration"
+      - "Drakol survives drain windows without external healing"
+      - "DPS ≥ 53% reference"
+    validation: "THE core tension scenario. Oscillation pattern = intended gameplay."
+
+  sr3_enemies_exploit_separation:
+    name: "SR3 — Intelligent Enemies Target Drakol During Deployment"
+    enemy_behavior: "Boss AoE displaces allies from Slime. Adds target Drakol."
+    healing_pressure: "High (8-12% party HP/3s)"
+    spiritcaller_play:
+      slime: "Unpredictable positioning. Flash Command to dodge boss knockback timing."
+      survival: "Scale Hardening for adds. Brine Armor when Moisture ≥60. Time extensions to add downtime."
+      moisture: "Hovering 50-70 (lean). Convergence for transitions."
+    expected:
+      dps: "48-55% ref (survival + repositioning)"
+      healing: "75-85% HP/min (Surge windows)"
+      moisture_avg: "45-65 (lean)"
+      deaths: "0-1 (Moisture mismanagement = death)"
+    pass_criteria:
+      - "Drakol survives ≥80% of encounter"
+      - "Healing meets encounter check (no party wipe)"
+      - "Flash Command used ≥2 times reactively"
+      - "Convergence used ≥1 during transition"
+      - "Moisture never flatlines at 0 for >6s"
+    validation: "Confirms Slime invulnerability ≠ free pass. Enemies exploit DRAKOL vulnerability."
+
+  aquatic_environment:
+    name: "Aquatic — Slime at Full Power, Environmental Advantage"
+    environment: "Underwater (Moisture locked 100) or flooded (+6/3s)"
+    spiritcaller_play:
+      slime: "Permanent max-range deployment. No recall needed."
+      drakol: "Full melee + water skills without DR penalty."
+      attention: "Reduced — no Moisture monitoring. Focus on positioning optimization."
+    expected:
+      dps: "75-85% ref (ceiling case)"
+      healing: "90-100% HP/min (permanent Surge-eligible)"
+      moisture: "95-100"
+      deaths: 0
+    pass_criteria:
+      - "DPS ≤ 85% reference (healer cap holds even in ideal conditions)"
+      - "Healing ≤ 120% of Elementalist (hard cap)"
+      - "Advantage = COMFORT not POWER (removes tension, doesn't break caps)"
+    validation: "Removes tension, not skill. Caps still hold. Vacation scenario."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# PASS/FAIL VALIDATION CHECKS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+validation_checks:
+
+  identity:
+    VAL-ID-01: {check: "Zero GCD heals", status: "PASS"}
+    VAL-ID-02: {check: "Melee physical DPS (trident)", status: "PASS"}
+    VAL-ID-03: {check: "Slime invulnerable (no HP/targeting)", status: "PASS"}
+    VAL-ID-04: {check: "Moisture = defense, not mana", status: "PASS"}
+    VAL-ID-05: {check: "Core tension present SR2+", status: "PASS"}
+    VAL-ID-06: {check: "Easy hands, hard brain", status: "PASS"}
+    VAL-ID-07: {check: "Bio race lock justified", status: "PASS"}
+    VAL-ID-08: {check: "MED-primary through Slime delivery", status: "PASS"}
+
+  mechanical:
+    VAL-MC-01: {check: "§25 CD compliance", status: "PASS", note: "All 11 flagged → converted."}
+    VAL-MC-02: {check: "Deterministic crit (no RNG)", status: "PASS"}
+    VAL-MC-03: {check: "No burst cadence alignment", status: "PASS"}
+    VAL-MC-04: {check: "Single-weave model", status: "PASS"}
+    VAL-MC-05: {check: "No fixed rotation", status: "PASS"}
+    VAL-MC-06: {check: "Moisture oscillation (not flatline)", status: "PASS"}
+    VAL-MC-07: {check: "Anti-patterns respected", status: "PASS"}
+
+  balance:
+    VAL-BL-01: {check: "DPS while healing ≤65%", status: "PASS (qual)", note: "53-67%."}
+    VAL-BL-02: {check: "Pure DPS ≤80%", status: "PASS (qual)", note: "68-75%."}
+    VAL-BL-03: {check: "Convergence ≤90%", status: "PASS (qual)", note: "80-90% for 15s."}
+    VAL-BL-04: {check: "Healing ≤120% Elementalist", status: "PASS"}
+    VAL-BL-05: {check: "DR total ≤35%", status: "PASS", note: "30% max."}
+    VAL-BL-06: {check: "Encounter-avg near 65% baseline", status: "PASS (qual)"}
+
+  moisture_gauge:
+    VAL-MG-01: {check: "SR1 maintenance 60-80%", status: "PASS"}
+    VAL-MG-02: {check: "SR2 maintenance 45-70%", status: "PASS"}
+    VAL-MG-03: {check: "SR3 maintenance 35-60%", status: "PASS"}
+    VAL-MG-04: {check: "Desiccated recovery ≤6s", status: "PASS", note: "Recall+15 → +8/3s = 23 in 3s."}
+    VAL-MG-05: {check: "Environment cap = comfort not invulnerability", status: "PASS"}
+
+  slime_healing:
+    VAL-SH-01: {check: "Passive HoT covers SR1 demand", status: "PASS"}
+    VAL-SH-02: {check: "Swell Burst provides burst healing", status: "PASS"}
+    VAL-SH-03: {check: "Spirit Surge meets SR3 heal checks", status: "PASS"}
+    VAL-SH-04: {check: "8y radius covers party stacks", status: "PASS"}
+
+  generate_water_economy:
+    VAL-GW-01: {check: "Passive trickle (+1/3s) exists", status: "PASS"}
+    VAL-GW-02: {check: "Slime proximity is PRIMARY gen (+8/3s)", status: "PASS"}
+    VAL-GW-03: {check: "Puddle alternative gen (+4/3s)", status: "PASS"}
+    VAL-GW-04: {check: "Economy supports ~2 water skills per cycle", status: "PASS"}
+    VAL-GW-05: {check: "Convergence 30-45s cycle achievable", status: "PASS"}
+
+  leash_distance:
+    VAL-LD-01: {check: "20-30y range = meaningful decisions", status: "PASS"}
+    VAL-LD-02: {check: "40y+ doubled penalty = prevents perma-deploy", status: "PASS"}
+    VAL-LD-03: {check: "60y auto-teleport = no soft-lock", status: "PASS"}
+    VAL-LD-04: {check: "150% Slime speed = reposition in 1-2 GCDs", status: "PASS"}
+    VAL-LD-05: {check: "Flash Command fills emergency gap", status: "PASS"}
+
+  dual_entity_efficiency:
+    VAL-DE-01: {check: "Slime commands never consume GCD", status: "PASS"}
+    VAL-DE-02: {check: "0.3s lock = no GCD clipping", status: "PASS"}
+    VAL-DE-03: {check: "1.0s Direct Spirit = every other GCD", status: "PASS"}
+    VAL-DE-04: {check: "Mode switch 2.0s prevents spam-toggle", status: "PASS"}
+    VAL-DE-05: {check: "DPS timeline uninterrupted by healing", status: "PASS"}
+
+  party_role:
+    VAL-PR-01: {check: "Clear role (positional healer + terrain)", status: "PASS"}
+    VAL-PR-02: {check: "Not redundant with Elementalist/Siren", status: "PASS"}
+    VAL-PR-03: {check: "Cross-class puddle combos provide value", status: "PASS"}
+
+  content_design:
+    VAL-CD-01: {check: "Aquatic bonus not required", status: "PASS"}
+    VAL-CD-02: {check: "Terrain neither required nor ignored", status: "REQUIREMENT (pending)"}
+    VAL-CD-03: {check: "SR3+ exploits Moisture vulnerability", status: "REQUIREMENT (pending)"}
+    VAL-CD-04: {check: "Split-party ≥1 per dungeon", status: "REQUIREMENT (pending)"}
+
+  summary:
+    total: 42
+    pass: 35
+    pass_qualitative: 4
+    requirements_pending: 3
+    fail: 0
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# §25 COMPLIANCE
+# ═══════════════════════════════════════════════════════════════════════════════
+
+section_25_compliance:
+  rule: "Identity-defining skills gated by resource, not arbitrary timers ≥90s."
+  design_file_flagged: 11  # Pre-fix version
+
+  audit_result:
+    # Skill              | Old CD  | New Gate                        | Status
+    flash_command:        ["30s",   "15 Moisture + 1.0s recast",     "PASS"]
+    spirit_surge:         ["60s",   "30 Moisture + 3s recast",       "PASS"]
+    tidal_convergence:    ["180s",  "100 Moisture + proximity req",  "PASS"]
+    aqua_veil:            ["90s",   "35 Moisture + 3s setup",        "PASS"]
+    ancestral_bond:       ["120s",  "25 Moisture + distance req",    "PASS"]
+    brine_armor:          ["90s",   "Moisture ≥60 threshold",        "PASS"]
+    drakol_roar:          ["60s",   "15s tactical (reduced)",        "PASS"]
+    swell_burst:          ["20s",   "10 Moisture + 5s recast",       "PASS"]
+    torrent_wave:         ["25s",   "15 Moisture + 8s recast",       "PASS"]
+    maelstrom:            ["30s",   "30 Moisture (no CD)",           "PASS"]
+    scale_hardening:      ["30s",   "30s kept (non-identity)",       "PASS"]
+
+  retained_cooldowns:
+    hydro_barrier: {cd: "45s", reason: "Utility shield, not identity."}
+    scale_hardening: {cd: "30s", reason: "Personal mitigation, non-identity."}
+    drakol_roar: {cd: "15s", reason: "Under §25 limit."}
+    depth_pressure: {cd: "8s", reason: "Under §25 limit."}
+
+  no_dead_identity: >
+    Between Convergences: Moisture-gated commands (Flash, Surge, Swell, Wave,
+    Bond, water skills) + banking via Slime proximity + positioning micro.
+    Zero seconds of "waiting for CD" exist in this kit. §25 FULLY COMPLIANT.
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# DUAL-ENTITY EFFICIENCY ANALYSIS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+dual_entity_efficiency:
+  core_question: "Can Drakol maintain full DPS while directing Slime heals?"
+  answer: "YES with SR-dependent attention tax."
+
+  attention_tax:
+    # SR    | DPS Loss | Cause
+    sr1:     ["0-3%",   "Slime on Follow. Autonomous."]
+    sr2:     ["5-12%",  "2-4 repositions/min. Brief decision pauses."]
+    sr3:     ["12-20%", "8-12 repos/min. Flash Commands. Active monitoring."]
+    sr4:     ["15-25%", "Constant micro. Every GCD includes positioning decision."]
+
+  why_loss_is_small:
+    - "Commands are oGCD (0.3s). Never clip GCD."
+    - "Combo deliberately simple (3-hit). No execution bandwidth needed."
+    - "Loss manifests as missed positionals, not dropped GCDs."
+
+  why_loss_exists:
+    - "Delayed positional crits (watching gauge instead of enemy rear)"
+    - "Suboptimal combo choice (attention elsewhere)"
+    - "Melee disengagement for distance adjustment"
+    - "Cast-time skills skipped to weave Slime commands"
+    - "Decision fatigue in extended encounters"
+
+  optimal_attention_cycle:
+    pattern: "GCD → 0.3s command weave → check Moisture → GCD → evaluate → GCD → redirect if needed"
+    repos_per_min: "8-12 during active healing"
+    mode_switches_per_encounter: "3-5"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# WEAKNESS BUDGET
+# ═══════════════════════════════════════════════════════════════════════════════
+
+weakness_budget:
+
+  fire_and_heat:
+    severity: "HIGH"
+    mechanism: "Desert/volcanic: -3 to -4 additional Moisture/3s"
+    impact: "Safe window shrinks 12s→7-8s. Puddles evaporate 50% faster."
+    slime: "UNAFFECTED (invulnerable spirit). Only Drakol skin dries."
+    counterplay: "Stay near water sources. Shorter extension distances. Puddle self-anchoring."
+
+  anti_magic_environments:
+    severity: "LOW-MODERATE"
+    mechanism: "Anti-magic fields suppress magical effects"
+    slime_status: "Spirit NOT disabled (no HP to drain). Movement unaffected. Moisture gen unaffected."
+    suppressed: "Slime healing/damage -50% in field. Water GCD skills fully suppressed in zone."
+    intact: "Moisture gauge (biological). Melee combo. Slime movement."
+    counterplay: "Position Slime outside field edge. Pre-place puddles. Physical combo only inside."
+
+  forced_separation:
+    severity: "CRITICAL"
+    mechanism: "Mechanic forces 40y+ distance or prevents recall"
+    impact: "Doubled drain (-10/3s). Desiccated in ~10s from full. Death probable if sustained 15s."
+    counterplay: "Pre-bank to 100. Scale Hardening. Brine Armor. Stand in puddle (+4/3s offset)."
+    design_intent: "THE primary encounter counter. Requires planning. Catches unprepared players."
+
+  multi_burst_heal_demand:
+    severity: "MODERATE-HIGH"
+    mechanism: "3+ allies need immediate heals, spread beyond 8y radius"
+    impact: "Slime covers 1-2 clusters only. No GCD backup heal exists."
+    counterplay: "Flash Command rapid-fire (15 Moisture each). Torrent Wave (15y line). Convergence if central."
+    design_intent: "Weakness vs Elementalist (targeted heals anywhere). SC answers with planning not reaction."
+
+  melee_disengagement:
+    severity: "MODERATE"
+    mechanism: "Knockback / forced movement out of 4y range"
+    impact: "DPS drops to 25-35% (Torrent Lance at 15 Moisture each). Healing UNAFFECTED."
+    counterplay: "Tidal Rush (gap close, 10 Moisture). Skewering Dive (15y lunge). Accept 1-2 ranged GCDs."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# TERRAIN INTERACTION VALIDATION
+# ═══════════════════════════════════════════════════════════════════════════════
+
+terrain_interaction:
+
+  puddle_sources:
+    # Source          | Size  | Duration | Cost          | Condition
+    slime_presence:    ["3y",  "refresh 6s", "0",         "Heal/Damage mode"]
+    undertow_slam:     ["3y",  "15s",        "0 Moisture", "AoE combo finisher"]
+    riptide_slash:     ["4y",  "15s",        "20 Moisture","GCD water skill"]
+    geyser_strike:     ["5y",  "20s",        "25 Moisture","Cast GCD"]
+    maelstrom:         ["8y",  "25s",        "30 Moisture","Long cast GCD"]
+    tidal_rush:        ["trail","15s",        "10 Moisture","Dash GCD"]
+
+  coverage_timeline:
+    minute_1: "15-25%"
+    minute_2: "30-45%"
+    minute_3: "40-60% (saturation target)"
+    steady_state: "45-55% (create ≈ expire)"
+
+  cross_class_combos:
+    fire_puddle: {result: "STEAM — enemy LoS block 5s. Allies see through.", balance: "Puddle consumed."}
+    ice_puddle: {result: "FROZEN GROUND — 50% prone, -50% move, 8s.", balance: "Puddle consumed."}
+    lightning_puddle: {result: "CONDUCTION — AoE damage in puddle. SC immune.", balance: "Puddle consumed."}
+    wind_puddle: {result: "MIST CLOUD — ally HoT + accuracy debuff, drifts, 10s.", balance: "Puddle consumed."}
+    earth_puddle: {result: "MUD — -40% move, no dash, 12s.", balance: "Puddle consumed."}
+    validation: "All combos consume the puddle (one-time per placement). Requires two-class coordination."
+
+  water_traversal:
+    drakol_advantages:
+      - "No swim penalty (others: -30 to -50%)"
+      - "Underwater breathing (innate)"
+      - "Moisture locked 100 underwater"
+      - "Slime unimpeded by water"
+    balance_check: "Comfort bonus (removes tension) not power bonus (caps still hold)."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SYSTEM INTERACTIONS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+system_interactions:
+
+  strategy_rank_scaling:
+    sr1: {enemy: "Ignore Slime. Attack nearest.", sc_difficulty: "Trivial"}
+    sr2: {enemy: "Path to casters. Ignore Slime.", sc_difficulty: "Low-Moderate"}
+    sr3: {enemy: "AoE displaces from Slime. Adds target Drakol.", sc_difficulty: "High"}
+    sr4: {enemy: "Exploit separation. Force movement. Anti-terrain.", sc_difficulty: "Expert"}
+
+  above_50_hp_rule:
+    interaction: >
+      Passive HoT ticks (150-200p/3s) naturally hold allies at 50-70% —
+      ideal zone. Sustained low-throughput model inherently respects the rule.
+      Swell Burst may push above 50% on low-HP allies — acceptable for stabilization.
+    verdict: "PASS — passive HoT model uniquely suited to >50% rule."
+
+  item_baseline:
+    # Item                   | Item                            | SC                      | Δ
+    healing_specter:          ["Stationary, duration-limited",  "Mobile, permanent",     "∞ duration"]
+    harmony_draught:          ["Single target, consumed",       "Multi-target, free",    "No cost"]
+    rejuvenation_flask:       ["Thrown burst, single use",      "Repeatable, adaptive",  "Unlimited"]
+    scout_familiar_scroll:    ["30s reveal, consumed",          "Permanent multi-role",  "Scout+heal+damage"]
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# CONSTRAINTS & INVARIANTS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+constraints:
+
+  hard_invariants:
+    INV-01: "Zero GCD heals. All healing = Slime."
+    INV-02: "Slime cannot die/be destroyed/become unavailable."
+    INV-03: "Moisture range exactly 0-100."
+    INV-04: "DR linear 0.2%/point. At 0 = -10% penalty."
+    INV-05: "Slime commands oGCD only (0.3s lock)."
+    INV-06: "No identity CD >15s (§25)."
+    INV-07: "Intensity scales generation only, never reduces costs."
+    INV-08: "Total DPS ≤ 75% of pure DPS reference."
+    INV-09: "Healing ≤ 120% of Elementalist."
+    INV-10: "Slime not targetable/CC-able/suppressible."
+
+  soft_constraints:
+    CON-01: ["Leash distance",        "20-30y",  "15-35y"]
+    CON-02: ["DR per Moisture point",  "0.2%",   "0.15-0.25%"]
+    CON-03: ["Heal tick rate",         "3s",     "2.5-4s"]
+    CON-04: ["Swell Burst CD",         "5s",     "4-8s"]
+    CON-05: ["Flash Command cost",     "15",     "10-20"]
+    CON-06: ["Convergence cost",       "100",    "80-100"]
+
+  boundary_conditions:
+    - {condition: "SR1, Slime close", outcome: "~70% DPS, 50% HPS, no stress."}
+    - {condition: "Slime 30y, healing allies", outcome: "12s safe → recall."}
+    - {condition: "Moisture 0, Slime 40y", outcome: "Desiccated. Recall = 6s recovery."}
+    - {condition: "Underwater", outcome: "Moisture locked. Tension absent."}
+    - {condition: "Desert, Slime 25y", outcome: "~8s to danger (fast drain)."}
+    - {condition: "3× Flash Command in 5s", outcome: "45 Moisture gone. DR collapse."}
+    - {condition: "Convergence → exit into AoE", outcome: "0 Moisture + damage = death unless planned."}
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# TUNING LEVERS & OPEN QUESTIONS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+tuning_levers:
+  if_too_strong:
+    - "Reduce heal potency (200p→150p/tick)"
+    - "Increase distance decay rates"
+    - "Reduce Convergence duration (15s→12s)"
+    - "Increase Flash Command cost (15→20)"
+    - "Reduce Slime speed (150%→130%)"
+  if_too_weak:
+    - "Increase heal potency (200p→250p)"
+    - "Reduce 20-30y decay (-5→-3/3s)"
+    - "Increase Recall bonus (+15→+20)"
+    - "Reduce Convergence cost (100→80)"
+    - "Extend safe window (12s→15s)"
+
+open_questions:
+  - "Potency → damage at benchmark STR; heal → HP at benchmark MED"
+  - "Slime speed in absolute units (m/s)"
+  - "8y radius vs standard party stack width"
+  - "Puddle overlap stacking behavior"
+  - "Anti-magic: exact spirit vs magical boundary"
+  - "Convergence exit lethality at target stat levels"
+
+integration_tests:
+  - "SC + Shaman: Frozen ground frequency from puddle combos"
+  - "SC + Fire DPS: Steam generation rate and LoS management"
+  - "SC + Madolt: Slime Follow Ally HPS vs frontliner incoming"
+  - "SC + Reaver: puddle Soaked setup for pursuit synergy"
+  - "2× SC party: puddle overlap + healing redundancy rules"
+  - "SC vs SR4 boss: Moisture pressure sufficient for tension"
+  - "SC solo: DPS + self-heal viable for Rank 1"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# VISUALIZATION HOOKS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+visualization_hooks:
+  real_time:
+    - {hook: "moisture_gauge", type: "Droplet gauge, Blue→Yellow→Red→Cracked"}
+    - {hook: "slime_tether", type: "Blue line Drakol↔Slime, color shifts with distance"}
+    - {hook: "slime_mode", type: "Slime color per mode (blue/green/red)"}
+    - {hook: "puddle_overlay", type: "Blue tint on puddled terrain"}
+    - {hook: "desiccated_warn", type: "Cracked edges + scale model + tone"}
+
+  post_encounter:
+    moisture_grade: {formula: "time_above_40 / total × 100", target: "≥75%"}
+    slime_efficiency: {formula: "heals_on_damaged / total_heals", target: "≥60%"}
+    terrain_coverage: {formula: "puddle_area / arena at min 3", target: "40-60%"}
+    dual_entity_uptime: {formula: "slime_active / combat_time", target: "≥95%"}
+    attention_efficiency: {formula: "actual_dps / potential_dps", target: "≥80%"}
+
+# ▼ AWAITING: Layer 1 Spatial Quantification Pass
