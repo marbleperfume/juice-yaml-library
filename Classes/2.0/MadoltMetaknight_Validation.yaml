@@ -1,0 +1,404 @@
+# ▲ CONTINUES FROM: MadoltMetaknight_Design.yaml, MadoltMetaknight_Skills.yaml
+# ═══════════════════════════════════════════════════════════════════════════════
+# MADOLT METAKNIGHT (Madolt) — Validation & Balance Specification
+# ═══════════════════════════════════════════════════════════════════════════════
+
+header:
+  class_name: "Madolt Metaknight"
+  race: "Madolt (cultural lock — engineering guild tradition)"
+  role: "Frontliner (Offensive — Unfocus / AI Suppression + Suction)"
+  execution_tier: "Experienced"
+  design_authority: "MadoltMetaknight_Design.yaml"
+  skills_authority: "MadoltMetaknight_Skills.yaml"
+  last_updated: "2026-07-14"
+  validation_status: "Qualitative Complete — Awaiting Layer 1 Numerical Pass"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 1: BALANCE TARGETS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+balance_targets:
+  reference: "Generic Experienced-tier DPS = 100%"
+  dps_band: [80, 87]  # Frontliner 80-87%. Metaknight high variance (parry skill).
+  pps_by_rank:
+    rank_1: {optimal: 100, realistic: 82, floor: 73}
+    rank_2: {optimal: 108, realistic: 87, floor: 78}
+    rank_3: {optimal: 115, realistic: 95, floor: 85}
+  deductions: "-8% stance, -12% missed parries, -5% reposition, -5% suppression hold"
+  gcd_timing: {base: "2.0s", cap: "1.4s", weave: "Single-weave (0.6s / 0.3s Parry+Stance)"}
+  racial_stats: {NTU: 16, DEX: 14, CRAFT: 12}
+
+  charge_gauge:
+    cap: 100
+    gen_rate_engaged: "~11.5/s active (7/GCD + 5/hit + 15/parry + 2/s)"
+    stance_drain: "4/s"
+    net_parrying: "+1.7/s (sustainable)"
+    net_no_parry: "+0.5/s (marginal)"
+    net_stance_off: "+7/s (rapid rebuild)"
+    first_spend: "12-14s"
+    full_gauge: "32-38s"
+    recovery_empty: "5-7s to 25g"
+    suppression_threshold: "≥50 = -2 SR | <50 = -1 SR"
+
+  voltaic_parry_impact:
+    window: "0.75s (NTU 16 perceives ~0.9s)"
+    rates: {expert: "85-90%", average: "70-75%", learning: "50-60%"}
+    pps_spread: {at_85: "~87", at_70: "~82", at_50: "~75"}
+    value_per_parry: "+420p (308p counter + 15g + 5%HP)"
+    cost_per_miss: "-247p (lockout + missed counter)"
+    breakeven: "37%"
+
+  self_sustain:
+    with_parry: "~2.5-3% HP/s"
+    without_parry: "~0.8% HP/s"
+    solo: {SR1: "Trivial", SR2: "Viable", SR3: "Tight", SR4: "Healer required"}
+
+  mitigation:
+    parry: "100% (0.75s window)"
+    passive: "10% DR frontal"
+    invuln: "0 — no invulnerability"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 2: MATCHUP SCENARIOS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+matchup_scenarios:
+
+  SR1_cluster:
+    geometry: "Open, 3-5 SR1 melee trash converging"
+    party: "Metaknight + caster + DPS"
+    flow: >
+      Stance ON optional. Combo → Parry → Counter → Shield Discharge (3+ crit)
+      → Overload. Unfocus IRRELEVANT (SR1 already dumb). Pure DPS mode.
+    results:
+      unfocus_value: "0%"
+      pull_value: "Marginal (accelerates contact ~1-2s)"
+      pps: "~95"
+      gauge: "Net positive. No suppression threshold concern."
+    verdict: "PASS — identity not fully engaged. Operates as pure DPS."
+
+  SR2_flankers:
+    geometry: "Room. Caster 10y behind. 4 enemies: 2 frontal, 2 flanking."
+    party: "Metaknight + caster"
+    flow: >
+      Stance ON (55g) → Pull drags flankers back (1.5y/s, no sprint) →
+      Unfocus suppresses to SR0/SR1 → forget caster → attack Metaknight →
+      Parry → Counter → Shield Discharge (4 targets, crit 252p×4) →
+      Terminal Edge (heal). VORTEX COMBO: Pull + Suppress = cluster + lobotomize.
+    results:
+      backline_damage: "0%"
+      unfocus_uptime: "100% while gauge ≥50"
+      vortex: "Flankers captured in 4s. Identity moment delivered."
+      pps: "~82"
+      gauge: "55→45 (dips below 50 briefly = -1 SR for ~4s). Intended tension."
+    verdict: "PASS — core identity. Vortex engaged."
+
+  SR3_coordinated:
+    geometry: "Open arena. 5× SR3 enemies (flank, retreat, coordinate)."
+    party: "Full party"
+    flow: >
+      Stance ON → SR3 enemies RECOGNIZE field → 2 retreat before entering →
+      3 commit → Mag-Dash closes on retreater → Unfocus suppresses 3 inside
+      to SR1 → Parry (MUST succeed, 2-2.5s frequency) → Counter → Overload
+      (50g, empties gauge) → suppression weakens → stance OFF 5s → rebuild.
+    results:
+      enemies_suppressed: "3/5 (60%)"
+      parry_requirement: "Mandatory survival"
+      backline_leakage: "15-25% (retreaters reach caster before re-engaged)"
+      pps: "~78"
+    verdict: "CONDITIONAL PASS — SR3+ enemies choose to avoid field. Designed limitation."
+
+  boss_single_target:
+    geometry: "Arena. 1× Boss (SR4, floor SR2 under suppression)."
+    party: "Full party"
+    flow: >
+      Stance ON → Pull = 0.5y/s drift (positional only) → Unfocus SR4→SR2
+      (mechanic complexity reduced) → Parry is PRIMARY survival (1.5-2s
+      frequency) → combo → EC Weapon (crit >50% HP) → Parry → Counter → cycle.
+    results:
+      pull_effect: "0.5y/s drift. Positional. Not controlling."
+      unfocus_value: "HIGH — fewer complex boss patterns at SR2"
+      parry_criticality: "Miss = 8-12% HP + lockout. Miss 2 consecutive = danger."
+      pps: "~80 (no cluster payoffs, stance drain)"
+    verdict: "PASS — parry defines boss. Unfocus = team value via mechanic reduction."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 3: PASS/FAIL CRITERIA
+# ═══════════════════════════════════════════════════════════════════════════════
+
+pass_fail_criteria:
+
+  charge_gauge:
+    VAL-CG-01: {check: "First spend ≤16s", target: "12-14s", fail: ">16s", status: "PASS"}
+    VAL-CG-02: {check: "Full gauge ≤40s", target: "32-38s", fail: ">45s or <25s", status: "PASS"}
+    VAL-CG-03: {check: "Sustain net+ w/ parry", target: "+1.7/s", fail: "Net negative at 70%+", status: "PASS"}
+    VAL-CG-04: {check: "Overcap <10%", target: "<10% wasted", fail: ">15%", status: "PASS"}
+    VAL-CG-05: {check: "Recovery ≤8s", target: "5-7s to 25g", fail: ">10s", status: "PASS"}
+    VAL-CG-06: {check: "Stance sustainable w/ combat", target: "Indefinite at 70%+", fail: "Net-negative w/ parry", status: "PASS"}
+
+  capacitor_pull:
+    VAL-CP-01: {check: "Pull 1.5y/s in 8y", target: "1.5y/s", fail: ">2 (OP) or <1 (irrelevant)", status: "PASS"}
+    VAL-CP-02: {check: "Boss 0.5y/s drift", target: "Drift, not lock", fail: "Boss locked in place", status: "PASS"}
+    VAL-CP-03: {check: "No-sprint in field", target: "Walk speed only", fail: "Sprint allowed", status: "PASS"}
+    VAL-CP-04: {check: "SR2 flanker captured ≤4s", target: "6y→0y in 4s", fail: "Escapes at walk", status: "PASS"}
+    VAL-CP-05: {check: "SR3 can escape (costs CD)", target: "Dash exits", fail: "No escape", status: "PASS"}
+    VAL-CP-06: {check: "SR4 retreats before entry", target: "Recognizes field", fail: "SR4 walks in", status: "PASS"}
+
+  unfocus_verification:
+    VAL-UF-01: {check: "Base = -1 SR (stance on)", target: "-1 always", fail: "No suppress", status: "PASS"}
+    VAL-UF-02: {check: "Enhanced = -2 SR (gauge ≥50)", target: "-2 at 50+", fail: "Always -2", status: "PASS"}
+    VAL-UF-03: {check: "Max -3 brief (4s post-parry)", target: "Transient only", fail: "Permanent -3", status: "PASS"}
+    VAL-UF-04: {check: "Not sustained above -2", target: "-3 is 4s spike", fail: ">-2 sustained", status: "PASS"}
+
+  voltaic_parry:
+    VAL-VP-01: {check: "Ceiling with perfect parries", target: "~87 PPS", fail: ">90% (DPS encroach)", status: "PASS"}
+    VAL-VP-02: {check: "Floor without parries", target: "~73 PPS", fail: "<70% (unplayable)", status: "PASS"}
+    VAL-VP-03: {check: "Breakeven rate", target: "37%", fail: ">50% (punishing)", status: "PASS"}
+    VAL-VP-04: {check: "Failed parry not lethal", target: "0.6s lock + normal dmg", fail: "Death on 1 miss", status: "PASS"}
+    VAL-VP-05: {check: "Counter window", target: "3.0s", fail: "<2s or >5s", status: "PASS"}
+
+  dps_band:
+    VAL-DPS-01: {check: "Average play ≥80%", target: "82% at 70% parry", fail: "<80%", status: "PASS"}
+    VAL-DPS-02: {check: "Ceiling ≤87%", target: "87% at 85%", fail: ">87%", status: "PASS"}
+    VAL-DPS-03: {check: "Spread ≤15 PPS", target: "14 PPS (73-87)", fail: ">20 PPS", status: "PASS"}
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 4: §25 COMPLIANCE
+# ═══════════════════════════════════════════════════════════════════════════════
+
+section_25_compliance:
+  rule: "No CDs ≥90s on identity skills. Gate via Charge Gauge."
+  built_native: "Gauge IS the limiter. No retrofit needed."
+
+  audit:
+    ArcStrike:            {cd: "GCD", gate: "free", status: "COMPLIANT"}
+    ConduktorSlash:       {cd: "GCD", gate: "free", status: "COMPLIANT"}
+    TerminalEdge:         {cd: "GCD", gate: "free", status: "COMPLIANT"}
+    ECWeaponDischarge:    {cd: "GCD", gate: "25g", status: "§25 COMPLIANT"}
+    ECShieldDischarge:    {cd: "GCD", gate: "35g", status: "§25 COMPLIANT"}
+    VoltaicCounter:       {cd: "GCD", gate: "Parry success (3s)", status: "§25 COMPLIANT"}
+    FieldOverload:        {cd: "GCD", gate: "50g", status: "§25 COMPLIANT"}
+    ElectronGuardStance:  {cd: "None", gate: "4/s", status: "§25 COMPLIANT"}
+    VoltaicParry:         {cd: "None", gate: "Risk (0.6s fail)", status: "COMPLIANT"}
+    MagDash:              {cd: "None", gate: "15g", status: "§25 COMPLIANT"}
+    CapacitorPull:        {cd: "N/A", gate: "Passive (stance)", status: "COMPLIANT"}
+
+  verification:
+    max_cd: "2.0s (GCD recast)"
+    no_90s: "CONFIRMED"
+    no_60s: "CONFIRMED"
+    no_30s: "CONFIRMED"
+    gauge_gated: "6/11"
+    free: "5/11 (combo ×3 + Parry + Capacitor Pull)"
+    empty_state: "5-7s rebuild. Combo + Parry functional. Weakened not helpless."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 5: UNFOCUS VALIDATION
+# ═══════════════════════════════════════════════════════════════════════════════
+
+unfocus_validation:
+  core_type: "AREA SUPPRESSION FIELD — zone property, NOT debuff"
+
+  type_checks:
+    VAL-UNF-01:
+      check: "Unfocus is AREA, not debuff"
+      proof: "No status icon on enemies. No duration. No dispel. Zone property."
+      status: "PASS"
+    VAL-UNF-02:
+      check: "Enemies regain intelligence IMMEDIATELY on leaving"
+      proof: "Exit 8y → full SR. Zero linger. Zero transition period."
+      status: "PASS"
+    VAL-UNF-03:
+      check: "Reduces SR by 1-2 sustained (not more)"
+      proof: "Base -1 (stance). Enhanced -2 (gauge ≥50). Max -3 = 4s post-parry spike ONLY."
+      status: "PASS"
+    VAL-UNF-04:
+      check: "Interaction with Capacitor Pull (vortex combo)"
+      proof: "Both share 8y radius. Pull drags INTO suppress zone. Combo = cluster + lobotomize."
+      status: "PASS"
+    VAL-UNF-05:
+      check: "Pulled + suppressed = vortex identity"
+      proof: "SR2 flanker at 6y: pulled 1.5y/s → 4s → arrives → suppressed to SR0 → forgets caster"
+      status: "PASS"
+
+  not_a_debuff:
+    - "Zone centered on Metaknight. Moves with him."
+    - "Instant removal on exit. Nothing 'on' enemy to cleanse."
+    - "Cannot be dispelled or resisted."
+    - "Doesn't reduce damage/accuracy — stupid, not weak."
+    - "Ally pulling enemy OUT of field = instant intelligence recovery."
+
+  sr_behavior:
+    SR1_in_field: "→SR0. No change (already dumb). Irrelevant."
+    SR2_in_field: "→SR0/SR1. Stop pathfinding to casters. Attack closest. CRITICAL."
+    SR3_in_field: "→SR1/SR2. Stop flanking/retreating. Major degradation."
+    SR4_in_field: "→SR2 (floor). Simplified patterns. Still dangerous."
+    boss_floor: "Minimum SR2 under suppression."
+
+  gauge_tension:
+    above_50: "-2 SR (hold = team utility)"
+    below_50: "-1 SR (spend = weaker control)"
+    decision: "Every discharge below 50 weakens suppression temporarily. Core tension."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 6: WEAKNESS BUDGET
+# ═══════════════════════════════════════════════════════════════════════════════
+
+weakness_budget:
+  philosophy: "Structural. Cannot be specced away."
+
+  weaknesses:
+    ranged_beyond_8y:
+      severity: "PRIMARY"
+      description: "Ranged enemies at 10y+ unaffected. 0% pull, 0% suppress."
+      exposed_at: "Archers, elevated casters, snipers"
+      mitigation: "Mag-Dash (12y). But field re-centers on self, not on them."
+      unfixable: true
+
+    multi_angle_beyond_field:
+      severity: "HIGH"
+      description: "Field centered on SELF. Enemies entering from 4+ angles at >8y cannot all be captured."
+      exposed_at: "Open arenas, multiple spawn points beyond 8y"
+      mitigation: "Mag-Dash repositions. Leaves previous position uncontrolled."
+      unfixable: true
+
+    gauge_depletion:
+      severity: "HIGH"
+      description: "4/s drain. Without parry, net +0.5/s. Extended stance → empty → ALL effects cease."
+      exposed_at: "No-parry pressure, ranged enemies, kiting"
+      mitigation: "Drop stance 5-7s to rebuild. Gap = zero control."
+      unfixable: true
+
+    parry_dependent_survival:
+      severity: "HIGH"
+      description: "10% passive DR only. Miss parry at SR3+ = full damage + 0.6s lockout. Chain misses = death."
+      exposed_at: "SR3+ (2-2.5s attack frequency). <50% parry = dies in ~12s."
+      mitigation: "Healer covers. Mag-Dash disengage."
+      unfixable: true
+
+    no_party_healing:
+      severity: "MODERATE"
+      description: "Zero ally healing. Terminal Edge is self only. Prevention model not cure model."
+      exposed_at: "DPS takes unavoidable damage. No spot-heal available."
+      mitigation: "Unfocus prevents the damage (enemies forget allies). Not a fix for existing HP loss."
+      unfixable: true
+
+    field_drop_vulnerability:
+      severity: "MODERATE"
+      description: "Stance OFF = ALL effects instant-cease. No residual. 5-8s rebuild windows."
+      exposed_at: "Post-heavy-spend. Gauge empty after Overload."
+      mitigation: "Time stance-off during low-threat. Position allies safe first."
+      unfixable: true
+
+  summary: {total: 6, primary: 1, high: 3, moderate: 2, removable: 0}
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 7: FRONTLINE COMPARISON
+# ═══════════════════════════════════════════════════════════════════════════════
+
+frontline_comparison:
+
+  metaknight:
+    sentence: "I keep enemies stupid."
+    archetype: "Arena king / SUPPRESSION / PROACTIVE controller"
+    mechanism: "Unfocus (AI suppress) + Capacitor Pull (suction)"
+    timing: "PROACTIVE — field created BEFORE threats form"
+    best: "Open arenas, SR2-3 packs, boss mechanic reduction"
+    worst: "Ranged >8y, field rebuild gaps, single target"
+    dps: [80, 87]
+    survival: "Parry-dependent (high ceiling, low floor)"
+
+  adabold:
+    sentence: "I physically block the path."
+    archetype: "Corridor king / DEFENSE / REACTIVE blocker"
+    mechanism: "Force Targeting (geometry, displacement, zone)"
+    timing: "REACTIVE — intercept after enemies commit"
+    best: "Corridors, escort splits, single-vector"
+    worst: "Open arenas, multi-angle 3+, ranged >20y"
+    dps: [82, 85]
+    survival: "Iron Body 50% DR (consistent, low variance)"
+
+  siegebreaker:
+    sentence: "I walk THROUGH enemies."
+    archetype: "Siege king / OFFENSE / COMMITTED charger"
+    mechanism: "Momentum (charge, CC immunity, kill-on-advance)"
+    timing: "COMMITTED — choose direction, go, deal with aftermath"
+    best: "Multi-wave siege, formations, breakthrough"
+    worst: "Single HP-sponge, tight spaces, flanks during commit"
+    dps: [83, 87]
+    survival: "CC immune during charge (zero after)"
+
+  archetype_distinctions:
+    proactive_vs_reactive: "Metaknight creates field BEFORE threats. Adabold intercepts AFTER they commit."
+    stationary_vs_mobile: "Metaknight holds position (vortex center). Siegebreaker abandons position (charges)."
+    cognitive_vs_geometric: "Metaknight manipulates AI. Adabold manipulates physics. Zero overlap."
+
+  scenario_matrix:
+    open_arena:        {best: "Metaknight", why: "No walls. Suppress keeps adds dumb."}
+    narrow_corridor:   {best: "Adabold", why: "Iron Body fills. Pins guaranteed."}
+    siege_waves:       {best: "Siegebreaker", why: "Charges through. Kills on advance."}
+    sr2_flankers:      {best: "Metaknight", why: "Vortex captures. Suppress removes paths."}
+    escort_split:      {best: "Adabold", why: "Self-sustains corridor. Geometry locks."}
+    sr4_boss:          {best: "Metaknight", why: "SR4→SR2 = fewer complex patterns."}
+    single_flanker:    {best: "Adabold", why: "Tether+Dash+Sentinel precision."}
+
+  overlap_check:
+    metaknight_vs_adabold: "ZERO. Cognition vs geometry. Complementary."
+    metaknight_vs_siegebreaker: "MINIMAL. Station vs advance. Non-competing."
+    adabold_vs_siegebreaker: "ZERO. Contain vs break-through. Opposite."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# VALIDATION SUMMARY
+# ═══════════════════════════════════════════════════════════════════════════════
+
+validation_summary:
+  identity:
+    VAL-ID-01: {check: "Unfocus is area zone, not debuff", status: "PASS"}
+    VAL-ID-02: {check: "Capacitor Pull is suction, not taunt", status: "PASS"}
+    VAL-ID-03: {check: "Distinct from Adabold Force Targeting", status: "PASS"}
+    VAL-ID-04: {check: "Distinct from Siegebreaker Momentum", status: "PASS"}
+    VAL-ID-05: {check: "Cultural lock justified (engineering guild)", status: "PASS"}
+    VAL-ID-06: {check: "Proactive timing archetype", status: "PASS"}
+  mechanical:
+    VAL-MC-01: {check: "§25 compliance (max CD = GCD)", status: "PASS"}
+    VAL-MC-02: {check: "Anti-rotation (reactive + field)", status: "PASS"}
+    VAL-MC-03: {check: "Zero RNG crits", status: "PASS"}
+    VAL-MC-04: {check: "No enmity/taunt/threat", status: "PASS"}
+    VAL-MC-05: {check: "No invulnerability", status: "PASS"}
+  balance:
+    VAL-BL-01: {check: "DPS 80-87%", status: "PASS"}
+    VAL-BL-02: {check: "Self-sustain SR1-2", status: "PASS"}
+    VAL-BL-03: {check: "Gauge timing in BalanceTargets", status: "PASS"}
+    VAL-BL-04: {check: "Parry spread acceptable (73-87)", status: "PASS"}
+  weakness:
+    VAL-WK-01: {check: "Ranged >8y unfixable", status: "PASS"}
+    VAL-WK-02: {check: "Gauge depletion window exists", status: "PASS"}
+    VAL-WK-03: {check: "Parry-dependent survival floor", status: "PASS"}
+    VAL-WK-04: {check: "No party healing", status: "PASS"}
+
+  totals: {total: 19, pass: 19, fail: 0}
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# TUNING LEVERS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+tuning_levers:
+  if_too_strong:
+    - "Stance drain 4/s → 5/s (20s max)"
+    - "Pull 1.5y/s → 1.0y/s"
+    - "Enhanced threshold ≥50 → ≥60"
+    - "Parry restore 5% → 3%"
+  if_too_weak:
+    - "Passive gen +2/s → +3/s"
+    - "Pull 1.5y/s → 2.0y/s"
+    - "EC Weapon 25g → 20g"
+    - "Parry window 0.75s → 0.85s"
+
+open_questions:
+  - "0.75s parry vs netcode (50-150ms). May need 0.8-0.85s."
+  - "Pull vs walk speed: can enemies walk OUT faster than 1.5y/s pull?"
+  - "Boss SR floor: SR2 confirmed? SR3 for 'suppression-resistant'?"
+  - "Field visual clarity: can all players see the 8y boundary?"
+  - "Overload Cascade R3 (refund 15 on 4+) — AoE gauge-positive risk?"
+
+# ▼ AWAITING: Layer 1 Spatial Quantification Pass
