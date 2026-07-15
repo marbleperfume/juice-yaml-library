@@ -1,0 +1,566 @@
+# ▲ CROSS-REFERENCE: Wavecaller_Design.yaml (identity/mechanics) | Wavecaller_Validation.yaml (balance/matchups)
+# ══════════════════════════════════════════════════════════════════════════════════
+# WAVECALLER — Skills Specification
+# juice-yaml-library | github.com/marbleperfume/juice-yaml-library
+# ══════════════════════════════════════════════════════════════════════════════════
+#
+# Full ability list organized by delivery type.
+# Sound = HEALING. Water = DAMAGE. Hybrid = Transition/Passive.
+#
+# SYSTEM RULES (enforced throughout):
+#   GCD: 2.0s base / 1.4s cap
+#   Weave: Single-weave ONLY (one oGCD per GCD window)
+#   Crit: ALL conditional (positional/situational). ZERO RNG crits.
+#   >50% HP: +25% damage to enemies above 50% HP
+#   §25: No identity skill has CD ≥ 90s. All long-gating via resource gates.
+#   Procs: ZERO. All resource generation deterministic.
+#
+# Balance Ref: Combat/BalanceTargets.yaml
+# Last Updated: 2026-07-14
+# ══════════════════════════════════════════════════════════════════════════════════
+
+header:
+  class_name: "Wavecaller"
+  file_scope: "Complete ability list — potencies, cast times, GCD/oGCD, Hydration costs, crit conditions"
+  design_authority: "Wavecaller_Design.yaml"
+  validation_authority: "Wavecaller_Validation.yaml"
+  last_updated: "2026-07-14"
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# §25 COMPLIANCE AUDIT
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+section_25_audit:
+  rule: "No identity skill may use a cooldown ≥ 90s. Convert to resource gates via Hydration/Pressure."
+  audit_date: "2026-07-14"
+  result: "PASS — no skill has CD ≥ 90s"
+  longest_fixed_cd: "Maelstrom Entry (45s) — also resource-gated by 3 Pressure Charges"
+  conversion_log:
+    - skill: "Maelstrom Entry"
+      original_concept: "Could have been 120s 'class ultimate' CD"
+      converted_to: "45s CD + 3 Pressure Charge cost + 10s gland lockout post-use = effective ~67s between uses"
+      gate_type: "Resource (Pressure Charge) + biological lockout"
+    - skill: "Rift Dive"
+      original_concept: "Could have been 30s gap-close CD"
+      converted_to: "GCD-speed, gated by 1 Pressure Charge (contextual regen)"
+      gate_type: "Resource (Pressure Charge)"
+    - skill: "Depths Call"
+      note: "20s CD — well under §25 threshold. Retained as fixed CD."
+      gate_type: "Fixed CD (compliant)"
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# POTENCY REFERENCE (from BalanceTargets.yaml)
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+potency_reference:
+  base_filler: 100
+  combo_finisher: "150-200"
+  gauge_spender_small: "200-300"
+  gauge_spender_large: "400-500"
+  class_ultimate: "600-800"
+  heal_gcd: "200-300 (per cast/tick)"
+  heal_ogcd: "150-400 (range based on CD)"
+  healer_dps_baseline: "65% of DPS reference (triage) / 80% (free DPS mode)"
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# SOUND / HEALING ABILITIES (8 abilities)
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+sound_healing:
+
+  - name: "Tidal Hymn"
+    delivery: Sound
+    type: GCD
+    classification: Heal
+    school: MED
+    cast_time: "1.5s channel (2 ticks)"
+    gcd: "2.0s base"
+    weave_window: "0.5s (tight — prefer not to weave)"
+    range: "20m radius, omnidirectional"
+    los_required: "No — 70% potency through 1 wall"
+    potency: "120p per tick × 2 = 240p total (AoE)"
+    hydration_scaling: "Potency × (Hydration%/100). At 80+: full. At 40: 85%. At 15: 65%."
+    cooldown: "None (GCD-gated)"
+    resonance_interaction: "Builds toward Warm/Resonant. Warm = 100% potency. Resonant = 120% + 5m radius."
+    item_replaced: "Healing Specter"
+    decision: "1.5s immobility. Safe at range. Dangerous in contested space. Weave slot is tight."
+    notes: "Primary healing GCD. What you SHOULD be pressing. Stationary — moving cancels."
+
+  - name: "Keening Pulse"
+    delivery: Sound
+    type: oGCD
+    classification: Heal
+    school: MED
+    cast_time: "Instant"
+    animation_lock: "0.6s"
+    range: "25m, single-target (auto-targets lowest-HP ally)"
+    los_required: "No — omnidirectional"
+    potency: "300p (single-target)"
+    hydration_scaling: "Same as Tidal Hymn"
+    cooldown: "8s"
+    resonance_interaction: "Counts toward Resonance build (is vocalization)"
+    item_replaced: "Rejuvenation Flask"
+    decision: "Burns your one oGCD slot. Heal before dive, or save slot for Geyser Burst after?"
+    notes: "Emergency oGCD heal. Last heal before committing to dive."
+
+  - name: "Harmonic Wash"
+    delivery: Sound
+    type: GCD
+    classification: Heal
+    school: MED
+    cast_time: "2.0s (full GCD cast — NO weave window)"
+    gcd: "2.0s base"
+    weave_window: "NONE (2.0s cast = clips into next GCD)"
+    range: "25m, 8m radius centered on densest ally cluster"
+    los_required: "No — full power through LoS"
+    potency: "350p (AoE — strongest GCD AoE heal)"
+    hydration_scaling: "Same as Tidal Hymn"
+    cooldown: "None (GCD-gated)"
+    resonance_interaction: "Builds Resonance. At Resonant: 420p + 13m radius."
+    item_replaced: "Rejuvenation Flask (AoE variant)"
+    decision: "Maximum throughput but costs ALL action economy. No oGCD weave. Commits you fully to healing."
+    notes: "Heavy AoE heal. Says 'I am a healer right now, not a diver.'"
+
+  - name: "Resonant Shield"
+    delivery: Sound
+    type: oGCD
+    classification: Utility
+    cast_time: "Instant"
+    animation_lock: "0.6s"
+    range: "25m, single-target"
+    effect: "Absorbs damage equal to 15% Wavecaller max HP. 8s duration. One active at a time."
+    cooldown: "15s"
+    item_replaced: "Hardshell Powder"
+    decision: "Shield tank for buster, or shield SELF to enable safe diving? Selfless vs selfish."
+    notes: "The 'permission to be aggressive' button when used on self."
+
+  - name: "Shattercroon"
+    delivery: Sound
+    type: oGCD
+    classification: CC
+    cc_stage: "Stage 2 (Interrupt)"
+    cast_time: "Instant"
+    animation_lock: "0.6s"
+    range: "20m"
+    los_required: "No — sound propagates"
+    effect: "Interrupts one enemy. 1.5s lockout on interrupted ability."
+    cooldown: "5s"
+    crit_condition: "N/A (CC ability)"
+    item_replaced: "Stupor Bell"
+    vs_shaman: "FASTER (5s vs 10s). ACTIVE (costs attention). LESS PERSISTENT (no set-and-forget)."
+    decision: "Which cast to interrupt? Can't stop everything. Prioritization IS the skill."
+    notes: "Fastest reactive interrupt in game. 5s CD, 20m, no LoS. Healer identity tool."
+
+  - name: "Undertow Lullaby"
+    delivery: Sound
+    type: GCD
+    classification: CC_Heal
+    cc_stage: "Stage 1 (Slow — -30% movement, 6s)"
+    cast_time: "1.5s"
+    gcd: "2.0s base"
+    weave_window: "0.5s (tight)"
+    range: "10m cone"
+    effect: "Slows all enemies in cone -30% for 6s AND heals all allies in same cone for light potency."
+    potency_heal: "100p (allies in cone)"
+    potency_damage: "0 (pure CC + heal)"
+    cooldown: "None (GCD-gated)"
+    item_replaced: "Thickglass Flask"
+    decision: "Cone requires facing enemies — turning away from retreating allies. Efficient but directional."
+    notes: "Same sound wave does both CC and heal. Positioning-dependent."
+
+  - name: "Depths Call"
+    delivery: Sound
+    type: GCD
+    classification: BigHeal
+    school: MED
+    cast_time: "2.5s (LONG — NO weave, NO movement, NO interruption tolerance)"
+    gcd: "2.0s base (but cast exceeds GCD — clips next)"
+    weave_window: "NONE"
+    range: "30m radius, ALL allies regardless of LoS"
+    los_required: "No — full propagation through all obstacles"
+    potency: "500p (party-wide — strongest single heal in kit)"
+    hydration_scaling: "Same as Tidal Hymn"
+    cooldown: "20s"
+    resonance_interaction: "Builds Resonance (counts as 2 consecutive heals due to power)"
+    item_replaced: "Mega Elixir"
+    decision: "2.5s total immobility. Suicidal in melee. Strongest heal at safe range. Anti-dive by design."
+    notes: "Emergency party heal. DEMANDS you stay at range. 20s CD is longest fixed CD on heals."
+
+  - name: "Tidemark"
+    delivery: Sound/Water
+    type: GCD
+    classification: Heal_Utility
+    school: MED
+    cast_time: "Instant"
+    gcd: "2.0s base"
+    weave_window: "Full (instant GCD = 1.4s weave window)"
+    range: "Self + 3m radius puddle"
+    effect: "Self-drench: +30 Hydration. Creates 3m water puddle (8s). Allies in puddle get 1% HP/s HoT."
+    hydration_restore: 30
+    cooldown: "12s internal CD (occupies a GCD)"
+    item_replaced: "N/A (unique maintenance tool)"
+    decision: "Costs a full GCD for maintenance. Essential on dry maps, skippable near water."
+    notes: "Hydration management + party terrain creation. Map awareness determines value."
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# WATER / DAMAGE ABILITIES (7 abilities)
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+water_damage:
+
+  - name: "Rift Dive"
+    delivery: Water
+    type: GCD
+    classification: Damage_Mobility
+    cast_time: "Instant (committed movement animation ~0.8s)"
+    gcd: "2.0s base"
+    weave_window: "Full (instant GCD — can weave Geyser Burst on landing)"
+    range: "30m targeted (dive to target location)"
+    effect: >
+      Generate portal → dive → emerge at target dealing heavy physical impact damage
+      in 3m radius. Now IN MELEE with harpoon ready. Portal lingers 2.5s.
+    potency: "250p (emergence impact, 3m AoE)"
+    above_50_bonus: "+25% = 312p against targets >50% HP"
+    cc_stage: "Stage 1 (2m knockback on emergence)"
+    cooldown: "GCD (resource-gated)"
+    pressure_cost: 1
+    hydration_restore: 25
+    crit_condition: "None on entry. Enables Geyser Burst crit within 2s."
+    item_replaced: "Flashstep Cartridge"
+    risk_profile: >
+      NOT EXTREME RISK. Dive itself is safe. The "risk" is team HP dropping while
+      you DPS. Not personal death — THEIR deaths through healing absence.
+    decision: "Every dive = 'My party can survive X seconds without me.' Wrong = they die. Right = enemy dies."
+    notes: "Primary gap-close + damage opener + rehydration. The ability that CALLS to you."
+
+  - name: "Breaching Strike"
+    delivery: Water/Physical
+    type: GCD
+    classification: Damage
+    weapon: Harpoon
+    cast_time: "Instant"
+    gcd: "2.0s base"
+    weave_window: "Full"
+    range: "0-3m (melee, polearm reach)"
+    effect: "Harpoon thrust enhanced by portal momentum. Single target physical damage."
+    potency: "180p (single-target, melee)"
+    above_50_bonus: "+25% = 225p against targets >50% HP"
+    crit_condition: "Conditional crit if target above 50% HP (guaranteed crit on >50% HP targets)"
+    cooldown: "None (GCD-gated)"
+    pressure_refund: 0.25
+    item_replaced: "Concussion Charge"
+    decision: "Each strike in melee = GCD not healing. But refunds resource for future dives. How greedy?"
+    notes: "Harpoon filler. Rewards aggression with resource. 'One more hit' temptation."
+
+  - name: "Undertow Slam"
+    delivery: Water
+    type: GCD
+    classification: Damage_AoE
+    cast_time: "Instant"
+    gcd: "2.0s base"
+    weave_window: "Full"
+    range: "0-5m (melee AoE)"
+    effect: "Ground-pound via harpoon butt-spike. 5m radius AoE. Leaves 2s water puddle (-20% enemy speed)."
+    potency: "130p (AoE, 5m radius)"
+    cc_stage: "Stage 1 (slow via difficult terrain)"
+    cooldown: "None (GCD-gated)"
+    pressure_refund: 0
+    hydration_note: "Puddle counts as water terrain for Hydration proximity bonus"
+    item_replaced: "Upheaval Flask"
+    decision: "AoE damage + terrain creation vs Breaching Strike refund. Efficiency vs output."
+    notes: "AoE melee option. No refund = punishes staying surrounded. Creates water terrain."
+
+  - name: "Return Tide"
+    delivery: Water
+    type: oGCD
+    classification: Mobility
+    cast_time: "Instant"
+    animation_lock: "0.6s"
+    range: "Returns to within 5m of last entry point"
+    effect: "Generate return portal → dive back. The escape. The 'splash back' in breach-strike-splash."
+    cooldown: "4s"
+    pressure_cost: 1
+    hydration_restore: 25
+    item_replaced: "Retrograde Bead"
+    decision: >
+      Same resource as Rift Dive. Every return = future dive NOT taken.
+      Full breach-strike-splash cycle costs 2 Charges. SAFETY vs FUTURE AGGRESSION.
+    notes: "Critical tension: dive costs 1, return costs 1. Being aggressive is EXPENSIVE."
+
+  - name: "Geyser Burst"
+    delivery: Water
+    type: oGCD
+    classification: Damage
+    cast_time: "Instant"
+    animation_lock: "0.6s"
+    range: "3m (melee only)"
+    effect: "Water jet through harpoon tip. High single-target physical damage."
+    potency: "280p"
+    execute_bonus: "+40% below 30% HP = 392p"
+    above_50_bonus: "+25% on base = 350p (before execute check)"
+    crit_condition: "Conditional crit within 2s of Rift Dive emergence (momentum crit)"
+    cooldown: "12s"
+    pressure_cost: 0
+    item_replaced: "Charcoal Pine Bundle"
+    decision: "Only in melee. Execute bonus = reason to dive 'one more time.' Worth it if target dies."
+    notes: "Execute tool. The ability that makes you stay when you should leave."
+
+  - name: "Pressure Wave"
+    delivery: Water
+    type: oGCD
+    classification: Damage_Ranged
+    cast_time: "Instant"
+    animation_lock: "0.6s"
+    range: "15m"
+    effect: "Compressed water bolt. Low-moderate damage. Only ranged damage tool."
+    potency: "100p"
+    above_50_bonus: "+25% = 125p"
+    crit_condition: "None (deliberately weak — no crit opportunity)"
+    cooldown: "8s"
+    pressure_cost: 0
+    item_replaced: "Charcoal Pine Bundle (ranged variant)"
+    decision: "Low damage from safety highlights the opportunity cost of NOT diving."
+    notes: "Token ranged damage. Maintains dive incentive by being visibly inferior."
+
+  - name: "Maelstrom Entry"
+    delivery: Water
+    type: GCD
+    classification: Damage_Ultimate
+    cast_time: "Instant (multi-hit animation ~4s — committed)"
+    gcd: "2.0s base (locks player for full animation)"
+    weave_window: "None during animation"
+    range: "Same target or up to 3 targets within 8m"
+    effect: >
+      Triple-portal chain dive. Three sequential emergence impacts + harpoon slams.
+      Massive cumulative physical damage. After: 0 Pressure Charges, 10s gland
+      lockout (no Pressure generation). +75 Hydration (3 × 25).
+    potency: "700p total (3 × ~233p emergence hits — CLASS ULTIMATE band)"
+    above_50_bonus: "+25% per hit on >50% targets = 875p potential"
+    cc_stage: "Stage 1 (3 × 2m displacement)"
+    cooldown: "45s"
+    pressure_cost: 3
+    hydration_restore: 75
+    post_lockout: "10s gland lockout → 12s first Charge regen = 22s minimum to next portal"
+    risk_profile: >
+      Risk is NOT personal death — risk is 10+ seconds of ZERO healing for party.
+      If team survives that long, it's the highest damage available.
+    decision: "Ultimate commitment. 22s minimum until next portal. Party gets ZERO heals for 10s+."
+    notes: "Class ultimate. Consequence is on your team, not yourself. Use when kill is GUARANTEED."
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# HYBRID / TRANSITION ABILITIES (2 passives)
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+hybrid_transition:
+
+  - name: "Echoing Impact"
+    type: Passive
+    classification: Heal_Bridge
+    trigger: "On Rift Dive hitting an enemy"
+    effect: >
+      Shockwave carries residual healing frequency. Allies within 8m of emergence
+      receive small heal (~30% of Keening Pulse potency).
+    potency: "~90p (AoE around emergence point, 8m)"
+    decision: "Dive near wounded allies for splash-heal, or dive highest-value target regardless of ally proximity?"
+    notes: "Bridge passive. Does NOT eliminate tension — tiny bonus on dives already planned."
+
+  - name: "Depths Between"
+    type: Passive
+    classification: Heal_QoL
+    trigger: "Any portal transit (Rift Dive, Return Tide, Maelstrom Entry)"
+    effect: >
+      During portal transit, voice resonates through water creating 1s healing pulse
+      reaching allies within 15m of BOTH entry AND exit points.
+    potency: "~60p (20% of Keening Pulse, very low — allies near both portals)"
+    notes: "QoL passive. Prevents diving from being COMPLETELY zero-healing. Does not make diving safe."
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# ABILITY SUMMARY TABLE
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+ability_summary:
+  total_abilities: 17
+  breakdown:
+    sound_healing_gcd: 4  # Tidal Hymn, Harmonic Wash, Undertow Lullaby, Depths Call, Tidemark (5 actually)
+    sound_healing_ogcd: 2  # Keening Pulse, Resonant Shield
+    sound_cc_ogcd: 1  # Shattercroon
+    water_damage_gcd: 4  # Rift Dive, Breaching Strike, Undertow Slam, Maelstrom Entry
+    water_damage_ogcd: 3  # Return Tide, Geyser Burst, Pressure Wave
+    hybrid_passive: 2  # Echoing Impact, Depths Between
+
+  gcd_count: 9
+  ogcd_count: 6
+  passive_count: 2
+
+  max_cooldown: "45s (Maelstrom Entry) — §25 COMPLIANT"
+  resource_gated_abilities: "Rift Dive (1), Return Tide (1), Maelstrom Entry (3)"
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# CRIT CONDITIONS (ZERO RNG — ALL CONDITIONAL)
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+crit_conditions:
+  rule: "Crit is NEVER random. All crit is positional or conditional."
+  conditions:
+    - ability: "Breaching Strike"
+      condition: "Target above 50% HP"
+      logic: "Synergizes with >50% HP bonus rule. Early dives crit. Late dives don't."
+
+    - ability: "Geyser Burst"
+      condition: "Within 2s of Rift Dive emergence"
+      logic: "Momentum crit — rewards immediate follow-up. Loses crit if you hesitate."
+
+    - ability: "Maelstrom Entry (each hit)"
+      condition: "Each emergence hit: target above 50% HP"
+      logic: "Same as Breaching Strike. Triple-dive into healthy target = triple crit potential."
+
+  no_crit_abilities:
+    - "Tidal Hymn (heals don't crit — consistent throughput)"
+    - "Keening Pulse (heal — no crit)"
+    - "Harmonic Wash (heal — no crit)"
+    - "Depths Call (heal — no crit)"
+    - "Rift Dive emergence (entry damage — no crit, enables crit on follow-up)"
+    - "Pressure Wave (deliberately weak — no reward)"
+    - "Undertow Slam (AoE — no crit, creates terrain instead)"
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# >50% HP ENEMY RULE INTEGRATION
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+above_50_rule_integration:
+  global_rule: "+25% damage to enemies above 50% HP"
+  wavecaller_synergy: >
+    Wavecaller's dive pattern naturally targets healthy enemies (early pressure).
+    The +25% bonus rewards EARLY dives when enemies are fresh. Late dives (execute
+    range) get Geyser Burst's +40% instead. Two distinct reward windows.
+
+  affected_abilities:
+    - "Rift Dive: 250p → 312p vs >50%"
+    - "Breaching Strike: 180p → 225p vs >50% (PLUS guaranteed crit = ~337p)"
+    - "Geyser Burst: 280p → 350p vs >50% (OR 392p below 30% — mutually exclusive)"
+    - "Maelstrom Entry: 700p → 875p vs >50%"
+    - "Pressure Wave: 100p → 125p vs >50%"
+    - "Undertow Slam: 130p → 162p vs >50%"
+
+  tactical_implication: >
+    Wavecaller should prioritize diving healthy enemies (>50% = +25% + guaranteed
+    Breaching Strike crit). Once enemy drops below 50%, crit disappears but execute
+    tools (Geyser Burst +40%) activate. Two distinct power spikes at different HP%.
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# RESOURCE ECONOMY (DETAILED)
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+resource_economy:
+  pressure_charge:
+    max: 4
+    passive_regen: "1 per 12s in combat (1 per 6s out of combat)"
+    active_regen: "Breaching Strike: +0.25 per hit"
+    bonus_regen: "Hydration 80+: +25% passive speed. Water terrain proximity: +50%."
+    full_from_zero: "48s passive (combat) / ~36s with active gen + bonus"
+    spending_patterns:
+      conservative: "Dive (1) + Return (1) = 2 per cycle. 2 full cycles from max."
+      aggressive: "Dive (1) + 4 Breaching (refund 1) + Return (1) = net 1 per cycle."
+      ultimate: "Maelstrom (3) + Return impossible. Must walk out or die in place."
+
+  hydration:
+    starting_value: "100 (out of combat near water) / variable"
+    drain_on_land: "3 per 10s passive / 5 per 10s in combat"
+    time_to_parched: "~80s combat on dry land (100→39)"
+    time_to_desiccated: "~160s combat on dry land (100→14)"
+    restore_per_dive: "+25 (each way = +50 per full cycle)"
+    tidemark_restore: "+30 (costs GCD, 12s internal CD)"
+    tactical_note: "Full dive cycle (+50) offsets ~100s of land drain. Diving IS maintenance."
+
+  vocal_resonance:
+    build_rate: "2 consecutive heals → Warm. 4 consecutive heals → Resonant."
+    break_conditions: "Any damage taken, any movement, any non-heal action, any portal dive."
+    rebuild_from_cold: "~4s (2 GCDs) to Warm. ~8s (4 GCDs) to Resonant."
+    potency_impact: "Cold=70%, Warm=100%, Resonant=120% + 5m AoE radius."
+    post_dive_tax: "Always returns to Cold. 70% healing for first 4s after return."
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# TYPICAL COMBAT SEQUENCES (NOT ROTATIONS — contextual examples)
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+combat_sequences:
+  note: "These are EXAMPLES, not rotations. Correct sequence depends on encounter state."
+
+  safe_healing_mode:
+    description: "Party under pressure. Stay at range. Maximize throughput."
+    sequence:
+      - "Tidal Hymn (GCD) — AoE heal, build Resonance"
+      - "Keening Pulse (oGCD) — spot heal lowest"
+      - "Tidal Hymn (GCD) — now at Warm (100%)"
+      - "Shattercroon (oGCD) — interrupt enemy cast"
+      - "Harmonic Wash (GCD) — heavy AoE, no weave"
+      - "Tidal Hymn (GCD) — maintain Warm/push Resonant"
+    output: "~1200p healing over 8s. Zero damage. Full commitment to role."
+
+  breach_strike_splash:
+    description: "Party stable. One dive cycle. In and out."
+    sequence:
+      - "Rift Dive (GCD, -1 Pressure) — 250p damage, +25 Hydration"
+      - "Geyser Burst (oGCD) — 280p, crit if within 2s"
+      - "Breaching Strike (GCD) — 180p, +0.25 Pressure, crit if >50%"
+      - "Return Tide (oGCD, -1 Pressure) — escape, +25 Hydration"
+      - "Tidal Hymn (GCD) — resume healing (Cold = 70%)"
+      - "Keening Pulse (oGCD) — spot heal"
+    output: "~710p+ damage in 4s, +50 Hydration. 2 Pressure spent. Cold tax on return."
+    time_away: "~4s (2 GCDs in melee)"
+
+  extended_aggression:
+    description: "DPS check phase. Push damage. Accept healing debt."
+    sequence:
+      - "Rift Dive (GCD, -1) — 250p + knockback"
+      - "Geyser Burst (oGCD) — 280p crit"
+      - "Breaching Strike (GCD) — 180p crit (>50%), +0.25"
+      - "Pressure Wave (cannot — in melee. Skip.)"
+      - "Breaching Strike (GCD) — 180p, +0.25"
+      - "Undertow Slam (GCD) — 130p AoE + puddle"
+      - "Breaching Strike (GCD) — 180p, +0.25 (total refund: 0.75)"
+      - "Return Tide (oGCD, -1) — escape"
+    output: "~1200p damage over 8s. +50 Hydration. Net 1.25 Pressure spent."
+    time_away: "~8s. Party unhealed. Healing debt accumulated."
+
+  maelstrom_commit:
+    description: "Kill confirmed. All-in. Party WILL survive."
+    sequence:
+      - "Resonant Shield (oGCD) on tank — pre-dive mitigation"
+      - "Maelstrom Entry (GCD, -3 Pressure) — 700p, +75 Hydration"
+      - "Geyser Burst (oGCD, if still in melee range) — 280p execute"
+      - "Walk out (no Return available — 0 Pressure, 10s lockout)"
+      - "Tidemark (GCD) — +30 Hydration, create water terrain"
+      - "Tidal Hymn (GCD) — begin Cold→Warm rebuild"
+    output: "~980p burst. 22s until next portal. Party endures 10s+ unhealed."
+    risk: "Maximum. If kill fails, party potentially wipes during recovery."
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# DPS OUTPUT ESTIMATES (Healer role context)
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+dps_estimates:
+  context: >
+    Healer baseline from BalanceTargets: 65% of DPS reference during triage,
+    80% when free to DPS. Wavecaller hits these through dive windows.
+
+  healing_only_mode:
+    dps_output: "~5% (Pressure Wave every 8s only)"
+    hps_output: "Maximum — Resonant state sustained, full throughput"
+
+  balanced_play:
+    dps_output: "~45-55% of reference (1-2 dive cycles per 30s)"
+    hps_output: "~75-85% of maximum (Cold tax after dives reduces average)"
+    notes: "Target gameplay — best Wavecallers hover here."
+
+  aggressive_play:
+    dps_output: "~65-75% of reference (maximum dive uptime)"
+    hps_output: "~50-60% of maximum (constant Cold, party at risk)"
+    notes: "Greedy but viable when healing demand is low (Rank 1 content)."
+
+  healer_dps_check:
+    target: "80% of DPS reference when zero healing needed"
+    achievable: "Yes — full dive uptime + Pressure Wave filler = ~78-82%"
+    status: "PASS (qualitative)"
+
+# ▼ AWAITING: Layer 1 Numerical Pass (absolute potency → damage conversion)

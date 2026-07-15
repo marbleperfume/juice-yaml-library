@@ -1,0 +1,606 @@
+# ▲ CROSS-REFERENCE: Wavecaller_Skills.yaml (ability list) | Wavecaller_Validation.yaml (balance/matchups)
+# ══════════════════════════════════════════════════════════════════════════════════
+# WAVECALLER — Design Specification
+# juice-yaml-library | github.com/marbleperfume/juice-yaml-library
+# ══════════════════════════════════════════════════════════════════════════════════
+#
+# "The aggressive healer who wants to fight but SHOULD be healing. The constant
+# push/pull between 'I could dive and kill that thing' vs 'my team needs me back
+# here' IS the class fantasy. No other healer has this identity."
+#
+# Sound magic = HEALING (fast, AoE, possibly no LoS since sound propagates).
+# Water portal dive = DAMAGE (generate portal → dive through → smash → emerge).
+#
+# IDENTITY: Dolphin/orca/killer whale — physical, fast, playful-violent predator.
+# NOT enchantment/lure/song-charm. AVOID ALL SIREN TERMINOLOGY.
+#
+# Balance Ref: Combat/BalanceTargets.yaml
+# Last Updated: 2026-07-14
+# ══════════════════════════════════════════════════════════════════════════════════
+
+header:
+  class_name: "Wavecaller"
+  file_scope: "Identity, race lock, role objective, class mechanic, rotation philosophy, anti-patterns, item baseline, design notes"
+  skills_authority: "Wavecaller_Skills.yaml"
+  validation_authority: "Wavecaller_Validation.yaml"
+  balance_ref: "Combat/BalanceTargets.yaml"
+  last_updated: "2026-07-14"
+  design_phase: qualitative_complete
+  validation_status: "Awaiting Layer 1 Numerical Pass"
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# IDENTITY
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+identity:
+  class_name: Wavecaller
+  race: Jumpers
+  race_category: Linfree
+  tier: Experienced
+  role: "Healer / DPS"
+  sub_role: "MED-primary (direct healing + drain)"
+  weapon: "Harpoon (trident-style polearm — aquatic hunter identity)"
+
+  biological_lock:
+    type: Biological
+    label: vocal_organ_aquatic
+    justification: >
+      Remove the Jumper body, remove the class. No other race has: vocal cords for
+      tissue-repair frequencies + portal glands for spatial rifts + aquatic body for
+      transit survival + hydration-dependent biology. The lock is "this body DOES this"
+      not "this race LEARNED this."
+    required_organs:
+      - "Vocal Apparatus — produces tissue-repair frequencies via acoustic resonance"
+      - "Portal Glands — biological organs secreting hyper-pressurized water for spatial rifts"
+      - "Aquatic Adaptation — pressure-resistant musculature, hydrodynamic body"
+      - "Hydration Dependence — semi-permeable skin, portal glands need water saturation"
+
+  animal_identity:
+    core: "Dolphin / Orca / Killer Whale"
+    traits:
+      - "Physical — damage is kinetic impact and harpoon strikes, not magic"
+      - "Fast — portal dives are rapid, hit-and-run, breach-and-strike"
+      - "Playful-violent predator — enjoys the hunt, treats combat as play"
+      - "Social — communicates through sound, heals through sound (pod behavior)"
+      - "Intelligent aggression — knows WHEN to strike, not just HOW"
+    explicitly_not:
+      - "NOT enchantment/lure/song-charm (no siren behavior)"
+      - "NOT passive/reactive (actively hunts opportunities)"
+      - "NOT graceful-ethereal (physical, kinetic, FAST)"
+      - "NOT brooding/dark (playful, energetic, competitive)"
+    banned_terminology:
+      - charm
+      - enchant
+      - lure
+      - allure
+      - siren
+      - seduce
+      - mesmerize
+      - bewitch
+      - captivate
+      - enthrall
+
+  racial_biology:
+    species: Jumpers
+    body_type: "Humanoid, compact, streamlined — athletic swimmer's build"
+    aesthetic: >
+      Cute aquatic humanoid — Shylily-esque. NOT whale-sized. Small athletic
+      humanoid with aquatic features (fin ears, sleek skin, subtle gill lines,
+      webbed digits). Teeth are visible as visual identity marker but have ZERO
+      mechanical function — purely aesthetic species flavor. Overall impression:
+      "cute predator" — dolphin's perpetual smile hiding rows of teeth.
+
+  design_statement: >
+    Wavecaller is THE AGGRESSIVE HEALER. Their body wants to fight. Sound healing is
+    effortless — open your mouth, your voice heals. But the portals call. You can SEE
+    the enemy. The harpoon is IN YOUR HAND. The portal is RIGHT THERE. "Can I dive?"
+    is never the question — "SHOULD I dive?" always is. The push/pull tension between
+    biological aggression and team responsibility IS the Wavecaller.
+
+  distinction_from_other_healers:
+    vs_elementalist: "Elementalist heals from safety with no positional sacrifice. Wavecaller is TEMPTED to abandon safe position."
+    vs_shaman: "Shaman heals as BYPRODUCT of offense (Hex Drain). Never stops attacking to heal. Wavecaller must CHOOSE: heal OR attack."
+    vs_siren: "Siren heals while COMMANDING — voice does two things at once. Wavecaller's heal/damage are MUTUALLY EXCLUSIVE positionally."
+    vs_spiritcaller: "Spiritcaller delegates healing to Water Slime companion. Wavecaller has no companion — YOU are healer AND diver."
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# ROLE OBJECTIVE
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+role_objective:
+  primary: "Keep party alive through sound-based direct healing (MED school)"
+  secondary: "Contribute burst melee damage during safe windows via portal dive"
+  execution_archetype: "Positional Tension + Opportunity Assessment + Healing Debt Management"
+  input_modality:
+    primary: "Party HP bars — can they survive 4s without heals?"
+    secondary: "Hydration Gauge — am I hydrated enough to heal effectively?"
+    tertiary: "Enemy positioning — which targets are portal-diveable?"
+    quaternary: "Own position — optimal healing range or stranded in melee?"
+    quinary: "Pressure Charge gauge — can I dive OR escape?"
+
+  healer_stat_architecture:
+    MAG: "Barriers + damage (NOT Wavecaller)"
+    MED: "Direct healing + drain (Wavecaller IS this)"
+    alignment: >
+      MED-primary. Healing is direct HP restoration via sound vibration. No barriers.
+      When Wavecaller heals, HP goes UP. Period. MED stat scales healing output.
+
+  frontline_rule:
+    statement: "HEALERS CANNOT REPLACE THE FRONTLINE — explicit, no exceptions."
+    application: >
+      Wavecaller dives for burst damage. Does NOT become a frontliner. Has:
+      no sustained mitigation, no threat/aggro tools, no durability scaling,
+      no block mechanic, no party-wide defensive coverage from position.
+      Melee presence is BRIEF, OPPORTUNISTIC, DEPENDENT on frontline holding aggro.
+    when_frontline_dies: "Cannot substitute. Retreat, heal survivors, regroup or wipe. No 'emergency tank mode.'"
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# CLASS MECHANIC — HYDRATION GAUGE
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+hydration_gauge:
+  name: "Hydration"
+  range: "0-100"
+  description: >
+    Tracks water exposure. Jumper biology is aquatic — skin, portal glands, and
+    vocal apparatus all require moisture. High hydration = thriving (full healing,
+    normal speed). Low hydration = suffering on land (healing reduced, movement
+    SLOWED — not rooted). This IS the land penalty mechanic.
+
+  effects:
+    high_80_100:
+      label: "Saturated"
+      healing_potency: "100%"
+      movement_speed: "100%"
+      portal_generation: "Normal"
+    medium_40_79:
+      label: "Damp"
+      healing_potency: "85%"
+      movement_speed: "95%"
+      portal_generation: "Normal"
+    low_15_39:
+      label: "Parched"
+      healing_potency: "65%"
+      movement_speed: "80% (SLOWED — clearly noticeable, NOT rooted)"
+      portal_generation: "-50%"
+    critical_0_14:
+      label: "Desiccated"
+      healing_potency: "40%"
+      movement_speed: "60% (severely SLOWED — NOT rooted, can still act)"
+      portal_generation: "Halted"
+
+  drain_rate:
+    on_dry_land: "-3 per 10s"
+    in_combat_on_land: "-5 per 10s"
+
+  restore_methods:
+    water_portal_transit: "+25 per transit (Rift Dive and Return Tide both rehydrate)"
+    submerging: "+15/s while submerged in water terrain"
+    water_proximity: "+2 per 5s within 5m of water terrain"
+    slime_proximity: "+1 per 5s within 5m of Water Slime ally (Spiritcaller synergy)"
+    rain_weather: "+3 per 10s during rain"
+    self_drench: "Tidemark ability: +30 instant (costs GCD)"
+
+  design_intent: >
+    SLOWED on land, NOT rooted. Weakened on land, NOT useless. Water portals serve
+    double duty: damage delivery AND hydration maintenance. Diving is not ONLY damage
+    — it's SELF-MAINTENANCE. A Wavecaller who never dives paradoxically dehydrates
+    faster. Biology rewards aggression. Role demands restraint. Tension is structural.
+
+  interaction_with_healing: >
+    Water conducts sound better than air. When hydrated (80-100), sound healing is
+    at full power and maximum range. Water portals enable easier healing by keeping
+    hydration high. Land = harder healing. Water = thriving.
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# CLASS MECHANIC — DUAL DELIVERY SYSTEM
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+dual_delivery_system:
+  type: dual_delivery_positional_tension
+  name: "Resonance & Rift"
+  description: >
+    Two opposed delivery systems compete for the Wavecaller's position. Sound healing
+    is strongest at RANGE (10-25m, stationary, hydrated). Water portal dive damage
+    requires MELEE (0-3m, harpoon range). Cannot optimize both simultaneously.
+    THE AGGRESSIVE HEALER wants to fight but should be healing. This push/pull IS the class.
+
+  delivery_sound:
+    name: "Resonance (Sound/Healing)"
+    function: "HEALING — fast, AoE, possibly no LoS since sound propagates"
+    properties:
+      - "AoE propagation — heals multiple allies within acoustic range"
+      - "Possible no-LoS — sound through walls at 70% effectiveness (1 wall max)"
+      - "Strongest stationary at range (sustained vocalization)"
+      - "Enhanced by high Hydration"
+      - "Interrupted by taking damage (biological disruption)"
+      - "Fast application — near-instant delivery"
+      - "MED-school: Direct HP restoration, not barriers"
+    sound_interrupt_cc:
+      stage: "Stage 2 (Interrupt)"
+      speed: "FASTER than Shaman's Bone Spirit (5s CD vs 10s CD)"
+      persistence: "LESS persistent (active use each time vs set-and-forget)"
+    optimal_position: "15-20m behind frontline, stationary"
+
+  delivery_water:
+    name: "Rift (Water Portal/Damage)"
+    function: "DAMAGE — generate portal → dive through → smash → emerge"
+    properties:
+      - "Portal generation requires Pressure Charge resource"
+      - "Impact damage on EMERGENCE"
+      - "Physical damage — melee-coded, scales with velocity"
+      - "Harpoon follow-up strikes (1-3 hits) during brief melee window"
+      - "Portal transit REHYDRATES (+25 per transit)"
+      - "One-way by default — return costs additional resource"
+      - "Portal lingers 2.5s (enemies can follow through at SR3+)"
+      - "Dive is COMMITTED — trajectory locked on entry"
+    melee_pattern: "Hit-and-run: emerge → harpoon strikes → return portal → resume healing"
+    optimal_condition: "High-value target, party HP stable, return available, Hydration above 40"
+
+  the_tension:
+    core: >
+      Diving means: in melee (dangerous), healing degraded (Cold resonance), resource
+      spent (escape costs more), party unhealed (HP dropping).
+      Staying means: safe but zero damage, kill opportunities wasted, Hydration draining.
+      No default mode. Correct answer changes every 5-10 seconds.
+    rift_dive_risk: >
+      RIFT DIVE IS NOT EXTREME RISK. The dive itself is safe — aquatic body handles
+      transit. The "risk" is IGNORING YOUR TEAM. Their HP drops while you DPS.
+      Not personal death — THEIR deaths through your healing absence.
+    skill_expression: >
+      Expert Wavecallers read party HP TRAJECTORY (projected 3-4s ahead), identify
+      safe windows, execute breach-strike-splash, return before debt becomes fatal.
+      Best players look like they never stop healing AND never stop diving.
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# ROTATION PHILOSOPHY
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+rotation_philosophy:
+  statement: "NO ROTATION EXISTS. NO 2-MINUTE BURST CYCLE. Dive timing is entirely contextual."
+  description: >
+    Sometimes 3 dives in 30s, sometimes 0 for 2 minutes. Rhythm from encounter,
+    not cooldowns. The "rotation" is: Heal → Read opportunity → Dive or don't →
+    Heal again. Every decision is fresh. Never scripted.
+
+  melee_pattern:
+    style: "Hit-and-run diving (dolphin breach → strike → splash back)"
+    explicitly_not: "NOT camping in melee. NOT sustained melee presence."
+    typical_dive_sequence:
+      - "Generate portal (GCD)"
+      - "Dive through (committed movement)"
+      - "Emerge with impact damage (automatic)"
+      - "1-2 harpoon strikes (Breaching Strike GCDs)"
+      - "Return portal OUT (Return Tide oGCD)"
+      - "Resume healing from safe position"
+    max_recommended_melee_time: "2-4 GCDs (4-8 seconds at base GCD)"
+
+  trigger_system:
+    heal_mode_triggers:
+      - "Party member drops below 60% HP"
+      - "Multiple allies taking simultaneous damage"
+      - "Portal resource depleted"
+      - "Boss entering high-damage phase"
+      - "Hydration dropping below 40"
+      - "Vocal disruption from recent damage"
+    damage_dive_triggers:
+      - "Isolated enemy at low HP (1-2 dive kill)"
+      - "Party HP stable at 80%+ (no healing demand)"
+      - "Enemy above 50% HP (+25% damage bonus window)"
+      - "Backline caster threatening party (interrupt via dive)"
+      - "Frontliner has target locked down (free window)"
+      - "Hydration low, need portal transit for rehydration"
+      - "Boss vulnerable (break state)"
+
+  punishment_philosophy:
+    based_on: "IGNORANCE — misreading when to heal vs dive"
+    framework: "Position × Action × Time"
+    description: >
+      Punishment is NEVER mechanical overwhelm. Buttons are simple. GCD is standard.
+      What kills is misreading: Where am I? What should I do? How long can my team
+      survive? All information is visible. All failures are knowledge failures.
+    explicitly_not:
+      - "NOT mechanical overwhelm"
+      - "NOT APM-gated (single-weave, standard GCD)"
+      - "NOT RNG-dependent"
+      - "NOT rotation failure (no rotation exists)"
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# RESOURCE SYSTEM (OVERVIEW — details in Skills file)
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+resource_system:
+  primary:
+    name: "Pressure Charge"
+    max_capacity: 4
+    description: >
+      Biological water pressure in portal glands. Gates BOTH offense (dives) and
+      defense (returns). Spending on offense reduces escape. Spending on escape
+      reduces future offense.
+    generation:
+      passive_rate: "1 per 12s (out of combat: 1 per 6s)"
+      active: "Breaching Strike: +0.25 per hit (4 hits = 1 Charge)"
+      bonus: "High Hydration (80+): +25% passive. Water terrain proximity: +50%. Stacks."
+    spending:
+      rift_dive: 1
+      return_tide: 1
+      maelstrom_entry: 3
+
+  secondary:
+    name: "Hydration Gauge (0-100)"
+    cross_reference: "See hydration_gauge section above"
+
+  tertiary:
+    name: "Vocal Resonance (State-based)"
+    states:
+      cold: "No recent vocalization. 70% healing potency. Builds to Warm after 2 consecutive heals."
+      warm: "2+ consecutive heals uninterrupted. 100% potency. Standard state."
+      resonant: "4+ consecutive heals, no interruption. 120% potency, +5m AoE radius. Breaks on damage/movement/non-heal."
+    post_dive_state: "Resets to Cold after any portal dive. Must rebuild. Hidden cost of aggression."
+
+  anti_spam_design:
+    no_heal_spam: "Resonant rewards sustained healing but encounter DPS checks force diving. Never diving = Hydration drains = weaker heals."
+    no_dive_spam: "4 max Charges, 12s regen, shared offense/defense pool. Math prevents permanent dive uptime."
+    zero_rng: "NO Freecure. NO random resets. ALL generation deterministic."
+    no_burst_cycle: "NO 2-minute alignment. NO fixed cadence. Pure contextual play."
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# ANTI-PATTERNS
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+anti_patterns:
+  - pattern: "NOT Jaguar from ToS"
+    why: "ONE interrupt (5s CD), ZERO hard CC. Enemies never frozen. Dive targets fight back at full capacity. No 'CC then hit safely' loop."
+
+  - pattern: "NOT rotation-based (NO 2-minute burst cycle)"
+    why: "Contextual dive decisions. Sometimes 3 dives in 30s, sometimes 0 for 2 minutes. Rhythm from encounter, not cooldowns."
+
+  - pattern: "NOT siren/enchanter (BANNED terminology)"
+    why: "Identity is DOLPHIN/ORCA — physical predator. Voice HEALS and INTERRUPTS, never dominates/compels. All siren terminology BANNED."
+
+  - pattern: "NOT damage-as-healing (not Sage/Disc Priest)"
+    why: "Heal and damage are SEPARATE, OPPOSED, require DIFFERENT positions. Must CHOOSE each GCD."
+
+  - pattern: "NOT camping in melee"
+    why: "Extended melee = failure state. Correct: breach → strike → splash back. Staying costs party HP + Resonance + resource."
+
+  - pattern: "NOT tank-healer hybrid (CANNOT REPLACE FRONTLINE)"
+    why: "Fragile in melee. No mitigation, no armor, no self-sustain under focus. If tank dies, party wipes."
+
+  - pattern: "NOT infinite mobility"
+    why: "4 max Charges, 12s regen, shared pool. Mobility is expensive and finite."
+
+  - pattern: "NOT support buffer"
+    why: "One single-target shield. No damage buffs. Value is DIRECT: personal healing + personal killing."
+
+  - pattern: "NOT RNG-dependent"
+    why: "Zero Freecure. Zero procs. Zero RNG crits. All deterministic. All failures = knowledge failures."
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# ITEM BASELINE
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+item_baseline:
+  source: "class_item_baselines.md — Wavecaller section"
+  description: >
+    These 7 items define what a party uses WITHOUT a Wavecaller. The class permanently
+    replaces these functions with persistent, scaling, integrated solutions.
+    Items define the floor. Class is the ceiling.
+
+  class_replaces_these_items:
+    - item: "Healing Specter"
+      item_function: "Deployable healing zone — positional AoE healing"
+      class_superiority: "Propagates through walls, unlimited, scales with Resonance + Hydration, no stationary requirement for allies"
+      replaced_by_ability: "Tidal Hymn / Harmonic Wash / Depths Call"
+
+    - item: "Rejuvenation Flask"
+      item_function: "Thrown AoE burst heal (2m radius, 20% HP) — emergency healing"
+      class_superiority: "Continuous, no-LoS, scales with vocalization, repeatable"
+      replaced_by_ability: "Keening Pulse / Harmonic Wash"
+
+    - item: "Flashstep Cartridge"
+      item_function: "8m directional teleport — gap closer"
+      class_superiority: "30m range, deals damage on arrival, creates portal, rehydrates, resource-gated not consumed"
+      replaced_by_ability: "Rift Dive"
+
+    - item: "Retrograde Bead"
+      item_function: "Mark position → recall within 20s — dive and return tool"
+      class_superiority: "Instant oGCD, no pre-placement needed, rehydrates, creates resource tension"
+      replaced_by_ability: "Return Tide"
+
+    - item: "Stupor Bell"
+      item_function: "Single interrupt, consumed on use"
+      class_superiority: "5s CD, 20m range, no LoS, repeatable, fastest interrupt in game"
+      replaced_by_ability: "Shattercroon"
+
+    - item: "Concussion Charge"
+      item_function: "Directional blast (area damage) — melee offense tool"
+      class_superiority: "Portal-momentum-enhanced, refunds Pressure Charge, conditional crits, no delay"
+      replaced_by_ability: "Breaching Strike"
+
+    - item: "Thickglass Flask"
+      item_function: "Thrown slow effect — CC application"
+      class_superiority: "Cone AoE, heals allies simultaneously, repeatable, no consumption"
+      replaced_by_ability: "Undertow Lullaby"
+
+  class_advantage_summary: >
+    The Wavecaller unifies healing + gap-close + damage + return into a SINGLE
+    integrated kit. Items require separate slots for healing (flask), gap-closing
+    (Flashstep), damage (Concussion Charge), and safe return (Retrograde Bead).
+    That's 4 item slots and 4 separate action commitments to achieve what one
+    portal dive + sound healing does. Sound healing solves the LoS problem that
+    no item addresses. Push/pull of aggression vs. safety creates DECISION DENSITY
+    that no item collection matches.
+
+  still_wants:
+    - "Smokebreak Ampule — safety window when Return Tide on CD"
+    - "Hardshell Powder — pre-dive party mitigation reduces healing demand during absence"
+    - "Harmony Draught — HoT on ally before diving (passive coverage)"
+    - "Ironvine Snare — escape tool if stranded"
+    - "Berserker's Draught — +30% damage before Maelstrom Entry"
+
+  countered_by:
+    - "Thickglass Flask — slows return to safety post-dive"
+    - "Stasis Pin — 3s freeze during recovery (no healing, no portals)"
+    - "Desiccant Bomb (theoretical) — destroys water terrain, accelerates dehydration"
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# SYSTEM RULES COMPLIANCE
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+system_rules:
+  gcd:
+    base: "2.0s"
+    cap: "1.4s"
+    weave_policy: "Single-weave ONLY (one oGCD per GCD window)"
+
+  crit:
+    rng: false
+    model: >
+      Positional/conditional only — no random crits. Crit from meeting specific
+      positional or situational conditions (e.g., striking targets above 50% HP,
+      post-dive momentum strikes).
+
+  damage_bonus:
+    greater_than_50_hp: "+25% damage to enemies above 50% HP"
+    description: "Encourages early burst, rewards targeting healthy enemies, aligns with dive-and-burst pattern."
+
+  items:
+    principle: "Items define baseline. Class abilities permanently replace item functionality."
+
+  burst_cycle:
+    forbidden: "NO 2-minute burst cycle. NO fixed cadence. Dive timing is entirely contextual."
+
+  procs:
+    forbidden: "ZERO Freecure. ZERO RNG procs. All resource generation is deterministic."
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# §25 COMPLIANCE NOTE
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+section_25_compliance:
+  rule: "No identity skill may have a cooldown ≥ 90s. All long-gating converted to resource gates."
+  audit_result: "PASS"
+  details: >
+    All Wavecaller skills audited. Maximum fixed cooldown is Maelstrom Entry at 45s.
+    No skill uses a ≥90s CD. Identity gating achieved via:
+    - Pressure Charge resource (4 max, 12s regen, shared offense/defense pool)
+    - Hydration Gauge (0-100, drain on land, restore via transit)
+    - Vocal Resonance state (Cold/Warm/Resonant — resets on dive)
+    All "cooldowns" are contextual resource decisions, not timer alignments.
+    Depths Call (20s CD) is the longest fixed CD on any healing ability.
+  conversions_performed:
+    - "Maelstrom Entry: could have been 120s CD — instead gated by 3 Pressure Charges + 10s gland lockout after use"
+    - "Rift Dive: could have been 30s CD — instead gated by 1 Pressure Charge (regenerates contextually)"
+    - "No ability was designed with ≥90s CD. All gating is resource-inherent from inception."
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# VULNERABILITY PROFILE
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+vulnerability:
+  core_weakness: "Healing absence during dive — party HP debt accumulates"
+  secondary_weakness: "Dehydration on land — performance degrades without water contact"
+  punishment_model: "IGNORANCE-based. Position × Action × Time. Not mechanical overwhelm."
+
+  vulnerability_states:
+    healing_absence:
+      condition: "Diving/in melee instead of healing"
+      exposure: "Party HP dropping without restoration. PRIMARY risk — not YOUR death, THEIR death."
+
+    post_dive_cold_resonance:
+      condition: "Just returned from dive"
+      duration: "4s to rebuild to Warm"
+      exposure: "70% healing potency. Hidden aggression tax."
+
+    dehydration:
+      condition: "Extended land time, Hydration below 40"
+      exposure: "SLOWED (not rooted). Healing degraded. Portal gen impaired."
+      explicitly_not: "NOT rooted. NOT helpless. NOT locked out. SLOWED and DEGRADED."
+
+    post_dive_stranded:
+      condition: "0 Pressure Charges, Return Tide on CD"
+      duration: "4-12s"
+      exposure: "In melee, no portal escape, Cold resonance. Must walk out."
+
+    post_maelstrom_critical:
+      condition: "Maelstrom Entry used (0 charges + 10s lockout)"
+      duration: "22s until first portal"
+      exposure: "Extended melee, zero portals, party unhealed 10s+. BUT fully rehydrated (+75)."
+
+  tuning_philosophy: >
+    Expert Wavecallers have near-zero vulnerability (never dive without return resources).
+    Bad Wavecallers are the most vulnerable healer (constantly stranded, Cold, dehydrated).
+    Skill gap is in READING, not EXECUTION. Intentional for Experienced tier.
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# CC BUDGET
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+cc_budget:
+  primary_cc: "Stage 2 — Sound Interrupt (Shattercroon, 5s CD, 20m, no LoS)"
+  secondary_cc: "Stage 1 — Incidental displacement/slow (Rift Dive, Undertow Slam, Undertow Lullaby, Maelstrom Entry)"
+  stage_3: "NONE — zero hard CC. Cannot stun/paralyze/sleep."
+
+  why_no_stage_3: >
+    Power budget allocated to: healing + burst damage + mobility. CC is the sacrifice.
+    Prevents self-sufficient solo play. Creates party dependency.
+    HEALERS CANNOT REPLACE THE FRONTLINE.
+
+  vs_shaman_interrupt: >
+    Wavecaller = FAST (5s), ACTIVE (costs attention each time), NO persistence.
+    Shaman = SLOW (10s), PASSIVE (set-and-forget installation), PERSISTENT.
+    Speed vs convenience tradeoff.
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# HIT/MISS ANALYSIS
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+hit_miss_analysis:
+  what_this_class_nails:
+    - "THE AGGRESSIVE HEALER archetype — no other healer has body-wants-to-fight vs role-demands-healing tension"
+    - "Positional tension as skill expression — heal at range vs damage in melee"
+    - "Hydration Gauge creates map awareness — water terrain becomes strategic"
+    - "Dolphin/orca identity — distinct, physical, fast, kinetically satisfying"
+    - "Biological lock necessity — four organs must coexist, no other race qualifies"
+    - "Punishment rewards game sense not APM — Position × Action × Time"
+    - "Speed-interrupt fills unique niche — 5s CD, faster than Shaman, no persistence"
+    - "Dive maintains Hydration (positive feedback) — biology rewards aggression, role demands restraint"
+    - "Harpoon weapon sells aquatic hunter identity — visual + mechanical coherence"
+
+  what_could_miss:
+    - risk: "Diving never correct in hard content"
+      mitigation: "Encounter design must include DPS checks and heal-light windows. Hydration drain also forces occasional diving."
+    - risk: "Hydration feels like chore on dry maps"
+      mitigation: "Most areas should have SOME water. Tidemark self-sufficient. Rain weather. Spiritcaller synergy."
+    - risk: "Return Tide makes diving too safe"
+      mitigation: "Costs 2 Charges per full cycle. Two cycles depletes everything. Plus healing TIME still lost."
+    - risk: "Sound no-LoS trivializes ally positioning"
+      mitigation: "70% through walls (1 wall max). Wavecaller's position still matters. Resonant state requires stationary."
+    - risk: "Party perception — 'healer keeps diving, we're dying'"
+      mitigation: "Punishment is immediate + educational. Teaches restraint through consequences."
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# DESIGN NOTES
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+design_notes:
+  session_origin: "Sessions 5-6 (Class Identity Workshop)"
+  key_decisions:
+    - "Sound = healing, water = damage. Inverted from 'water heals' trope. Biological justification holds."
+    - "Harpoon over staff/wand — sells aquatic hunter, not aquatic mage."
+    - "Hydration Gauge serves DOUBLE DUTY: land penalty AND dive incentive. One mechanic, two design goals."
+    - "Portal transit rehydrates — positive feedback loop for aggression that role demands you resist."
+    - "Vocal Resonance (Cold→Warm→Resonant) is the HIDDEN cost of diving. Not visible until you return."
+    - "Pressure Charge shared offense/defense pool creates resource tension without complexity."
+    - "5s interrupt chosen over 10s to differentiate from Shaman. Speed at the cost of persistence."
+    - "No Stage 3 CC — healer cannot disable enemies. Must rely on party frontline."
+
+  open_questions:
+    - "Sound no-LoS at 70% through walls — too powerful? Limited to 1 wall max."
+    - "Portal entry lingering 2.5s — enemies follow? Scale with SR: SR1-2 never, SR3 sometimes, SR4 always."
+    - "Hydration drain rates correct? Playtest vs average encounter length."
+    - "Water terrain frequency in map pool? Jumper-heavy areas have water. Generic dungeons may not."
+    - "Party portal access — final decision pending."
+
+# ▼ AWAITING: Layer 1 Spatial Quantification Pass

@@ -1,0 +1,580 @@
+# ▲ CROSS-REFERENCE: Wavecaller_Design.yaml (identity/mechanics) | Wavecaller_Skills.yaml (ability list)
+# ══════════════════════════════════════════════════════════════════════════════════
+# WAVECALLER — Validation & Balance Specification
+# juice-yaml-library | github.com/marbleperfume/juice-yaml-library
+# ══════════════════════════════════════════════════════════════════════════════════
+#
+# This file validates the Wavecaller against:
+#   - Combat/BalanceTargets.yaml (potency bands, TTK, role baselines)
+#   - §25 compliance (no identity CD ≥ 90s)
+#   - 4 matchup scenarios (SR1-SR3 + aquatic environment)
+#   - Pass/fail criteria
+#   - Weakness budget & terrain interaction
+#
+# Last Updated: 2026-07-14
+# ══════════════════════════════════════════════════════════════════════════════════
+
+header:
+  class_name: "Wavecaller"
+  file_scope: "Balance targets, matchup scenarios, pass/fail criteria, §25 verification, weakness budget, terrain interaction"
+  design_authority: "Wavecaller_Design.yaml"
+  skills_authority: "Wavecaller_Skills.yaml"
+  balance_ref: "Combat/BalanceTargets.yaml"
+  last_updated: "2026-07-14"
+  validation_status: "Qualitative Complete — Awaiting Layer 1 Numerical Pass"
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# BALANCE TARGETS
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+balance_targets:
+  reference: "Generic Experienced-tier DPS = 100%. Healer baseline = 65% (triage) / 80% (free DPS)."
+
+  healing_output_by_state:
+    # State                    | HPS % of Max | Condition
+    resonant_saturated:         [115, 125]     # 4+ uninterrupted heals, Hydration 80+
+    warm_saturated:             [95, 105]      # Standard healing, Hydration 80+
+    warm_damp:                  [80, 90]       # Standard healing, Hydration 40-79
+    cold_saturated:             [70, 80]       # Post-dive, Hydration 80+ (hidden tax)
+    cold_parched:               [45, 55]       # Post-dive, Hydration 15-39 (double penalty)
+    cold_desiccated:            [28, 35]       # Post-dive, Hydration 0-14 (crisis state)
+
+  dps_output_by_mode:
+    # Mode                     | % of DPS Ref | Duration   | Intent
+    heal_only:                  [3, 8]         # Indefinite | Pressure Wave only. Role-focused.
+    balanced_play:              [45, 55]       # Sustained  | Target gameplay. 1-2 dives/30s.
+    aggressive_play:            [65, 75]       # Sustained  | Maximum dive uptime. Low healing.
+    free_dps_mode:              [78, 82]       # Easy content | Zero healing needed. Full dive rotation.
+    maelstrom_burst:            [150, 180]     # 4-6s window | All-in commit. Party unhealed.
+
+  encounter_averaged:
+    expert_play: [62, 68]    # 65% baseline met. Healing + damage optimized. Near-zero deaths.
+    average_play: [50, 58]   # Some overcautious healing, some overdiving. Occasional party deaths.
+    poor_play: [35, 45]      # Constant Cold state, dehydrated, party dying. Or: never diving, underperforming DPS.
+
+  hps_targets:
+    sustained_single_target: "250-350p per GCD (Keening Pulse level)"
+    sustained_aoe: "200-280p per GCD per ally hit (Tidal Hymn level)"
+    burst_aoe: "400-500p single cast (Depths Call)"
+    note: "Healer HPS must sustain party through Rank 2 content. Must NOT sustain through Rank 4 without perfect play."
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# MATCHUP SCENARIOS
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+matchup_scenarios:
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  scenario_sr1:
+    name: "SR1 — Trash Corridor (Standard Land)"
+    strategy_rank: 1
+    environment: "Dry dungeon corridor. No water terrain. Indoor."
+    party: "Frontliner + DPS + Wavecaller"
+    enemies: "3-5 trash mobs. Attack closest. No tactics."
+    duration: "5-8s (full party TTK target)"
+
+    wavecaller_behavior:
+      optimal: >
+        Free DPS mode. Party takes minimal damage. Frontliner holds aggro trivially.
+        Dive every pack. Breach-strike-splash. Party never drops below 80%.
+        Tidemark once for Hydration maintenance. Keening Pulse between packs.
+      healing_demand: "Minimal — Keening Pulse (8s CD) covers all needs"
+      dive_frequency: "Every pack (1-2 per 20s)"
+      hydration_management: "Tidemark once per 2-3 packs. Never reaches Parched."
+
+    expected_output:
+      dps_contribution: "~75-80% of reference"
+      hps_required: "~150p per 10s (trivial)"
+      hydration_at_end: "60-80 (manageable with Tidemark)"
+
+    pass_criteria:
+      - "Wavecaller achieves ≥70% DPS output"
+      - "Party never drops below 60% HP"
+      - "Hydration never drops below 40 (Parched)"
+      - "Encounters complete within TTK target (5-8s)"
+    fail_if:
+      - "Wavecaller unable to dive (resource starved) — BALANCE ISSUE"
+      - "Party dies despite low enemy output — HPS TOO LOW"
+      - "Hydration reaches critical on dry map within 2 encounters — DRAIN TOO FAST"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  scenario_sr2:
+    name: "SR2 — Dungeon Elite (Mixed Terrain)"
+    strategy_rank: 2
+    environment: "Cave with intermittent water pools (25% floor coverage). Some LoS blockers."
+    party: "Frontliner + DPS + Wavecaller"
+    enemies: "1 elite + 2 trash. Elite seeks shortest path to squishies."
+    duration: "20-30s (elite TTK target)"
+
+    wavecaller_behavior:
+      optimal: >
+        Balanced play. Heal frontliner through elite attacks. Identify safe dive
+        windows (when elite is locked on frontliner). Use water pools for Hydration.
+        Shattercroon on elite casts. 1-2 dive cycles during fight.
+        Position near water pool for passive Hydration regen.
+      healing_demand: "Moderate — Tidal Hymn sustains, Depths Call if spike damage"
+      dive_frequency: "1-2 per encounter (when frontliner has elite controlled)"
+      hydration_management: "Water pool proximity handles passive. Dives supplement."
+      interrupt_usage: "Shattercroon 2-4 times per elite (every dangerous cast)"
+
+    expected_output:
+      dps_contribution: "~50-60% of reference"
+      hps_required: "~200-250p sustained, 400p+ burst on spikes"
+      hydration_at_end: "70-90 (water pools available)"
+
+    pass_criteria:
+      - "Wavecaller maintains 50-60% DPS while keeping party alive"
+      - "Frontliner never drops below 30% HP (healing adequate)"
+      - "Elite is interrupted on at least 2 dangerous casts"
+      - "Dive windows correctly identified (party stable during absence)"
+      - "Hydration maintained at Damp or above"
+    fail_if:
+      - "Frontliner dies because Wavecaller dove at wrong time — CORRECT (punishment working)"
+      - "Wavecaller cannot contribute ANY damage — DIVE NEVER SAFE (encounter design issue)"
+      - "Shattercroon insufficient for cast prevention — CD TOO LONG (5s should be enough)"
+      - "Healing output inadequate even without diving — BASE HPS TOO LOW"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  scenario_sr3:
+    name: "SR3 — Boss with Phases (Indoor, Dry)"
+    strategy_rank: 3
+    environment: "Boss arena. No water terrain. Dry. Indoor. Enemies flank and coordinate."
+    party: "Frontliner + DPS + Wavecaller"
+    enemies: "Boss + 2 adds that spawn at 50% boss HP. Boss targets installations, flanks."
+    duration: "2-3 minutes (dungeon boss TTK)"
+
+    wavecaller_behavior:
+      optimal: >
+        Phase 1 (100-50%): Heal-primary with opportunistic dives during safe windows.
+        Tidemark on cooldown for Hydration (no water terrain). 2-3 dive cycles.
+        Phase 2 (50%-adds): Heavy healing. Adds pressure party. Minimize diving.
+        Shattercroon on add casts. Depths Call on party-wide damage.
+        DPS check moment: Maelstrom Entry on boss during add CC window (party stun).
+        Post-Maelstrom: Walk back, rebuild Resonance, heavy heal phase.
+      healing_demand: "High sustained (Phase 2). Moderate (Phase 1). Spike on transitions."
+      dive_frequency: "Phase 1: 2-3 dives. Phase 2: 0-1 dives. DPS check: 1 Maelstrom."
+      hydration_management: "CRITICAL — no water terrain. Tidemark every 12s. Dives help (+25 each)."
+      interrupt_usage: "4-8 Shattercroons across fight (boss + adds)"
+
+    expected_output:
+      dps_contribution: "~45-55% of reference (averaged over fight)"
+      hps_required: "~250p sustained, 500p spike (Depths Call handles)"
+      hydration_at_end: "30-50 (dry map — Tidemark + dives barely maintain Damp)"
+
+    pass_criteria:
+      - "Boss dies within TTK window (2-3 min) with Wavecaller contributing 45-55% DPS"
+      - "Party survives Phase 2 add pressure (healing adequate under sustained damage)"
+      - "Hydration never reaches Desiccated (0-14) — Tidemark + dives sufficient"
+      - "Maelstrom Entry timed correctly (DPS check met, party survives absence)"
+      - "Post-Maelstrom recovery completes before next damage spike"
+      - "Wavecaller correctly shifts to heal-priority during Phase 2"
+    fail_if:
+      - "Hydration reaches Desiccated on dry map — TIDEMARK INSUFFICIENT (buff Tidemark or drain rate)"
+      - "Maelstrom Entry never viable (party cannot survive 10s without heals) — ENCOUNTER NEEDS SAFE WINDOW"
+      - "DPS contribution too low (boss doesn't die in time) — DIVE DAMAGE TOO LOW"
+      - "Party wipes during Phase 2 (HPS inadequate) — BASE HEALING TOO WEAK"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  scenario_aquatic:
+    name: "Aquatic Environment — Jumper Homeland Dungeon"
+    strategy_rank: 2
+    environment: "Coastal cave. 60% water terrain. Submerged sections. Rain weather active."
+    party: "Frontliner + DPS + Wavecaller"
+    enemies: "2 elites (aquatic). Enemies also benefit from water (faster)."
+    duration: "30-45s (2 elites)"
+
+    wavecaller_behavior:
+      optimal: >
+        THRIVING. Hydration maxed from environment. Full Saturated throughout.
+        Aggressive diving — full healing potency regardless. Water proximity
+        accelerates Pressure Charge regen (+50%). Rain provides +3/10s Hydration.
+        Maximum dive frequency. Party healed at 100% potency even during Cold.
+        Underwater sections: can submerge for instant full Hydration.
+      healing_demand: "Moderate (enemies also faster in water — deal more DPS)"
+      dive_frequency: "3-4 per encounter (Pressure regen accelerated)"
+      hydration_management: "Automatic — environment maintains Saturated"
+      unique_advantage: "Full Saturated = 100% healing even at Cold state. Effectively removes Cold tax."
+
+    expected_output:
+      dps_contribution: "~70-80% of reference (maximum dive uptime, rapid regen)"
+      hps_required: "~200-250p sustained (enemies also empowered)"
+      hydration_at_end: "95-100 (Saturated — environment maintains)"
+
+    pass_criteria:
+      - "Wavecaller achieves 70-80% DPS (significant aquatic advantage)"
+      - "Pressure Charge regen noticeably faster (+50% from water proximity)"
+      - "Hydration management is trivial (environment handles it)"
+      - "Aquatic enemies are ALSO buffed (fight isn't trivially easy)"
+      - "Net advantage: ~15-20% more effective than dry land equivalent"
+      - "Does not feel like 'easy mode' — enemies compensate with speed"
+    fail_if:
+      - "Wavecaller too dominant in aquatic (>90% DPS — exceeds healer role boundary)"
+      - "Aquatic enemies not threatening enough (no healing needed = just a DPS)"
+      - "Advantage too small to notice (<5% improvement over dry) — WATER BONUSES TOO WEAK"
+      - "Advantage too large (>30% improvement) — WATER BONUSES NEED NERF"
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# SYSTEM INTERACTIONS
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+system_interactions:
+
+  strategy_rank:
+    sr1:
+      portal_exploit: "Enemies never follow through portals. Free aggression."
+      healing_demand: "Trivial. Wavecaller is functionally a DPS with panic heal."
+      interrupt_value: "Low (enemies rarely cast meaningful abilities)."
+    sr2:
+      portal_exploit: "Enemies do NOT follow through portals."
+      healing_demand: "Moderate. Must heal consistently. Dive windows exist."
+      interrupt_value: "Moderate (elites have dangerous casts worth interrupting)."
+    sr3:
+      portal_exploit: "Enemies SOMETIMES follow through portals (SR3 awareness)."
+      healing_demand: "High. Limited dive windows. Healing primary."
+      interrupt_value: "High (boss coordination requires interrupt discipline)."
+    sr4:
+      portal_exploit: "Enemies ALWAYS follow through portals. Portal = liability."
+      healing_demand: "Extreme. Diving is a LUXURY, not a baseline."
+      interrupt_value: "Critical (multiple casters requiring triage of interrupts)."
+
+  above_50_rule:
+    interaction: >
+      Wavecaller dives enemies >50% HP for +25% damage + Breaching Strike crit.
+      This rewards EARLY aggression. Once enemy drops <50%, switch targets or
+      stay for Geyser Burst execute. Two distinct power windows.
+    healer_implication: >
+      Wavecaller should NOT top party to full HP (>50% HP = +25% incoming damage).
+      Optimal: heal TO 50-60%, then stop. Over-healing is counterproductive.
+      This aligns with dive windows: heal to stable → dive → heal to stable → dive.
+
+  over_50_player_hp:
+    interaction: >
+      Party members above 50% HP take +25% incoming damage. Wavecaller must heal
+      TO 50%, not to full. Over-healing actively endangers allies. Creates natural
+      "healing done, can dive now" signal: party at 50-55% = safe to stop healing.
+
+  procgen_maps:
+    water_frequency:
+      jumper_regions: "40-60% water terrain"
+      generic_dungeons: "10-25% water terrain"
+      minimum_guarantee: "≥1 water feature per dungeon floor"
+    advantage_delta:
+      dry_map: "Base performance. Tidemark handles Hydration. Harder but viable."
+      mixed_map: "Comfortable. Water pools for positioning advantage."
+      wet_map: "Thriving. Maximum dive frequency. ~15-20% more effective."
+    map_seed_impact: "High-water = Wavecaller-favored. Dry = neutral (not crippled)."
+
+  aquatic_terrain_table:
+    # Parameter              | Dry Land       | Water Proximity (5m) | Submerged
+    hydration_drain:          ["-5/10s combat", "+2/5s regen",        "+15/s regen"]
+    pressure_regen:           ["12s per charge","9s per charge (+50%)","6s per charge"]
+    healing_potency:          ["Hydration-dependent", "Stable high", "Always Saturated"]
+    movement_speed:           ["Hydration-dependent", "Normal",       "+10% swim speed"]
+    portal_generation:        ["Normal",        "Normal",             "Enhanced (glands saturated)"]
+    enemy_portal_follow:      ["SR-dependent",  "SR-dependent",       "Enemies may not follow underwater"]
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# PASS/FAIL VALIDATION CHECKS
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+validation_checks:
+
+  identity:
+    VAL-ID-01: {check: "Aggressive healer tension present", status: "PASS", note: "Push/pull between dive DPS and heal role is structural, not incidental."}
+    VAL-ID-02: {check: "Dolphin/orca identity (no siren)", status: "PASS", note: "All terminology audited. Zero banned terms in ability names/descriptions."}
+    VAL-ID-03: {check: "Biological lock justified (4 organs)", status: "PASS", note: "Vocal apparatus + portal glands + aquatic body + hydration dependence."}
+    VAL-ID-04: {check: "Harpoon weapon coherent", status: "PASS", note: "Harpoon used in melee dive sequences. Aquatic hunter identity."}
+    VAL-ID-05: {check: "NOT siren, NOT Jaguar, NOT Sage", status: "PASS", note: "Anti-patterns explicitly exclude all three archetypes."}
+    VAL-ID-06: {check: "Healer cannot replace frontline", status: "PASS", note: "No sustained mitigation, no aggro tools, fragile in melee."}
+
+  mechanical:
+    VAL-MC-01: {check: "§25 CD compliance (no CD ≥ 90s)", status: "PASS", note: "Max CD = 45s (Maelstrom Entry). All identity gating via resources."}
+    VAL-MC-02: {check: "No 2-minute burst cycle", status: "PASS", note: "All dive timing contextual. No fixed cadence."}
+    VAL-MC-03: {check: "Crit is conditional (zero RNG)", status: "PASS", note: "Breaching Strike (>50% HP), Geyser Burst (2s post-dive), Maelstrom (>50%)."}
+    VAL-MC-04: {check: "GCD 2.0s base / 1.4s cap", status: "PASS", note: "All GCDs conform. Cast times noted where applicable."}
+    VAL-MC-05: {check: "Single-weave only", status: "PASS", note: "All sequences single-weave. Harmonic Wash has NO weave window (2.0s cast)."}
+    VAL-MC-06: {check: "Zero Freecure / zero RNG procs", status: "PASS", note: "All generation deterministic. Pressure = passive + active. Hydration = physics."}
+    VAL-MC-07: {check: "Items define baseline (class replaces)", status: "PASS", note: "7 items replaced. Documented in Design file."}
+
+  balance:
+    VAL-BL-01: {check: "Healer DPS at 65% during triage", status: "PASS (qual)", note: "50-55% during active healing with dives. 65% with optimal windows."}
+    VAL-BL-02: {check: "Healer DPS at 80% in easy content", status: "PASS (qual)", note: "78-82% achievable with full dive uptime."}
+    VAL-BL-03: {check: "HPS adequate for Rank 2 sustained", status: "PASS (qual)", note: "240p AoE per GCD (Tidal Hymn) sustains SR2 damage."}
+    VAL-BL-04: {check: "Cannot solo-sustain through SR4", status: "PASS", note: "SR4 damage exceeds single-healer throughput. Party must mitigate."}
+    VAL-BL-05: {check: "Potencies within BalanceTargets bands", status: "PASS (qual)", note: "Heal GCD: 240p (band 200-300). Ultimate: 700p (band 600-800)."}
+    VAL-BL-06: {check: "Aquatic advantage 15-20% (not dominant)", status: "PASS (qual)", note: "Water proximity = +50% Pressure regen + Hydration maintenance."}
+
+  party_role:
+    VAL-PR-01: {check: "Clear role (healer with DPS windows)", status: "PASS"}
+    VAL-PR-02: {check: "Not redundant with other healers", status: "PASS", note: "Unique: aggressive + interrupt + LoS-penetrating. No other healer dives."}
+    VAL-PR-03: {check: "Party survives Wavecaller dive", status: "CONDITIONAL", note: "Depends on dive timing. Correct timing = safe. Wrong = deaths."}
+    VAL-PR-04: {check: "Benefits from coordination", status: "PASS", note: "Frontliner holding aggro = free dive window. Spiritcaller water = Hydration."}
+    VAL-PR-05: {check: "Cannot self-sufficient solo", status: "PASS", note: "No Stage 3 CC, fragile in melee, needs frontline."}
+
+  content_design:
+    VAL-CD-01: {check: "Encounters include DPS check windows", status: "REQUIREMENT (pending)", note: "Without DPS windows, diving is never correct."}
+    VAL-CD-02: {check: "Water terrain available on most maps", status: "REQUIREMENT (pending)", note: "Min 1 water feature/floor. Tidemark backup on dry maps."}
+    VAL-CD-03: {check: "SR3+ portals exploitable by enemies", status: "REQUIREMENT (pending)", note: "Enemies follow portals at SR3+. Creates dive cost."}
+    VAL-CD-04: {check: "Boss phases give recovery time post-Maelstrom", status: "REQUIREMENT (pending)", note: "22s portal lockout needs boss downtime or transition."}
+
+  section_25:
+    VAL-25-01: {check: "No ability CD ≥ 90s", status: "PASS", note: "Max = 45s (Maelstrom Entry)."}
+    VAL-25-02: {check: "Identity gating via resource not timers", status: "PASS", note: "Pressure Charge, Hydration Gauge, Vocal Resonance."}
+    VAL-25-03: {check: "No long-CD converted to shorter without compensation", status: "PASS", note: "All resource gates provide DECISIONS, not just waits."}
+
+  summary:
+    total: 24
+    pass: 17
+    pass_qualitative: 5
+    conditional: 1
+    requirements_pending: 4
+    fail: 0
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# WEAKNESS BUDGET
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+weakness_budget:
+  description: >
+    Every class must have clear, exploitable weaknesses. Wavecaller's weaknesses
+    are structural (emerge from core mechanic), not arbitrary debuffs.
+
+  structural_weaknesses:
+    - weakness: "Healing absence during dive"
+      severity: "HIGH"
+      exploitable_by: "Enemies with party-wide damage during dive windows"
+      counterplay: "Correct dive timing, pre-dive Resonant Shield, Depths Between passive"
+      cannot_be_removed: true
+
+    - weakness: "Dehydration on dry land"
+      severity: "MEDIUM"
+      exploitable_by: "Dry environments, anti-water mechanics, extended land combat"
+      counterplay: "Tidemark (12s CD, +30), diving for transit rehydration"
+      cannot_be_removed: true
+
+    - weakness: "Cold Resonance after dive"
+      severity: "MEDIUM"
+      exploitable_by: "Spike damage immediately after dive return (heals at 70%)"
+      counterplay: "Pre-dive healing to build buffer, Keening Pulse for instant spot-heal"
+      cannot_be_removed: true
+
+    - weakness: "Shared offense/defense resource pool"
+      severity: "HIGH"
+      exploitable_by: "Sustained aggression that depletes both escape AND future dive capacity"
+      counterplay: "Conservative play (only dive with 2+ Charges), Breaching Strike refund"
+      cannot_be_removed: true
+
+    - weakness: "No Stage 3 CC"
+      severity: "MEDIUM"
+      exploitable_by: "Enemies that require hard CC to stop (unstoppable chargers)"
+      counterplay: "Party dependency — need frontliner or Grappler for disables"
+      cannot_be_removed: true
+
+    - weakness: "Portal can be followed by enemies (SR3+)"
+      severity: "LOW-MEDIUM (SR-dependent)"
+      exploitable_by: "Smart enemies diving the portal back to Wavecaller's healspot"
+      counterplay: "Awareness of SR level, portal positioning, team blocking entry"
+      cannot_be_removed: true
+
+  what_wavecaller_is_NOT_weak_to:
+    - "Silence/anti-magic — biological vocalization, not spellcasting"
+    - "LoS denial — sound propagates through 1 wall at 70%"
+    - "Single-target pressure on self — can portal away (if Charges available)"
+    - "Mana/resource starvation — Pressure regenerates passively"
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# TERRAIN INTERACTION
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+terrain_interaction:
+  water_terrain:
+    proximity_5m:
+      hydration: "+2 per 5s"
+      pressure_regen: "+50% speed"
+      healing: "No direct bonus (Hydration maintained = stable potency)"
+    submerged:
+      hydration: "+15/s (instant saturation)"
+      pressure_regen: "+100% speed (6s per Charge)"
+      healing: "Full Saturated maintained indefinitely"
+      movement: "+10% swim speed (aquatic biology)"
+
+  created_terrain:
+    tidemark_puddle:
+      size: "3m radius"
+      duration: "8s"
+      effects: "1% HP/s HoT (allies), counts as water for proximity bonuses"
+    undertow_slam_puddle:
+      size: "5m radius"
+      duration: "2s"
+      effects: "-20% enemy speed (difficult terrain), counts as water for Hydration"
+
+  weather:
+    rain:
+      hydration: "+3 per 10s (passive supplement)"
+      effect: "Reduces dry-map penalty. Makes Tidemark less urgent."
+    drought:
+      hydration: "Additional -2 per 10s drain"
+      effect: "Worst-case scenario. Forces more frequent Tidemark/diving."
+
+  terrain_strategy: >
+    Wavecaller should position near water when possible. Created puddles (Tidemark,
+    Undertow Slam) serve as positioning anchors. In dry environments, Tidemark
+    becomes mandatory maintenance. Expert play: create puddle near healing position,
+    stand in it for passive Hydration, dive from stable base.
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# MATCHUP ANALYSIS (PARTY SYNERGIES & COUNTERS)
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+matchup_analysis:
+
+  party_synergies:
+    with_spiritcaller:
+      synergy: "STRONG"
+      description: "Water Slime provides +1/5s Hydration proximity. Slime heals while Wavecaller dives. Double healer coverage."
+      combined_advantage: "Wavecaller can dive more freely (Slime covers healing gap). Hydration maintained passively."
+
+    with_frontliner_madolt:
+      synergy: "STANDARD"
+      description: "Madolt holds aggro. Wavecaller heals + dives when Madolt has target locked."
+      combined_advantage: "Clear dive windows when Madolt parries (enemy in recovery). Standard healer-tank pair."
+
+    with_frontliner_grappler:
+      synergy: "STRONG"
+      description: "Grappler pins target (Stage 3 CC). Wavecaller dives pinned target for free damage."
+      combined_advantage: "Pinned enemy = guaranteed safe dive (can't fight back). Maximum aggression window."
+
+    with_reaver:
+      synergy: "MODERATE"
+      description: "Reaver pursues isolated target. Wavecaller heals party while Reaver self-sustains."
+      combined_advantage: "Wavecaller doesn't need to heal Reaver during pursuit. Frees dive windows."
+      note: "Wavecaller's water puddles don't directly help Reaver (Reaver has own water bonuses)."
+
+    with_shaman:
+      synergy: "MODERATE"
+      description: "Shaman slows enable easier dive targeting. Bone Spirit handles persistent interrupts (Wavecaller covers reactive)."
+      combined_advantage: "Split interrupt duty. Shaman CC creates safe dive windows."
+
+  countered_by:
+    sustained_party_damage:
+      threat: "HIGH"
+      description: "Constant party-wide damage prevents diving. Wavecaller trapped in heal-only mode."
+      wavecaller_response: "Accept reduced DPS. Wait for momentary dips. Use Tidemark for maintenance."
+
+    anti_melee_mechanics:
+      threat: "MEDIUM"
+      description: "Boss AoEs around self, ground hazards in melee range."
+      wavecaller_response: "Cannot dive during anti-melee phases. Must contribute via Pressure Wave (weak)."
+
+    enemy_backline_pressure:
+      threat: "MEDIUM"
+      description: "Enemies targeting Wavecaller's heal position forces movement (breaks Resonance)."
+      wavecaller_response: "Shattercroon interrupt, Resonant Shield self, or portal AWAY (defensive dive)."
+
+    dry_environments:
+      threat: "LOW-MEDIUM"
+      description: "No water terrain. Hydration maintenance solely via Tidemark + dives."
+      wavecaller_response: "Tidemark every 12s. Dives become dual-purpose (damage + hydration)."
+
+    portal_followers_sr3_plus:
+      threat: "LOW-MEDIUM"
+      description: "Smart enemies follow through lingering portal to Wavecaller's safe position."
+      wavecaller_response: "Position awareness. Don't create portal exit near party backline."
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# CONSTRAINTS & INVARIANTS
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+constraints:
+
+  hard_invariants:
+    INV-01: "Sound = healing. Water = damage. Never swap delivery functions."
+    INV-02: "Heal and damage require DIFFERENT positions. Cannot optimize both."
+    INV-03: "Healers CANNOT replace the frontline. No exceptions."
+    INV-04: "Zero RNG. All crits conditional. All generation deterministic."
+    INV-05: "No siren terminology. Dolphin/orca identity always."
+    INV-06: "Dehydration = SLOWED, never ROOTED. Always functional."
+    INV-07: "Portal dive = safe for Wavecaller. Risk is on TEAM, not self."
+    INV-08: "No 2-minute burst cycle. No fixed cadence. Contextual only."
+
+  soft_constraints:
+    # ID   | Parameter              | Current  | Flex Range   | Rationale
+    CON-01: ["Hydration drain (combat)", "-5/10s", "-3 to -7/10s", "Must feel urgent without being oppressive"]
+    CON-02: ["Portal rehydration", "+25 each", "+20 to +30", "Must reward diving without making Hydration trivial"]
+    CON-03: ["Pressure Charge max", "4", "3-5", "2 cycles minimum from full. More = less tension."]
+    CON-04: ["Pressure regen rate", "12s", "10-15s", "Too fast = infinite mobility. Too slow = never dive."]
+    CON-05: ["Cold potency penalty", "70%", "60-80%", "Must be felt (not trivial) but not crippling"]
+    CON-06: ["Sound LoS penetration", "70% / 1 wall", "50-80% / 1-2 walls", "Full penetration trivializes position"]
+    CON-07: ["Maelstrom CD", "45s", "30-60s", "Must feel available but not spammable"]
+    CON-08: ["Shattercroon CD", "5s", "4-6s", "Faster than Shaman (10s) but not every GCD"]
+
+  boundary_conditions:
+    - {condition: "Wavecaller never dives (pure healer)", outcome: "Hydration drains to Parched in ~80s. Healing degrades. Biology FORCES diving."}
+    - {condition: "Wavecaller never heals (pure DPS)", outcome: "Party dies within 10-15s under SR2+ pressure. Role failure."}
+    - {condition: "Dry map, no water, extended fight", outcome: "Tidemark every 12s + dive rehydration maintains Damp. Tight but viable."}
+    - {condition: "Aquatic map, full water access", outcome: "~15-20% more effective. Comfortable. Not game-breaking."}
+    - {condition: "Maelstrom Entry + target survives", outcome: "22s with no portals. Walk back. Cold healing. Maximum vulnerability. Punishment for misjudgment."}
+    - {condition: "All Pressure Charges spent, enemy alive", outcome: "Walk out of melee. Cold + potentially Parched. Dangerous but recoverable in 12s."}
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# TUNING LEVERS
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+tuning_levers:
+  if_too_strong:
+    - "Increase Hydration drain rate (land penalty harsher)"
+    - "Reduce Tidemark restore (30 → 20)"
+    - "Increase Cold penalty (70% → 60%)"
+    - "Reduce Breaching Strike refund (0.25 → 0.15)"
+    - "Increase Pressure Charge regen time (12s → 15s)"
+    - "Reduce sound LoS penetration (70% → 50%)"
+
+  if_too_weak:
+    - "Reduce Hydration drain rate (-5/10s → -3/10s)"
+    - "Increase portal rehydration (+25 → +30)"
+    - "Reduce Cold penalty (70% → 80%)"
+    - "Add Hydration bonus from Rain weather (+3 → +5/10s)"
+    - "Reduce Pressure Charge regen (12s → 10s)"
+    - "Increase Echoing Impact heal (30% → 40% Keening Pulse)"
+
+  if_never_diving:
+    - "Increase Hydration drain to force more transit"
+    - "Add DPS check encounters that require healer damage"
+    - "Make Resonant state build SLOWER (require diving breaks for reset)"
+    - "Add environmental triggers that reward portal use"
+
+  if_always_diving:
+    - "Increase Cold penalty (longer rebuild time)"
+    - "Reduce Pressure Charge max (4 → 3)"
+    - "Increase party damage in content (healing demand forces restraint)"
+    - "Make Depths Call even stronger (reward staying to cast)"
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# INTEGRATION TESTS (cross-class)
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+integration_tests:
+  - "Wavecaller+Spiritcaller: Slime Hydration bonus value check (meaningful but not free)"
+  - "Wavecaller+Reaver: Reaver self-sustains during pursuit → frees Wavecaller to dive"
+  - "Wavecaller+Grappler: Pin duration ≥ 2 GCDs for meaningful dive window"
+  - "Wavecaller+Madolt: Parry recovery frames = safe dive signal"
+  - "Wavecaller vs SR4 portal-followers: defensive portal use viable"
+  - "Wavecaller on dry map: 3-minute boss without reaching Desiccated"
+  - "2×Wavecaller party: does one dive while other heals (alternating coverage)"
+  - "Wavecaller + over-50% HP rule: does not over-heal party above safe threshold"
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# OPEN QUESTIONS (LAYER 1)
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+open_questions_layer_1:
+  - "Absolute potency → damage/healing conversion at benchmark MED stat"
+  - "Hydration drain vs encounter duration (does average fight reach Parched?)"
+  - "Pressure Charge full-cycle math (how many dive cycles per 3-minute boss?)"
+  - "Healer HPS vs party incoming DPS at each SR (sustainability check)"
+  - "Sound propagation distance falloff (linear? inverse square? flat 70%?)"
+  - "Portal linger time vs enemy pathfinding speed (do SR3 enemies realistically follow?)"
+  - "Tidemark puddle size vs typical party spread (does 3m radius cover 4-person party?)"
+  - "Geyser Burst execute threshold (30% HP) vs typical elite HP pools"
+
+# ▼ AWAITING: Layer 1 Spatial Quantification Pass
