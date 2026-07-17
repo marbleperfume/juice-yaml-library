@@ -1,11 +1,11 @@
 # Class List — Qualitative Context Pass
 
 **Purpose:** Add qual context to every class so we can work backwards (Qual_class → Qual_strat → Quant).  
-**Source:** Classes/Class_Library.yaml + session design decisions.
+**Source:** Classes/Class_Library.yaml + session design decisions. Access model per DESIGN_OVERRIDE_PROGRESSION.md.
 
 ---
 
-## Base Available (No Merc gate, easy rank-1 on-ramp)
+## Starter Classes (Available from character creation or early narrative)
 
 ### 1. Adafold (Shield Knight)
 - **Race:** Rawrotin (Linfree) — bodyguard/courier
@@ -63,7 +63,7 @@
 
 ---
 
-## Experienced (Mercenary Rank 2 + originating area)
+## Quest-Unlocked Classes (Requires narrative progression + prerequisite trial)
 
 ### 7. Lancer
 - **Race:** Unassigned
@@ -157,7 +157,7 @@
 
 ---
 
-## Special (Mercenary Rank 3, "almost a different game")
+## Advanced Classes (Requires dedicated trial chain — "almost a different game")
 
 ### 17. Dracomancer
 - **Race:** Unassigned (HBD strong fit — closest to dragons, MAGICCAP 18)
