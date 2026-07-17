@@ -150,7 +150,21 @@ Per-role naming prevents:
 
 ---
 
-## 8. Files That Require Revision
+## 8. Supersession Notice
+
+This document supersedes the following content in other files:
+
+| File | Section | What is superseded |
+|------|---------|-------------------|
+| `DESIGN_OVERRIDE.md` §2 | Player Rank table (Low/Merc/Strategist) | Replaced by §3-4 of THIS file |
+| `DESIGN_OVERRIDE.md` §2b | "3-4 (Merc)" feel references | Use R2/R3 labels only |
+| `DESIGN_OVERRIDE.md` §3c, §3e | "Merc+" language | Read as "R2+" |
+| `class_list_qual_context.md` | Section headers | Already updated to narrative access model |
+| Any class YAML | "mercenary_rank" as unlock condition | Read as quest-gated per §2 of this file |
+
+Until these files are individually revised, read them through the lens of THIS document. Where Mercenary Rank language conflicts with this guidebook, this guidebook wins.
+
+### Files Still Requiring Individual Revision
 
 The following files contain Mercenary Rank references that now conflict with this guidebook:
 
