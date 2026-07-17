@@ -25,7 +25,8 @@ header:
   skills_authority: "Wavecaller_Skills.yaml"
   validation_authority: "Wavecaller_Validation.yaml"
   balance_ref: "Combat/BalanceTargets.yaml"
-  last_updated: "2026-07-14"
+  guidebook_ref: "Guidebooks/DESIGN_OVERRIDE_RACIAL_LOCKS.md"
+  last_updated: "2026-07-15"
   design_phase: qualitative_complete
   validation_status: "Awaiting Layer 1 Numerical Pass"
 
@@ -40,21 +41,50 @@ identity:
   tier: Experienced
   role: "Healer / DPS"
   sub_role: "MED-primary (direct healing + drain)"
+
+StatPriority:
+    Primary: MED    # Healing output scaling
+    Secondary: SPD  # GCD reduction + Evasion (Tidepool-enhanced)
+    Tertiary: STR   # Dive emergence damage (physical, melee-coded)
+    Quaternary: NTU # Dive window reads, HP trajectory prediction
+    DumpStat: MAG   # Zero magic. Sound is biological, not arcane.
+    DumpStat2: DEF  # Low innate — relies on Evasion, not DR
+    # Jumpers racial base: MED 14, SPD 12, STR 10, NTU 10, STA 8, DEX 6, MAG 4
   weapon: "Harpoon (trident-style polearm — aquatic hunter identity)"
 
-  unique_passive:
-    type: Biological
-    label: vocal_organ_aquatic
+  racial_lock:
+    type: Race-Exclusive Passives
+    race: Jumpers
+    reference: Guidebooks/DESIGN_OVERRIDE_RACIAL_LOCKS.md
     justification: >
-      Remove the Jumper body, remove the class. No other race has: vocal cords for
-      tissue-repair frequencies + portal glands for spatial rifts + aquatic body for
-      transit survival + hydration-dependent biology. The lock is "this body DOES this"
-      not "this race LEARNED this."
-    required_organs:
-      - "Vocal Apparatus — produces tissue-repair frequencies via acoustic resonance"
-      - "Portal Glands — biological organs secreting hyper-pressurized water for spatial rifts"
-      - "Aquatic Adaptation — pressure-resistant musculature, hydrodynamic body"
-      - "Hydration Dependence — semi-permeable skin, portal glands need water saturation"
+      Only Jumpers access the passive systems that define Wavecaller.
+      No cross-race access — the passives require Jumper physiology to function.
+      The lock is expressed as game mechanics with player decisions, not involuntary biology.
+
+    unique_passives:
+      - name: "Rift Vents"
+        type: "Resource-gated spatial ability"
+        mechanic: "Internal pressure → spatial rift creation. Gated by Pressure Charges (regenerating resource)."
+        player_decision: "When to portal (charges are limited), where to emerge (trajectory locked on entry)."
+        counterplay: "Rift destinations are predictable. Enemies can pre-aim emergence points."
+
+      - name: "Acoustic Healing"
+        type: "Sound-frequency healing system"
+        mechanic: "Vocal output at specific frequencies triggers tissue repair in allies within range."
+        player_decision: "Heal proximity vs range tradeoff. Close = passive aura. Far = directed burst (costs more)."
+        counterplay: "Silence effects shut down healing entirely. Spread formation reduces aura value."
+
+      - name: "Aquatic Transit"
+        type: "Movement passive"
+        mechanic: "No penalty in water terrain. Enhanced speed in aquatic environments. Survives portal transit."
+        player_decision: "Positioning relative to water sources for Tidepool maintenance and escape routes."
+        counterplay: "Fire terrain evaporates Tidepool. Knockback separates from pool."
+
+      - name: "Hydration Dependency"
+        type: "Conditional DR + vulnerability system"
+        mechanic: "DR scales with Hydration gauge (high = armored, low = vulnerable). Passive drain on land."
+        player_decision: "How long to stay grounded (risk) vs dive for Hydration refresh (safe but heals pause)."
+        counterplay: "Fire evaporates Tidepool (5-8s). Knockback separates. Freeze converts pool to ice."
 
   animal_identity:
     core: "Dolphin / Orca / Killer Whale"
@@ -143,7 +173,7 @@ hydration_gauge:
   name: "Hydration"
   range: "0-100"
   description: >
-    Tracks water exposure. Jumper biology is aquatic — skin, portal glands, and
+    Tracks water exposure. Jumper biology is aquatic — skin, rift vents, and
     vocal apparatus all require moisture. High hydration = thriving (full healing,
     normal speed). Low hydration = suffering on land (healing reduced, movement
     SLOWED — not rooted). This IS the land penalty mechanic.
@@ -253,6 +283,20 @@ dual_delivery_system:
       safe windows, execute breach-strike-splash, return before debt becomes fatal.
       Best players look like they never stop healing AND never stop diving.
 
+HealerRatioSplit:
+    Description: >
+      Healing output scales with ally HP deficit — lower HP = stronger heals but
+      proportionally higher resource drain (Hydration consumed faster, Vocal Resonance
+      harder to maintain). This creates natural triage:
+      - Ally at 90% HP: small heal, cheap
+      - Ally at 30% HP: massive heal, expensive (drains Hydration rapidly)
+    DesignInteraction: >
+      Combined with Wavecaller's dive-or-heal tension: if you let allies get LOW
+      before healing, each heal costs MORE resources. Proactive healing is CHEAPER
+      but means fewer dive windows. Reactive healing after extended dives is
+      EXPENSIVE — the structural punishment for greed.
+    Supersedes: "OverFiftyRule (+25% incoming damage above 50% HP) — REMOVED"
+
 # ═══════════════════════════════════════════════════════════════════════════════════
 # ROTATION PHILOSOPHY
 # ═══════════════════════════════════════════════════════════════════════════════════
@@ -287,7 +331,7 @@ rotation_philosophy:
     damage_dive_triggers:
       - "Isolated enemy at low HP (1-2 dive kill)"
       - "Party HP stable at 80%+ (no healing demand)"
-      - "Enemy above 50% HP (+25% damage bonus window)"
+      - "Exploit condition active on target (OffBalance from prior dive, or in Tidepool)"
       - "Backline caster threatening party (interrupt via dive)"
       - "Frontliner has target locked down (free window)"
       - "Hydration low, need portal transit for rehydration"
@@ -315,7 +359,7 @@ resource_system:
     name: "Pressure Charge"
     max_capacity: 4
     description: >
-      Biological water pressure in portal glands. Gates BOTH offense (dives) and
+      Stored tidal pressure in rift vents. Gates BOTH offense (dives) and
       defense (returns). Spending on offense reduces escape. Spending on escape
       reduces future offense.
     generation:
@@ -344,6 +388,12 @@ resource_system:
     no_dive_spam: "4 max Charges, 12s regen, shared offense/defense pool. Math prevents permanent dive uptime."
     zero_rng: "NO Freecure. NO random resets. ALL generation deterministic."
     no_burst_cycle: "NO 2-minute alignment. NO fixed cadence. Pure contextual play."
+
+ManaRelationship: >
+    Wavecaller does NOT use Mana. MagicCapacity is irrelevant (dump stat).
+    All resource gating is via Pressure Charges (rift vent pressure),
+    Hydration Gauge (water dependence), and Vocal Resonance (state-based).
+    No mana bar exists for this class.
 
 # ═══════════════════════════════════════════════════════════════════════════════════
 # ANTI-PATTERNS
@@ -416,7 +466,7 @@ item_baseline:
 
     - item: "Concussion Charge"
       item_function: "Directional blast (area damage) — melee offense tool"
-      class_superiority: "Portal-momentum-enhanced, refunds Pressure Charge, conditional crits, no delay"
+      class_superiority: "Portal-momentum-enhanced, refunds Pressure Charge, Exploit bonus on emergence, no delay"
       replaced_by_ability: "Breaching Strike"
 
     - item: "Thickglass Flask"
@@ -452,19 +502,16 @@ item_baseline:
 system_rules:
   gcd:
     base: "2.0s"
-    cap: "1.4s"
+    floor: "1.2s"
+    note: "Wavecaller's base GCD is 2.0s. SPD reduces via Haste formula. 1.2s is the system floor for high-SPD classes."
     weave_policy: "Single-weave ONLY (one oGCD per GCD window)"
 
-  crit:
+  exploit:
     rng: false
     model: >
-      Positional/conditional only — no random crits. Crit from meeting specific
-      positional or situational conditions (e.g., striking targets above 50% HP,
-      post-dive momentum strikes).
-
-  damage_bonus:
-    greater_than_50_hp: "+25% damage to enemies above 50% HP"
-    description: "Encourages early burst, rewards targeting healthy enemies, aligns with dive-and-burst pattern."
+      ExploitSystem — deterministic bonus damage from conditions (OffBalance,
+      EnvironmentalExposure). No random crit chance, no crit damage multiplier.
+      All bonus damage is player-created via dive positioning or Tidepool placement.
 
   items:
     principle: "Items define baseline. Class abilities permanently replace item functionality."
@@ -491,7 +538,7 @@ section_25_compliance:
     All "cooldowns" are contextual resource decisions, not timer alignments.
     Depths Call (20s CD) is the longest fixed CD on any healing ability.
   conversions_performed:
-    - "Maelstrom Entry: could have been 120s CD — instead gated by 3 Pressure Charges + 10s gland lockout after use"
+    - "Maelstrom Entry: could have been 120s CD — instead gated by 3 Pressure Charges + 10s vent lockout after use"
     - "Rift Dive: could have been 30s CD — instead gated by 1 Pressure Charge (regenerates contextually)"
     - "No ability was designed with ≥90s CD. All gating is resource-inherent from inception."
 
@@ -535,6 +582,103 @@ vulnerability:
     Skill gap is in READING, not EXECUTION. Intentional for Experienced tier.
 
 # ═══════════════════════════════════════════════════════════════════════════════════
+# SURVIVABILITY — TIDEPOOL EVASION MODEL
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+Survivability:
+  Philosophy: >
+    Wavecaller's survivability is NOT Defense/DR (fragile aquatic body, no armor).
+    It is EVASION via a persistent Tidepool that follows the Wavecaller.
+
+    Tidepool:
+      Description: >
+        A constant shallow water pool (3-4m radius) that follows the Wavecaller at
+        all times. Passive effect — ambient moisture maintained by Rift Vent residual
+        output. The Tidepool IS the Wavecaller's defensive layer.
+      Reference: "Guidebooks/DESIGN_OVERRIDE_RACIAL_LOCKS.md — Hydration Dependency passive"
+    Mechanical_Function:
+      - "Evasion boost: SPD-based evasion significantly enhanced while standing in own Tidepool"
+      - "Treated as a portal surface for skill interactions (abilities that require 'portal' can use Tidepool as source/destination)"
+      - "Constant Hydration maintenance: +5/s while Tidepool is active (prevents land dehydration in combat)"
+      - "Allies standing in Tidepool receive minor Hydration benefit (+1/s)"
+      - "Enemies standing in Tidepool receive EnvironmentalExposure Exploit condition"
+    Evasion_Model: >
+      Wavecaller uses SPD-based Evasion as primary survivability. The Tidepool
+      enhances this — water makes the Wavecaller's aquatic body slippery, agile,
+      and difficult to hit. Ranged projectiles deflected by water surface tension
+      at shallow angles. Melee attacks slip off wet skin.
+      Formula: Evasion = SPD × coeff (standard) + Tidepool_bonus (significant while in pool)
+      This answers ranged foes — not immune, but highly evasive within the pool.
+    Portal_Interaction: >
+      The Tidepool counts as a valid portal surface. Skills that generate portals
+      can use the Tidepool as origin point. This means Rift Dive can be cast FROM
+      the Tidepool without generating a separate portal (saving Pressure Charge in
+      some cases, or enabling emergency escapes).
+    Movement: "Follows Wavecaller at movement speed. Brief delay (0.5s) on sudden direction changes."
+    Counterplay:
+      - "Fire/heat abilities evaporate Tidepool temporarily (5-8s, environment-dependent)"
+      - "Desiccant effects accelerate evaporation"
+      - "Forced displacement (knockback) separates Wavecaller from pool briefly"
+      - "Frozen terrain converts pool to ice (no evasion bonus, slippery instead)"
+
+  DefenseFormula: >
+    Wavecaller has LOW base Defense (no armor, aquatic skin). EffectiveDefense =
+    Defense_base + (STA × small_coeff) + Gear. DR% = Def/(Def+K) asymptotic.
+    Primary survivability is Evasion (Tidepool + SPD), NOT damage reduction.
+    sqrt-DR soft cap acknowledged but rarely relevant (Wavecaller doesn't stack Defense).
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# NTU EXPRESSION
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+NTUExpression:
+  BaseNTU: 10  # Moderate — reads team state and dive safety
+  Role: "Healer NTU: reads incoming damage to ALLIES, not personal threats"
+  Reads:
+    NTU_5_ThreatAssessment:
+      Name: "Tidal Sense"
+      UIElement: "HP trajectory overlay on party frames"
+      Reads: "Projected HP in 3-4s based on current incoming damage rate. Green=stable, Yellow=declining, Red=spike incoming"
+    NTU_8_DiveWindow:
+      Name: "Breach Window"
+      UIElement: "Dive target ring color"
+      Reads: "Green=safe to dive (target won't counter), Yellow=risky (target has response ready), Red=will punish emergence"
+    NTU_10_SpikePrediction:
+      Name: "Wave Warning"
+      UIElement: "Pulsing border on party frames"
+      Reads: "Specific ally about to take spike damage (boss telegraph targeting them). Pre-heal window."
+  DesignNote: >
+    Healer NTU is ALLY-FOCUSED. Wavecaller reads TEAM state to determine dive
+    safety windows, not personal evasion needs (that's handled by Tidepool).
+    Higher NTU = better dive timing = more DPS without team deaths.
+
+# ═══════════════════════════════════════════════════════════════════════════════════
+# EXPLOIT SYSTEM
+# ═══════════════════════════════════════════════════════════════════════════════════
+
+ExploitSystem:
+  Philosophy: >
+    Wavecaller applies Exploit through DIVE IMPACT — the physical force of
+    portal emergence displaces and destabilizes targets. Party capitalizes
+    with bonus damage during the brief OffBalance window. Tidepool provides
+    persistent terrain-based Exploit for enemies who step into it.
+  ConditionsApplied:
+    OffBalance:
+      Source: "Rift Dive emergence impact (automatic on landing)"
+      Duration: "2s after emergence"
+      Effect: "Target exploitable — DEX-scaled bonus damage from any source"
+      Reference: "Conditions/Exploit.PlayerInflicted.yaml"
+    EnvironmentalExposure:
+      Source: "Target standing in Wavecaller's Tidepool"
+      Duration: "While in pool + 1s after leaving"
+      Effect: "Exploitable — water-saturated targets take increased damage from party"
+      Reference: "Conditions/Exploit.TerrainInflicted.yaml"
+  NoCritAntiPattern: >
+    Zero random crit chance. All bonus damage is positional (dive emergence)
+    or terrain-conditional (Tidepool). Deterministic. If bonus damage occurs,
+    the player CREATED the condition through dive placement or Tidepool positioning.
+
+# ═══════════════════════════════════════════════════════════════════════════════════
 # CC BUDGET
 # ═══════════════════════════════════════════════════════════════════════════════════
 
@@ -563,7 +707,7 @@ hit_miss_analysis:
     - "Positional tension as skill expression — heal at range vs damage in melee"
     - "Hydration Gauge creates map awareness — water terrain becomes strategic"
     - "Dolphin/orca identity — distinct, physical, fast, kinetically satisfying"
-    - "Biological lock necessity — four organs must coexist, no other race qualifies"
+      - "Race-exclusive passives — four unique systems interlock, no cross-race access (see DESIGN_OVERRIDE_RACIAL_LOCKS.md)"
     - "Punishment rewards game sense not APM — Position × Action × Time"
     - "Speed-interrupt fills unique niche — 5s CD, faster than Shaman, no persistence"
     - "Dive maintains Hydration (positive feedback) — biology rewards aggression, role demands restraint"
