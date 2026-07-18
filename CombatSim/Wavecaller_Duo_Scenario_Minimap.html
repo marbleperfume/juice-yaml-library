@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html><head><style id="qw-theme">:root {
+  --color-bg: #faf9fc;
+  --color-text: #131920;
+  --color-navbar-bg: #f9f9fb;
+  --color-bg-chat-view: #fcfcfd;
+  --color-bg-secondary: #ffffff;
+  --color-bg-tertiary: #f9fafb;
+  --color-bg-hover: #f3f4f6;
+  --color-surface: #f9fafb;
+  --color-surface-hover: #f3f4f6;
+  --color-surface-active: #e5e7eb;
+  --color-border: rgba(0, 0, 0, .12);
+  --color-border-light: rgba(0, 0, 0, .06);
+  --color-border-strong: #d1d5db;
+  --color-primary: #4200db;
+  --color-primary-dark: #35009e;
+  --color-primary-light: #8575ff;
+  --color-primary-bg: #e8e6ff;
+  --color-primary-hover-border: #35009e;
+  --color-nav-icon-active: #4200db;
+  --color-nav-hover-border: #4200db;
+  --color-primary-alpha-3: color-mix(in srgb, #4200db 3%, transparent);
+  --color-primary-alpha-5: color-mix(in srgb, #4200db 5%, transparent);
+  --color-primary-alpha-8: color-mix(in srgb, #4200db 8%, transparent);
+  --color-primary-alpha-12: color-mix(in srgb, #4200db 12%, transparent);
+  --color-primary-alpha-15: color-mix(in srgb, #4200db 15%, transparent);
+  --color-primary-alpha-20: color-mix(in srgb, #4200db 20%, transparent);
+  --color-primary-alpha-25: color-mix(in srgb, #4200db 25%, transparent);
+  --color-primary-alpha-30: color-mix(in srgb, #4200db 30%, transparent);
+  --color-primary-alpha-40: color-mix(in srgb, #4200db 40%, transparent);
+  --color-primary-alpha-50: color-mix(in srgb, #4200db 50%, transparent);
+  --color-primary-alpha-60: color-mix(in srgb, #4200db 60%, transparent);
+  --color-primary-subtle: color-mix(in srgb, #4200db 12%, transparent);
+  --color-primary-border: color-mix(in srgb, #4200db 30%, transparent);
+  --color-focus-ring: color-mix(in srgb, #4200db 50%, transparent);
+  --color-sidebar-hover: color-mix(in srgb, #4200db 12%, transparent);
+  --color-accent: #4200db;
+  --color-accent-foreground: #4200db;
+  --color-accent-dark: #35009e;
+  --color-accent-light: #e8e6ff;
+  --color-accent-inverse: #ffffff;
+  --color-link: #4200db;
+  --color-primary-gradient-end: #e8e6ff;
+  --color-primary-bg-solid: #e8e6ff;
+  --color-user-bubble: #F3F3F7;
+  --color-user-bubble-text: #131920;
+  --color-text-secondary: #5e5e5e;
+  --color-text-tertiary: #656871;
+  --color-text-muted: #9ca3af;
+  --color-text-on-primary: #ffffff;
+  --color-success: #00802f;
+  --color-success-dark: #00471e;
+  --color-success-light: #d9ffd6;
+  --color-success-hover: #005c26;
+  --color-success-bg: #e6f5eb;
+  --color-success-border: #b3d9bf;
+  --color-success-foreground: #00802f;
+  --color-success-dark-foreground: #00471e;
+  --color-success-text: #00471e;
+  --color-error: #db0000;
+  --color-error-dark: #700000;
+  --color-error-light: #ffe0e0;
+  --color-error-hover: #ffe0e0;
+  --color-error-bg: #fceaea;
+  --color-error-border: #f2cccc;
+  --color-error-active-border: #db0000;
+  --color-error-foreground: #db0000;
+  --color-error-dark-foreground: #700000;
+  --color-error-inverse: #ffffff;
+  --color-error-text: #700000;
+  --color-warning: #f2b100;
+  --color-warning-dark: #573a00;
+  --color-warning-light: #fffbbd;
+  --color-warning-hover: #db9200;
+  --color-warning-bg: #fef7e6;
+  --color-warning-border: #f9dfa3;
+  --color-warning-foreground: #f2b100;
+  --color-warning-dark-foreground: #573a00;
+  --color-warning-inverse: #573a00;
+  --color-surface-warning: #fffbbd;
+  --color-text-warning: #573a00;
+  --color-info: #006ce0;
+  --color-info-dark: #002a66;
+  --color-info-light: #d1f1ff;
+  --color-info-hover: #003b8f;
+  --color-info-bg: #ebf3fc;
+  --color-info-border: #b3d1f0;
+  --color-info-foreground: #006ce0;
+  --color-info-dark-foreground: #002a66;
+  --color-info-inverse: #ffffff;
+  --color-overlay: rgba(0, 0, 0, .5);
+  --color-shadow: rgba(0, 0, 0, .08);
+  --color-hover: rgba(0, 0, 0, .05);
+  --color-tooltip-bg: rgba(0, 0, 0, .85);
+  --color-tooltip-text: #ffffff;
+  --color-voice-purple: #8575ff;
+  --color-voice-purple-dark: #4200db;
+  --color-voice-purple-light: #8575ff;
+  --color-voice-red: #db0000;
+  --color-voice-red-dark: #700000;
+  --color-voice-amber: #f2b100;
+  --color-voice-purple-glow: rgba(66, 0, 219, .4);
+  --color-voice-red-glow: rgba(219, 0, 0, .4);
+  --font-sans: "Amazon Ember", "Helvetica Neue", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "SF Mono", "Monaco", "Menlo", "Consolas", monospace;
+  --text-2xs: .5625rem;
+  --text-xs: .625rem;
+  --text-sm: .6875rem;
+  --text-base: .75rem;
+  --text-md: .8125rem;
+  --text-lg: .875rem;
+  --text-xl: 1rem;
+  --text-2xl: 1.125rem;
+  --text-3xl: 1.25rem;
+  --text-4xl: 1.5rem;
+  --text-5xl: 2rem;
+  --spacing-1: calc(.25rem * 1);
+  --spacing-1-5: calc(.25rem * 1.5);
+  --spacing-2: calc(.25rem * 2);
+  --spacing-3: calc(.25rem * 3);
+  --spacing-4: calc(.25rem * 4);
+  --spacing-5: calc(.25rem * 5);
+  --spacing-6: calc(.25rem * 6);
+  --spacing-7: calc(.25rem * 7);
+  --spacing-8: calc(.25rem * 8);
+  --spacing-9: calc(.25rem * 9);
+  --spacing-10: calc(.25rem * 10);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-card: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 8px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, .08);
+  --color-success-bg-solid: #d9ffd6;
+  --color-error-bg-solid: #ffe0e0;
+  --color-error-border-solid: #ffe0e0;
+  --color-warning-bg-solid: #fffbbd;
+  --color-warning-text: #573a00;
+  --color-info-bg-solid: #d1f1ff;
+  --color-info-bg-solid-alt: #d1f1ff;
+  --color-info-text: #002a66;
+  --color-info-text-alt: #002a66;
+  --color-emerald: #10b981;
+  --color-teal: #4ecdc4;
+  --color-code-bg: #F3F3F7;
+  --color-code-header-bg: #f1f3f5;
+  --color-code-text: #24292e;
+  --color-code-border: #e1e4e8;
+  --color-code-muted: #6a737d;
+  --color-inline-code-bg: #F3F3F7;
+  --color-inline-code-text: #24292e;
+  --color-inline-code-border: #e1e4e8;
+  --color-scrollbar-thumb: #d1d5db;
+  --color-scrollbar-track: transparent;
+  --color-graph-node-text: #333333;
+  --color-graph-node-text-dim: #7F8C8D;
+  --color-graph-edge-default: #95A5A6;
+  --color-graph-edge-cross: #E67E22;
+  --color-graph-edge-text: #666666;
+  --color-graph-edge-stroke: #ffffff;
+  --color-graph-highlight-bg: #FF6B6B;
+  --color-graph-highlight-border: #E74C3C;
+  --color-graph-search-bg: #FFD700;
+  --color-graph-search-border: #FFA500;
+  --color-graph-focus-border: #C0392B;
+  --color-graph-external-border: #95A5A6;
+  --color-graph-cat-file: #3498DB;
+  --color-graph-cat-folder: #7F8C8D;
+  --color-graph-cat-file-aggregate: #2980B9;
+  --color-graph-cat-class: #9B59B6;
+  --color-graph-cat-function: #2ECC71;
+  --color-graph-cat-method: #1ABC9C;
+  --color-graph-cat-variable: #F39C12;
+  --color-graph-cat-import: #D35400;
+  --color-graph-cat-module: #5B6ABF;
+  --color-graph-cat-concept: #E74C3C;
+  --color-graph-cat-person: #FF6B6B;
+  --color-graph-cat-org: #4ECDC4;
+  --color-graph-cat-organization: #4ECDC4;
+  --color-graph-cat-product: #A29BFE;
+  --color-graph-cat-metric: #FD79A8;
+  --color-graph-cat-location: #34495E;
+  --color-graph-cat-date: #E056A0;
+  --color-graph-cat-code: #3498DB;
+  --color-graph-cat-doc: #7F8C8D;
+  --color-graph-cat-url: #00B894;
+  --color-graph-cat-email: #6C5CE7;
+  --color-graph-cat-unknown: #BDC3C7;
+  --color-graph-rel-contains: #BDC3C7;
+  --color-graph-rel-extends: #9B59B6;
+  --color-graph-rel-implements: #3498DB;
+  --color-graph-rel-imports: #E67E22;
+  --color-graph-rel-uses: #2ECC71;
+  --color-graph-rel-calls: #27AE60;
+  --color-graph-rel-references: #F39C12;
+  --color-graph-rel-related-to: #95A5A6;
+  --color-graph-rel-works-on: #E74C3C;
+  --color-graph-rel-owns: #1ABC9C;
+  --color-graph-rel-depends-on: #E67E22;
+  --color-graph-rel-parent-of: #BDC3C7;
+  --qs-content: #fff;
+  --qs-main: #fff;
+  --qs-primary-foreground: #131920;
+  --qs-secondary-foreground: #656871;
+  --qs-tertiary-foreground: #9ca3af;
+  --qs-placeholder-foreground: #8c8c94;
+  --qs-divider: #dedee3;
+  --qs-default-border: #8c8c94;
+  --qs-neutral-soft: #b4b4bb;
+  --qs-neutral-gray-50: #f9fafb;
+  --qs-tertiary-background: #f9fafb;
+  --qs-action-hover: #f3f3f7;
+  --qs-primary-default: #4200db;
+  --qs-primary-dark: #35009e;
+  --qs-primary-light: #e8e6ff;
+  --qs-success-default: #00802f;
+  --qs-error-default: #db0000;
+  --qs-font-sans: "Amazon Ember", "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
+  --qs-font-family: "Amazon Ember", "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
+  --qs-font-base-letter-spacing: .15px;
+  --qs-shadow-sm: 0 0 2px 0 #00000029, 0 0 4px 0 #00000029;
+  --qs-shadow-md: 0 0 2px 0 #00000029, 0 2px 8px 1px #00000029;
+  --qs-shadow-lg: 0 4px 16px 4px #00000029, 0 2px 6px 1px #00000029;
+  --qs-shadow-xl: 0 4px 8px 2px #00000029, 0 6px 20px 4px #00000029;
+  --qs-width-modal-sm: 384px;
+  --qs-width-modal-md: 600px;
+  --qs-width-modal-lg: 1136px;
+  --qs-grid-gap: 16px;
+  --qs-grid-gap-xl: 24px;
+  --qs-primary-medium: #8575ff;
+  --qs-primary-inverse: #fff;
+  --qs-neutral-lightest: #f9f9fb;
+  --qs-neutral-light: #f3f3f7;
+  --qs-neutral-default: #dedee3;
+  --qs-neutral-medium: #8c8c94;
+  --qs-neutral-deep: #656871;
+  --qs-neutral-dark: #333843;
+  --qs-neutral-strong: #131920;
+  --qs-neutral-white: #fff;
+  --qs-neutral-black: #000;
+  --qs-success-medium: #005c26;
+  --qs-success-dark: #00471e;
+  --qs-success-light: #d9ffd6;
+  --qs-success-inverse: #fff;
+  --qs-info-default: #006ce0;
+  --qs-info-medium: #003b8f;
+  --qs-info-dark: #002a66;
+  --qs-info-light: #d1f1ff;
+  --qs-info-inverse: #fff;
+  --qs-warning-default: #f2b100;
+  --qs-warning-medium: #db9200;
+  --qs-warning-dark: #573a00;
+  --qs-warning-light: #fffbbd;
+  --qs-warning-inverse: #573a00;
+  --qs-warning-experimental: #f2b100;
+  --qs-warning-experimental-light: #fffbbd;
+  --qs-warning-experimental-light-foreground: #fffbbd;
+  --qs-error-medium: #900;
+  --qs-error-dark: #700000;
+  --qs-error-light: #ffe0e0;
+  --qs-error-inverse: #fff;
+  --qs-connection-default: #db3300;
+  --qs-connection-soft: #ff997a;
+  --qs-connection-light: #ffe0d6;
+  --qs-connection-dark: #661800;
+  --qs-automation-default: #b3008f;
+  --qs-automation-medium: #d600ba;
+  --qs-automation-soft: #ff94f1;
+  --qs-automation-light: #ffe0fb;
+  --qs-automation-dark: #660052;
+  --qs-insight-default: #a000b8;
+  --qs-insight-soft: #f299ff;
+  --qs-insight-light: #fce6ff;
+  --qs-insight-dark: #590066;
+  --qs-visualization-default: #7300e5;
+  --qs-visualization-soft: #d4a8ff;
+  --qs-visualization-light: #f2e5ff;
+  --qs-visualization-dark: #45008a;
+  --qs-spice: #ff9800;
+  --qs-coachmark: #006ce0;
+  --qs-brand: #fff;
+  --qs-brand-foreground: #131920;
+  --qs-brand-navbar: #131920;
+  --qs-brand-navbar-foreground: #fff;
+  --qs-brand-navbar-light: #dedee3;
+  --qs-brand-navbar-dark: #000;
+  --qs-application-navbar: #4200db;
+  --qs-application-navbar-foreground: #fff;
+  --qs-application-navbar-light: #e8e6ff;
+  --qs-application-navbar-dark: #35009e;
+  --qs-dimension: #4200db;
+  --qs-dimension-foreground: #fff;
+  --qs-dimension-experimental: #4200db;
+  --qs-dimension-experimental-foreground: #4200db;
+  --qs-measure: #00802f;
+  --qs-measure-foreground: #fff;
+  --qs-measure-experimental: #f2b100;
+  --qs-measure-experimental-foreground: #f2b100;
+  --qs-content-inverse: #333843;
+  --qs-content-inverse-active: #131920;
+  --qs-secondary: #dedee3;
+  --qs-disabled: #8c8c94;
+  --qs-divider-light: #f3f3f7;
+  --qs-hover-border: #333843;
+  --qs-active-border: #4200db;
+  --qs-disabled-border: #dedee3;
+  --qs-error-border: #ffe0e0;
+  --qs-error-active-border: #db0000;
+  --qs-disabled-foreground: #b4b4bb;
+  --qs-primary-inverse-foreground: #fff;
+  --qs-error-foreground: #db0000;
+  --qs-contrast-foreground: #131920;
+  --qs-main-foreground: #131920;
+  --qs-main-secondary-foreground: #656871;
+  --qs-action-disabled: #f3f3f7;
+  --qs-action-active: #e8e6ff;
+  --qs-default-badge: #dedee3;
+  --qs-tag-default: #dedee3;
+  --qs-tag-soft-border: #b4b4bb;
+  --qs-focus-offset: 1px;
+  --qs-toggle-tile-sm: calc(.25rem * 8);
+  --qs-toggle-tile-md: calc(.25rem * 12);
+  --qs-toggle-tile-lg: calc(.25rem * 15);
+  --qs-shadow-pin-right: inset 4px 0 4px -4px #00000029;
+  --qs-shadow-pin-left: inset -4px 0 4px -4px #00000029;
+  --react-pdf-text-layer: 1;
+  --highlight-bg-color: rgba(180, 0, 170, 1);
+  --highlight-selected-bg-color: rgba(0, 100, 0, 1);
+  --react-pdf-annotation-layer: 1;
+  --annotation-unfocused-field-background: url("data:image/svg+xml;charset=UTF-8,<svg width='1px' height='1px' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' style='fill:rgba(0, 54, 255, 0.13);'/></svg>");
+  --input-focus-border-color: Highlight;
+  --input-focus-outline: 1px solid Canvas;
+  --input-unfocused-border-color: transparent;
+  --input-disabled-border-color: transparent;
+  --input-hover-border-color: black;
+  --link-outline: none;
+  color-scheme: light;
+}
+body { background: var(--color-bg); color: var(--color-text); }
+a { color: var(--color-link, var(--color-primary)); }</style><meta charset="UTF-8">
+<style>
+body { background: var(--color-bg, #ffffff); font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif); color: var(--color-text, #172b4d); margin: 0; padding: 20px; }
+h2 { margin: 0 0 16px; font-size: 18px; font-weight: 600; }
+.minimap-container { position: relative; width: 100%; max-width: 700px; margin: 0 auto; }
+.map-canvas { width: 100%; height: 520px; background: var(--color-bg-secondary, #f4f5f7); border: 1px solid var(--color-border, #dfe1e6); border-radius: 8px; position: relative; overflow: hidden; }
+.entity { position: absolute; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; border-radius: 50%; text-align: center; z-index: 2; }
+.entity.wavecaller { width: 32px; height: 32px; background: #0065ff; color: white; border: 2px solid #003d99; }
+.entity.frontliner { width: 32px; height: 32px; background: #36b37e; color: white; border: 2px solid #1e7a50; }
+.entity.enemy-melee { width: 22px; height: 22px; background: #de350b; color: white; border: 2px solid #991f00; }
+.entity.enemy-archer { width: 22px; height: 22px; background: #ff5630; color: white; border: 2px solid #cc2200; }
+.entity.enemy-bomber { width: 22px; height: 22px; background: #ff991f; color: #172b4d; border: 2px solid #cc7a00; font-size: 9px; }
+.entity.enemy-rusher { width: 22px; height: 22px; background: #de350b; color: white; border: 2px solid #991f00; }
+.problem-circle { position: absolute; border: 3px dashed #de350b; border-radius: 50%; z-index: 1; opacity: 0.7; }
+.problem-label { position: absolute; font-size: 11px; font-weight: 600; color: #de350b; z-index: 3; background: rgba(255,255,255,0.9); padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
+.range-circle { position: absolute; border: 2px solid rgba(0,101,255,0.3); border-radius: 50%; z-index: 0; background: rgba(0,101,255,0.04); }
+.range-label { position: absolute; font-size: 9px; color: rgba(0,101,255,0.6); z-index: 0; }
+.tidepool { position: absolute; width: 40px; height: 40px; border-radius: 50%; background: radial-gradient(circle, rgba(0,101,255,0.15), rgba(0,101,255,0.05)); border: 1px solid rgba(0,101,255,0.2); z-index: 0; }
+.elevation { position: absolute; background: var(--color-border-light, #ebecf0); border: 1px solid var(--color-border, #dfe1e6); border-radius: 4px; z-index: 0; }
+.elevation-label { position: absolute; font-size: 9px; color: var(--color-text-muted, #8993a4); }
+.path-arrow { position: absolute; z-index: 1; }
+.legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; font-size: 11px; }
+.legend-item { display: flex; align-items: center; gap: 4px; }
+.legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+.phase-tabs { display: flex; gap: 4px; margin-bottom: 12px; }
+.phase-tab { padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid var(--color-border, #dfe1e6); background: var(--color-bg-secondary, #f4f5f7); color: var(--color-text-secondary, #44546f); transition: all 0.15s; }
+.phase-tab:hover { background: var(--color-surface-hover, #eef0f3); }
+.phase-tab.active { background: #0065ff; color: white; border-color: #0065ff; }
+.verdict-box { margin-top: 16px; padding: 12px 16px; border-radius: 8px; font-size: 12px; line-height: 1.5; }
+.verdict-box.pass { background: rgba(54,179,126,0.1); border: 1px solid rgba(54,179,126,0.3); }
+.verdict-box.warn { background: rgba(255,153,31,0.1); border: 1px solid rgba(255,153,31,0.3); }
+.verdict-box.fail { background: rgba(222,53,11,0.1); border: 1px solid rgba(222,53,11,0.3); }
+.distance-line { position: absolute; z-index: 1; }
+svg.overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+</style>
+</head>
+<body>
+<h2>Wavecaller Duo Scenario — Minimap</h2>
+
+<div class="phase-tabs">
+  <div class="phase-tab active" data-phase="1">Phase 1 (0-22s)</div>
+  <div class="phase-tab" data-phase="2">Phase 2 (22-44s)</div>
+  <div class="phase-tab" data-phase="3">Phase 3 (44-66s)</div>
+</div>
+
+<div class="minimap-container">
+  <div class="map-canvas" id="map">
+    <!-- Elevation platforms -->
+    <div class="elevation" id="cliff-left" style="left: 40px; top: 30px; width: 100px; height: 60px;"></div>
+    <div class="elevation-label" style="left: 50px; top: 34px;">Cliff +8m</div>
+    <div class="elevation" id="floor-right" style="right: 60px; top: 60px; width: 90px; height: 50px;"></div>
+    <div class="elevation-label" style="right: 70px; top: 64px;">2F +5m</div>
+
+    <!-- SVG overlay for lines and arrows -->
+    <svg class="overlay" id="svg-overlay"></svg>
+
+    <!-- Heal range circle (centered on Wavecaller) -->
+    <div class="range-circle" id="heal-range"></div>
+    <div class="range-label" id="heal-range-label">20m heal range</div>
+
+    <!-- Tidepool -->
+    <div class="tidepool" id="tidepool"></div>
+
+    <!-- Entities will be positioned by JS -->
+    <div class="entity wavecaller" id="wavecaller">WC</div>
+    <div class="entity frontliner" id="frontliner">FL</div>
+
+    <!-- Center melee x5 -->
+    <div class="entity enemy-melee" id="cm1">M</div>
+    <div class="entity enemy-melee" id="cm2">M</div>
+    <div class="entity enemy-melee" id="cm3">M</div>
+    <div class="entity enemy-melee" id="cm4">M</div>
+    <div class="entity enemy-melee" id="cm5">M</div>
+
+    <!-- Bombers x2 -->
+    <div class="entity enemy-bomber" id="b1">B</div>
+    <div class="entity enemy-bomber" id="b2">B</div>
+
+    <!-- Archers x3 -->
+    <div class="entity enemy-archer" id="a1">A</div>
+    <div class="entity enemy-archer" id="a2">A</div>
+    <div class="entity enemy-archer" id="a3">A</div>
+
+    <!-- Rushers x3 -->
+    <div class="entity enemy-rusher" id="r1">R</div>
+    <div class="entity enemy-rusher" id="r2">R</div>
+    <div class="entity enemy-rusher" id="r3">R</div>
+
+    <!-- Problem circles -->
+    <div class="problem-circle" id="problem1" style="display:none;"></div>
+    <div class="problem-circle" id="problem2" style="display:none;"></div>
+    <div class="problem-circle" id="problem3" style="display:none;"></div>
+    <div class="problem-label" id="plabel1" style="display:none;"></div>
+    <div class="problem-label" id="plabel2" style="display:none;"></div>
+    <div class="problem-label" id="plabel3" style="display:none;"></div>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#0065ff;"></div> Wavecaller</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#36b37e;"></div> Frontliner</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#de350b;"></div> Melee / Rushers</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ff5630;"></div> Archers</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ff991f;"></div> Bombers</div>
+  <div class="legend-item"><div class="legend-dot" style="border:2px dashed #de350b; width:10px; height:10px;"></div> Problem zone</div>
+  <div class="legend-item"><div class="legend-dot" style="border:2px solid rgba(0,101,255,0.3); background:rgba(0,101,255,0.05); width:10px; height:10px;"></div> Heal range</div>
+</div>
+
+<div class="verdict-box pass" id="verdict">
+  <strong>Phase 1 — ✅ KEEPS UP</strong><br>
+  15m gap. Frontliner within heal range. Rushers addressable with 1 dive cycle (2 charges). Hydration stable via Tidepool. Resonance builds to Warm/Resonant.
+</div>
+
+<script>
+const mapW = 700, mapH = 520;
+// Convert game meters to pixels (scale: ~8px per meter)
+const scale = 8;
+
+// All positions in game-meters, origin = bottom-center of map
+// Map pixel coords: x=left, y=top (0,0 = top-left)
+function gameToPixel(gx, gy) {
+  // gx: left/right from center (- = left, + = right)
+  // gy: forward distance from start (0 = Wavecaller start position)
+  const px = mapW/2 + gx * scale;
+  const py = mapH - 60 - gy * scale; // 60px margin from bottom
+  return [px, py];
+}
+
+const phases = {
+  1: {
+    wavecaller: [0, 0],
+    frontliner: [0, 15],
+    centerMelee: [[0,16],[-2,14],[2,14],[-1,17],[1,17]],
+    bombers: [[8,30],[12,32]],
+    archers: [[-18,35],[-20,37],[-16,36]],
+    rushers: [[-3,6],[0,5],[3,6]], // arriving at WC
+    problems: [
+      {x:0, y:3, r:50, label:"Rushers arriving (t=6s)\n2 charges to address"},
+    ],
+    verdict: {cls:"pass", html:"<strong>Phase 1 — ✅ KEEPS UP</strong><br>15m gap. Frontliner within heal range. Rushers addressable with 1 dive cycle (2 charges). Hydration stable via Tidepool. Resonance builds to Warm/Resonant."}
+  },
+  2: {
+    wavecaller: [0, 0],
+    frontliner: [5, 30],
+    centerMelee: [], // dead
+    bombers: [[8,30],[12,32]],
+    archers: [[-18,35],[-20,37],[-16,36]],
+    rushers: [[-2,2],[0,1],[2,2]], // on WC
+    problems: [
+      {x:0, y:15, r:80, label:"OUT OF RANGE (30m > 20m heal)"},
+      {x:0, y:1, r:40, label:"Rushers ON Wavecaller"},
+      {x:8, y:31, r:45, label:"Bombers dropping AoE on path"},
+    ],
+    verdict: {cls:"warn", html:"<strong>Phase 2 — ⚠️ BARELY SOLVENT</strong><br>30m gap. Heal range exceeded by 10m. Must spend 1+ charge on pure MOVEMENT. Rushers still alive and on you. Every option costs resources budgeted for healing. 8s healing blackout on frontliner."}
+  },
+  3: {
+    wavecaller: [0, 0],
+    frontliner: [-15, 36],
+    centerMelee: [],
+    bombers: [], // dead
+    archers: [[-18,35],[-20,37],[-16,36]],
+    rushers: [], // dead or irrelevant
+    problems: [
+      {x:-8, y:18, r:130, label:"40m+ gap — ZERO heal coverage"},
+      {x:-17, y:36, r:55, label:"Elevation gap — sound blocked"},
+    ],
+    verdict: {cls:"fail", html:"<strong>Phase 3 — ✗ FAILS</strong><br>40m+ total distance (forward + lateral + elevation). Acoustic healing cannot reach. Rift Dive forward costs 1 charge for pure movement + resets Resonance. Frontliner is UNHEALED for entire phase unless Wavecaller burns 1-2 charges just to reposition."}
+  }
+};
+
+function posEntity(el, gx, gy) {
+  const [px, py] = gameToPixel(gx, gy);
+  el.style.left = (px - el.offsetWidth/2) + 'px';
+  el.style.top = (py - el.offsetHeight/2) + 'px';
+}
+
+function renderPhase(n) {
+  const p = phases[n];
+  const wc = document.getElementById('wavecaller');
+  const fl = document.getElementById('frontliner');
+
+  posEntity(wc, ...p.wavecaller);
+  posEntity(fl, ...p.frontliner);
+
+  // Tidepool under wavecaller
+  const tp = document.getElementById('tidepool');
+  const [tpx, tpy] = gameToPixel(...p.wavecaller);
+  tp.style.left = (tpx - 20) + 'px';
+  tp.style.top = (tpy - 20) + 'px';
+
+  // Heal range circle
+  const hr = document.getElementById('heal-range');
+  const rangeR = 20 * scale; // 20m in pixels
+  const [wcx, wcy] = gameToPixel(...p.wavecaller);
+  hr.style.width = (rangeR*2) + 'px';
+  hr.style.height = (rangeR*2) + 'px';
+  hr.style.left = (wcx - rangeR) + 'px';
+  hr.style.top = (wcy - rangeR) + 'px';
+  const hrl = document.getElementById('heal-range-label');
+  hrl.style.left = (wcx + rangeR + 4) + 'px';
+  hrl.style.top = (wcy - 6) + 'px';
+
+  // Center melee
+  const cms = ['cm1','cm2','cm3','cm4','cm5'];
+  cms.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (i < p.centerMelee.length) {
+      el.style.display = 'flex';
+      posEntity(el, ...p.centerMelee[i]);
+    } else {
+      el.style.display = 'none';
+    }
+  });
+
+  // Bombers
+  ['b1','b2'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (i < p.bombers.length) {
+      el.style.display = 'flex';
+      posEntity(el, ...p.bombers[i]);
+    } else { el.style.display = 'none'; }
+  });
+
+  // Archers
+  ['a1','a2','a3'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (i < p.archers.length) {
+      el.style.display = 'flex';
+      posEntity(el, ...p.archers[i]);
+    } else { el.style.display = 'none'; }
+  });
+
+  // Rushers
+  ['r1','r2','r3'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (i < p.rushers.length) {
+      el.style.display = 'flex';
+      posEntity(el, ...p.rushers[i]);
+    } else { el.style.display = 'none'; }
+  });
+
+  // Problem circles
+  ['problem1','problem2','problem3'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    const lbl = document.getElementById('plabel'+(i+1));
+    if (i < p.problems.length) {
+      const prob = p.problems[i];
+      const [px, py] = gameToPixel(prob.x, prob.y);
+      el.style.display = 'block';
+      el.style.width = prob.r*2 + 'px';
+      el.style.height = prob.r*2 + 'px';
+      el.style.left = (px - prob.r) + 'px';
+      el.style.top = (py - prob.r) + 'px';
+      lbl.style.display = 'block';
+      lbl.textContent = prob.label;
+      lbl.style.left = (px + prob.r + 6) + 'px';
+      lbl.style.top = (py - 8) + 'px';
+    } else {
+      el.style.display = 'none';
+      lbl.style.display = 'none';
+    }
+  });
+
+  // SVG line from WC to FL showing distance
+  const svg = document.getElementById('svg-overlay');
+  const [wx, wy] = gameToPixel(...p.wavecaller);
+  const [fx, fy] = gameToPixel(...p.frontliner);
+  const dist = Math.sqrt(Math.pow(p.frontliner[0]-p.wavecaller[0],2) + Math.pow(p.frontliner[1]-p.wavecaller[1],2));
+  const inRange = dist <= 20;
+  svg.innerHTML = `
+    <line x1="${wx}" y1="${wy}" x2="${fx}" y2="${fy}" 
+          stroke="${inRange ? 'rgba(54,179,126,0.5)' : 'rgba(222,53,11,0.6)'}" 
+          stroke-width="2" stroke-dasharray="${inRange ? '' : '6,4'}"/>
+    <text x="${(wx+fx)/2 + 8}" y="${(wy+fy)/2}" 
+          font-size="11" font-weight="600" 
+          fill="${inRange ? '#36b37e' : '#de350b'}">${Math.round(dist)}m</text>
+  `;
+
+  // Verdict
+  const v = document.getElementById('verdict');
+  v.className = 'verdict-box ' + p.verdict.cls;
+  v.innerHTML = p.verdict.html;
+}
+
+// Tab switching
+document.querySelectorAll('.phase-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.phase-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    renderPhase(parseInt(tab.dataset.phase));
+  });
+});
+
+// Initial render
+renderPhase(1);
+</script>
+</body></html>
